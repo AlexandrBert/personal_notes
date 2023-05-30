@@ -78,7 +78,7 @@ int shmget(key_t key, size_t size, int shmflg);
             当保留交换空间时，可以保证可以修改该段。
             当交换空间未被保留时，如果没有可用的物理内存，则可能会在写入时获得SIGSEGV。
 返回值：
-    成功：返回有效的共享内存段的标识符；
+    成功：返回有效的共享内存段的标识符shmid；
     失败：-1，并把错误设置到errno。  
 */
 ```
@@ -112,6 +112,10 @@ int shmget(key_t key, size_t size, int shmflg);
   - 该实现对每个进程的共享内存段的最大数量（`SHMSEG`）没有特定限制。
 - 在Linux 2.3.30版本之前，Linux将为计划删除的共享内存段上的`shmget()`返回值 `EIDRM ` 。
 
+**个人使用中的问题**
+- `shmget()` 函数在使用过程中，如果使用的key已经创建过了一个共享内存，会导致函数直接返回-1，错误是共享内存已存在，不能通过这个函数获取到这个已经存在的`shmid`了。
+
+
 ### ftok() 函数创建key
 ```c
 #include <sys/types.h>
@@ -142,6 +146,13 @@ key_t ftok(const char *pathname, int proj_id);
 
 ### shmat() 函数
 ```c
+
+/* Flags for `shmat'.  */
+#define SHM_RDONLY	010000		/* attach read-only else read-write */
+#define SHM_RND		020000		/* round attach address to SHMLBA */
+#define SHM_REMAP	040000		/* take-over region on attach */
+#define SHM_EXEC	0100000		/* execution access */
+
 #include <sys/types.h>
 #include <sys/shm.h>
 
@@ -155,12 +166,7 @@ void *shmat(int shmid, const void *shmaddr, int shmflg);
     shmid：共享内存区域的标识符；
     shmaddr：指定共享内存attach到进程地址空间的起始地址，通常是NULL（系统自动选择合适的地址）；
     shmflg：标志位，通常为0（表示不进行特殊操作）.
-        0:表示只读映射，如果该内存区域是只读的，那么映射后的数据也是只读的。
-        1:表示写保护映射，如果该内存区域是写保护的，那么映射后的数据也是只读的。
-        2:表示独占映射，如果该内存区域已经被其他进程占用了，那么会返回一个错误码。
-        3:表示同步映射，如果该内存区域是需要同步访问的，那么在访问时需要进行信号量操作。
-        4:表示自动对齐映射，如果该内存区域是按照非对齐方式分配的，那么会进行对齐操作。
-        5:表示内存映射文件标志，用于支持 mmap() 函数。
+        0 ：以读写模式访问共享内存。
 返回值：
     成功：返回有效的共享内存段的标识符
     失败：(void *) -1，并把错误设置到errno。  
@@ -230,6 +236,10 @@ int shmdt(const void *shmaddr);
 
 ### shmctl() 函数
 ```c
+/* Commands for `shmctl'.  */
+#define SHM_LOCK	11		/* lock segment (root only) */
+#define SHM_UNLOCK	12		/* unlock segment (root only) */
+
 #include <sys/types.h>
 #include <sys/shm.h>
 
