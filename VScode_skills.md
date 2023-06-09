@@ -29,3 +29,18 @@
 > 假设解压后放在 ` C:\Program Files\mingw64 ` 目录，则在系统环境变量中添加一个环境变量 ` C:\Program Files\mingw64\bin ` 。
 
 - 完成上述步骤后，通过命令行 `gcc -v` 以及 `gdb -v` 就可以查看是否安装成功，这一步需要重新打开 VScode 才会生效。
+
+
+
+## 工作区独立编码 ##
+由于不同的项目所用的默认编码格式不同，所以选择在不同的工作区使用不同的编码格式，可以通过设置工作区下 `.vscode` 文件夹中的文件 `settings.json` 文件进行修改单独的工作区设置，直接根据现有格式在工作区目录下添加配置即可。
+
+具体的设置变量名可以通过先查看首选项设置中的英文名称，在`帮助文档` 路径或网站: [getstarted/settings](https://code.visualstudio.com/docs/getstarted/settings) 搜索查看。
+
+如想要改变每个工作区的默认编码，可以在 `settings.json` 文件中添加：
+
+>`"files.encoding": "utf8"`
+
+修改完成后重新打开文件就发现编码自动转换成功了。
+
+也可以通过首选项设置中的工作区编码修改，但是可能有其他原因会导致不生效，保险起见最好直接修改 `settings.json` 文件。
