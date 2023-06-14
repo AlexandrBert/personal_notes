@@ -112,7 +112,7 @@ Link with -pthread.
 ```
 
 ## POSIX 无名信号量
-### 创建/打开函数 sem_open()
+### 创建/打开函数 sem_init()
 ```C
 #include <semaphore.h>
 
