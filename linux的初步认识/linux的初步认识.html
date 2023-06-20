@@ -1,0 +1,1797 @@
+<html lang="zh-cn" style="--olcb-folder-code-block-max-height: 80vh; --cnb-code-bg: rgb(245, 245, 245); --cnb-code-font-size: 12px; --cnb-code-color: rgb(68, 68, 68);"><head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="never">
+    <meta name="description" content="1. Linux操作系统概述 组成结构 kernel:内核，包围在硬件之上 作用：管理设备、进程、内存、交换空间、文件系统、精灵进程等； 控制系统程序与硬件之间打交道的功能 shell：外壳，包裹在内核之上 作用：提供人机交互界面，用户与内核之间打交道的功能，类似windows的cmd 分类：不同的">
+    <meta property="og:description" content="1. Linux操作系统概述 组成结构 kernel:内核，包围在硬件之上 作用：管理设备、进程、内存、交换空间、文件系统、精灵进程等； 控制系统程序与硬件之间打交道的功能 shell：外壳，包裹在内核之上 作用：提供人机交互界面，用户与内核之间打交道的功能，类似windows的cmd 分类：不同的">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Linux基础使用学习笔记 - ray963 - 博客园</title>
+    <link id="favicon" rel="shortcut icon" href="" type="image/svg+xml">
+    
+    <style>#home :not(.cnblogs_code):not(.cnblogs_Highlighter)>pre:not([highlighted]):not([class*="brush:"]) code:not(.hljs), :not(.cnblogs_code):not(.cnblogs_Highlighter)>pre:not([highlighted]):not([class*="brush:"]) code:not(.hljs) {background: rgb(245, 245, 245);
+        padding: 12px;
+        border: 1px solid rgb(204, 204, 204);
+        border-radius: 3px;
+        border-color: transparent;
+        color: rgb(68, 68, 68);
+        font-family: "Courier New", sans-serif;
+        font-size: 12px</style><link rel="stylesheet" href="/css/blog-common.min.css?v=-TytV_RFMTxA-_30mBwzKHwytUd14zKOTnC06zwidDE">
+    
+
+    
+        <link id="highlighter-theme-cnblogs" type="text/css" rel="stylesheet" href="/css/hljs/cnblogs.css?v=5J1NDtbnnIr2Rc2SdhEMlMxD4l9Eydj88B31E7_NhS4">
+    <link type="text/css" rel="stylesheet" href="https://www.cnblogs.com/ray93/custom.css?v=Sqf22idVKWMrlQTaP3rLWETYnAI=">
+    
+    <link id="mobile-style" media="only screen and (max-width: 767px)" type="text/css" rel="stylesheet" href="/skins/SimpleMemory/bundle-simplememory-mobile-pure.min.css?v=ZBWq3OPQpKdP7jvC_UMCkC1a79tQGcXLPZwlftZaLVg">
+    
+    <link type="application/rss+xml" rel="alternate" href="https://www.cnblogs.com/ray93/rss">
+    <link type="application/rsd+xml" rel="EditURI" href="https://www.cnblogs.com/ray93/rsd.xml">
+    <link type="application/wlwmanifest+xml" rel="wlwmanifest" href="https://www.cnblogs.com/ray93/wlwmanifest.xml">
+    <script type="text/javascript" async="" src="https://www.google-analytics.com/analytics.js"></script><script>
+        var currentBlogId = 745175;
+        var currentBlogApp = 'ray93';
+        var isLogined = false;
+        var isBlogOwner = false;
+        var skinName = 'SimpleMemory';
+        var visitorUserId = '';
+        var hasCustomScript = true;
+        try {
+            if (hasCustomScript && document.referrer && document.referrer.indexOf('baidu.com') >= 0) {
+                Object.defineProperty(document, 'referrer', { value: '' });
+                Object.defineProperty(Document.prototype, 'referrer', { get: function () { return ''; } });
+            }
+        } catch (error) { }
+        window.cb_enable_mathjax = true;
+        window.mathEngine = 0;
+        window.codeHighlightEngine = 1;
+        window.enableCodeLineNumber = false;
+        window.codeHighlightTheme = 'cnblogs';
+        window.darkModeCodeHighlightTheme = 'vs2015';
+        window.isDarkCodeHighlightTheme = false;
+        window.isDarkModeCodeHighlightThemeDark = true;
+        window.isDisableCodeHighlighter = false;
+        window.enableCodeThemeTypeFollowSystem = false;
+        window.enableMacStyleCodeBlock = false
+    </script>
+        <script>
+            var currentPostDateAdded = '2022-06-12 14:18';
+        </script>
+    <script src="https://common.cnblogs.com/scripts/jquery-2.2.0.min.js"></script>
+    <script src="/js/blog-common.min.js?v=Bmx7pMfs9HRtyxx_Qil99cQyM5qkfVaonUH4oUKDf2Q"></script><style>.medium-zoom-overlay {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  opacity: 0;
+  transition: opacity 300ms;
+  will-change: opacity;
+}
+
+.medium-zoom--opened .medium-zoom-overlay {
+  cursor: pointer;
+  cursor: zoom-out;
+  opacity: 1;
+}
+
+.medium-zoom-image {
+  cursor: pointer;
+  cursor: zoom-in;
+  /*
+    The `transition` is marked as "!important" for the animation to happen
+    even though it's overriden by another inline `transition` style attribute.
+
+    This is problematic with frameworks that generate inline styles on their
+    images (e.g. Gatsby).
+
+    See https://github.com/francoischalifour/medium-zoom/issues/110
+   */
+  transition: transform 300ms cubic-bezier(0.2, 0, 0.2, 1) !important;
+}
+
+.medium-zoom-image--hidden {
+  visibility: hidden;
+}
+
+.medium-zoom-image--opened {
+  position: relative;
+  cursor: pointer;
+  cursor: zoom-out;
+  will-change: transform;
+}
+</style><script id="hljs-script" src="https://common.cnblogs.com/highlight/11.4.0/highlight.min.js?v=2.3.886" type="text/javascript" async=""></script>
+    
+
+    
+<script id="mathjax" src="https://mathjax.cnblogs.com/2_7_5/MathJax.js?config=TeX-AMS-MML_HTMLorMML&amp;delayStartupUntil=configured&amp;v=20200504" type="text/javascript" defer=""></script><style type="text/css">.MathJax_Hover_Frame {border-radius: .25em; -webkit-border-radius: .25em; -moz-border-radius: .25em; -khtml-border-radius: .25em; box-shadow: 0px 0px 15px #83A; -webkit-box-shadow: 0px 0px 15px #83A; -moz-box-shadow: 0px 0px 15px #83A; -khtml-box-shadow: 0px 0px 15px #83A; border: 1px solid #A6D ! important; display: inline-block; position: absolute}
+.MathJax_Menu_Button .MathJax_Hover_Arrow {position: absolute; cursor: pointer; display: inline-block; border: 2px solid #AAA; border-radius: 4px; -webkit-border-radius: 4px; -moz-border-radius: 4px; -khtml-border-radius: 4px; font-family: 'Courier New',Courier; font-size: 9px; color: #F0F0F0}
+.MathJax_Menu_Button .MathJax_Hover_Arrow span {display: block; background-color: #AAA; border: 1px solid; border-radius: 3px; line-height: 0; padding: 4px}
+.MathJax_Hover_Arrow:hover {color: white!important; border: 2px solid #CCC!important}
+.MathJax_Hover_Arrow:hover span {background-color: #CCC!important}
+</style><style type="text/css">#MathJax_About {position: fixed; left: 50%; width: auto; text-align: center; border: 3px outset; padding: 1em 2em; background-color: #DDDDDD; color: black; cursor: default; font-family: message-box; font-size: 120%; font-style: normal; text-indent: 0; text-transform: none; line-height: normal; letter-spacing: normal; word-spacing: normal; word-wrap: normal; white-space: nowrap; float: none; z-index: 201; border-radius: 15px; -webkit-border-radius: 15px; -moz-border-radius: 15px; -khtml-border-radius: 15px; box-shadow: 0px 10px 20px #808080; -webkit-box-shadow: 0px 10px 20px #808080; -moz-box-shadow: 0px 10px 20px #808080; -khtml-box-shadow: 0px 10px 20px #808080; filter: progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color='gray', Positive='true')}
+#MathJax_About.MathJax_MousePost {outline: none}
+.MathJax_Menu {position: absolute; background-color: white; color: black; width: auto; padding: 2px; border: 1px solid #CCCCCC; margin: 0; cursor: default; font: menu; text-align: left; text-indent: 0; text-transform: none; line-height: normal; letter-spacing: normal; word-spacing: normal; word-wrap: normal; white-space: nowrap; float: none; z-index: 201; box-shadow: 0px 10px 20px #808080; -webkit-box-shadow: 0px 10px 20px #808080; -moz-box-shadow: 0px 10px 20px #808080; -khtml-box-shadow: 0px 10px 20px #808080; filter: progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color='gray', Positive='true')}
+.MathJax_MenuItem {padding: 2px 2em; background: transparent}
+.MathJax_MenuArrow {position: absolute; right: .5em; padding-top: .25em; color: #666666; font-size: .75em}
+.MathJax_MenuActive .MathJax_MenuArrow {color: white}
+.MathJax_MenuArrow.RTL {left: .5em; right: auto}
+.MathJax_MenuCheck {position: absolute; left: .7em}
+.MathJax_MenuCheck.RTL {right: .7em; left: auto}
+.MathJax_MenuRadioCheck {position: absolute; left: 1em}
+.MathJax_MenuRadioCheck.RTL {right: 1em; left: auto}
+.MathJax_MenuLabel {padding: 2px 2em 4px 1.33em; font-style: italic}
+.MathJax_MenuRule {border-top: 1px solid #CCCCCC; margin: 4px 1px 0px}
+.MathJax_MenuDisabled {color: GrayText}
+.MathJax_MenuActive {background-color: Highlight; color: HighlightText}
+.MathJax_MenuDisabled:focus, .MathJax_MenuLabel:focus {background-color: #E8E8E8}
+.MathJax_ContextMenu:focus {outline: none}
+.MathJax_ContextMenu .MathJax_MenuItem:focus {outline: none}
+#MathJax_AboutClose {top: .2em; right: .2em}
+.MathJax_Menu .MathJax_MenuClose {top: -10px; left: -10px}
+.MathJax_MenuClose {position: absolute; cursor: pointer; display: inline-block; border: 2px solid #AAA; border-radius: 18px; -webkit-border-radius: 18px; -moz-border-radius: 18px; -khtml-border-radius: 18px; font-family: 'Courier New',Courier; font-size: 24px; color: #F0F0F0}
+.MathJax_MenuClose span {display: block; background-color: #AAA; border: 1.5px solid; border-radius: 18px; -webkit-border-radius: 18px; -moz-border-radius: 18px; -khtml-border-radius: 18px; line-height: 0; padding: 8px 0 6px}
+.MathJax_MenuClose:hover {color: white!important; border: 2px solid #CCC!important}
+.MathJax_MenuClose:hover span {background-color: #CCC!important}
+.MathJax_MenuClose:hover:focus {outline: none}
+</style><style type="text/css">.MathJax_Preview .MJXf-math {color: inherit!important}
+</style><style type="text/css">.MJX_Assistive_MathML {position: absolute!important; top: 0; left: 0; clip: rect(1px, 1px, 1px, 1px); padding: 1px 0 0 0!important; border: 0!important; height: 1px!important; width: 1px!important; overflow: hidden!important; display: block!important; -webkit-touch-callout: none; -webkit-user-select: none; -khtml-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none}
+.MJX_Assistive_MathML.MJX_Assistive_MathML_Block {width: 100%!important}
+</style><style type="text/css">#MathJax_Zoom {position: absolute; background-color: #F0F0F0; overflow: auto; display: block; z-index: 301; padding: .5em; border: 1px solid black; margin: 0; font-weight: normal; font-style: normal; text-align: left; text-indent: 0; text-transform: none; line-height: normal; letter-spacing: normal; word-spacing: normal; word-wrap: normal; white-space: nowrap; float: none; -webkit-box-sizing: content-box; -moz-box-sizing: content-box; box-sizing: content-box; box-shadow: 5px 5px 15px #AAAAAA; -webkit-box-shadow: 5px 5px 15px #AAAAAA; -moz-box-shadow: 5px 5px 15px #AAAAAA; -khtml-box-shadow: 5px 5px 15px #AAAAAA; filter: progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color='gray', Positive='true')}
+#MathJax_ZoomOverlay {position: absolute; left: 0; top: 0; z-index: 300; display: inline-block; width: 100%; height: 100%; border: 0; padding: 0; margin: 0; background-color: white; opacity: 0; filter: alpha(opacity=0)}
+#MathJax_ZoomFrame {position: relative; display: inline-block; height: 0; width: 0}
+#MathJax_ZoomEventTrap {position: absolute; left: 0; top: 0; z-index: 302; display: inline-block; border: 0; padding: 0; margin: 0; background-color: white; opacity: 0; filter: alpha(opacity=0)}
+</style><style type="text/css">.MathJax_Preview {color: #888}
+#MathJax_Message {position: fixed; left: 1em; bottom: 1.5em; background-color: #E6E6E6; border: 1px solid #959595; margin: 0px; padding: 2px 8px; z-index: 102; color: black; font-size: 80%; width: auto; white-space: nowrap}
+#MathJax_MSIE_Frame {position: absolute; top: 0; left: 0; width: 0px; z-index: 101; border: 0px; margin: 0px; padding: 0px}
+.MathJax_Error {color: #CC0000; font-style: italic}
+</style><style type="text/css">.MJXp-script {font-size: .8em}
+.MJXp-right {-webkit-transform-origin: right; -moz-transform-origin: right; -ms-transform-origin: right; -o-transform-origin: right; transform-origin: right}
+.MJXp-bold {font-weight: bold}
+.MJXp-italic {font-style: italic}
+.MJXp-scr {font-family: MathJax_Script,'Times New Roman',Times,STIXGeneral,serif}
+.MJXp-frak {font-family: MathJax_Fraktur,'Times New Roman',Times,STIXGeneral,serif}
+.MJXp-sf {font-family: MathJax_SansSerif,'Times New Roman',Times,STIXGeneral,serif}
+.MJXp-cal {font-family: MathJax_Caligraphic,'Times New Roman',Times,STIXGeneral,serif}
+.MJXp-mono {font-family: MathJax_Typewriter,'Times New Roman',Times,STIXGeneral,serif}
+.MJXp-largeop {font-size: 150%}
+.MJXp-largeop.MJXp-int {vertical-align: -.2em}
+.MJXp-math {display: inline-block; line-height: 1.2; text-indent: 0; font-family: 'Times New Roman',Times,STIXGeneral,serif; white-space: nowrap; border-collapse: collapse}
+.MJXp-display {display: block; text-align: center; margin: 1em 0}
+.MJXp-math span {display: inline-block}
+.MJXp-box {display: block!important; text-align: center}
+.MJXp-box:after {content: " "}
+.MJXp-rule {display: block!important; margin-top: .1em}
+.MJXp-char {display: block!important}
+.MJXp-mo {margin: 0 .15em}
+.MJXp-mfrac {margin: 0 .125em; vertical-align: .25em}
+.MJXp-denom {display: inline-table!important; width: 100%}
+.MJXp-denom > * {display: table-row!important}
+.MJXp-surd {vertical-align: top}
+.MJXp-surd > * {display: block!important}
+.MJXp-script-box > *  {display: table!important; height: 50%}
+.MJXp-script-box > * > * {display: table-cell!important; vertical-align: top}
+.MJXp-script-box > *:last-child > * {vertical-align: bottom}
+.MJXp-script-box > * > * > * {display: block!important}
+.MJXp-mphantom {visibility: hidden}
+.MJXp-munderover, .MJXp-munder {display: inline-table!important}
+.MJXp-over {display: inline-block!important; text-align: center}
+.MJXp-over > * {display: block!important}
+.MJXp-munderover > *, .MJXp-munder > * {display: table-row!important}
+.MJXp-mtable {vertical-align: .25em; margin: 0 .125em}
+.MJXp-mtable > * {display: inline-table!important; vertical-align: middle}
+.MJXp-mtr {display: table-row!important}
+.MJXp-mtd {display: table-cell!important; text-align: center; padding: .5em 0 0 .5em}
+.MJXp-mtr > .MJXp-mtd:first-child {padding-left: 0}
+.MJXp-mtr:first-child > .MJXp-mtd {padding-top: 0}
+.MJXp-mlabeledtr {display: table-row!important}
+.MJXp-mlabeledtr > .MJXp-mtd:first-child {padding-left: 0}
+.MJXp-mlabeledtr:first-child > .MJXp-mtd {padding-top: 0}
+.MJXp-merror {background-color: #FFFF88; color: #CC0000; border: 1px solid #CC0000; padding: 1px 3px; font-style: normal; font-size: 90%}
+.MJXp-scale0 {-webkit-transform: scaleX(.0); -moz-transform: scaleX(.0); -ms-transform: scaleX(.0); -o-transform: scaleX(.0); transform: scaleX(.0)}
+.MJXp-scale1 {-webkit-transform: scaleX(.1); -moz-transform: scaleX(.1); -ms-transform: scaleX(.1); -o-transform: scaleX(.1); transform: scaleX(.1)}
+.MJXp-scale2 {-webkit-transform: scaleX(.2); -moz-transform: scaleX(.2); -ms-transform: scaleX(.2); -o-transform: scaleX(.2); transform: scaleX(.2)}
+.MJXp-scale3 {-webkit-transform: scaleX(.3); -moz-transform: scaleX(.3); -ms-transform: scaleX(.3); -o-transform: scaleX(.3); transform: scaleX(.3)}
+.MJXp-scale4 {-webkit-transform: scaleX(.4); -moz-transform: scaleX(.4); -ms-transform: scaleX(.4); -o-transform: scaleX(.4); transform: scaleX(.4)}
+.MJXp-scale5 {-webkit-transform: scaleX(.5); -moz-transform: scaleX(.5); -ms-transform: scaleX(.5); -o-transform: scaleX(.5); transform: scaleX(.5)}
+.MJXp-scale6 {-webkit-transform: scaleX(.6); -moz-transform: scaleX(.6); -ms-transform: scaleX(.6); -o-transform: scaleX(.6); transform: scaleX(.6)}
+.MJXp-scale7 {-webkit-transform: scaleX(.7); -moz-transform: scaleX(.7); -ms-transform: scaleX(.7); -o-transform: scaleX(.7); transform: scaleX(.7)}
+.MJXp-scale8 {-webkit-transform: scaleX(.8); -moz-transform: scaleX(.8); -ms-transform: scaleX(.8); -o-transform: scaleX(.8); transform: scaleX(.8)}
+.MJXp-scale9 {-webkit-transform: scaleX(.9); -moz-transform: scaleX(.9); -ms-transform: scaleX(.9); -o-transform: scaleX(.9); transform: scaleX(.9)}
+.MathJax_PHTML .noError {vertical-align: ; font-size: 90%; text-align: left; color: black; padding: 1px 3px; border: 1px solid}
+</style><script src="https://cdn.jsdelivr.net/gh/BNDong/Cnblogs-Theme-SimpleMemory@master/src/script/jquery.mousewheel.min.js"></script><script type="text/javascript" charset="utf-8" async="" data-requirecontext="_" data-requiremodule="snapSvg" src="https://cdn.cnblogs.com/jsDelivr/gh/BNDong/Cnblogs-Theme-SimpleMemory@v1.3.3/src/script/lib/snap.svg-min.js"></script><script type="text/javascript" charset="utf-8" async="" data-requirecontext="_" data-requiremodule="tools" src="https://cdn.cnblogs.com/jsDelivr/gh/BNDong/Cnblogs-Theme-SimpleMemory@v1.3.3/src/script/tools.min.js"></script><script type="text/javascript" charset="utf-8" async="" data-requirecontext="_" data-requiremodule="src/script/lib/css.min" src="https://cdn.cnblogs.com/jsDelivr/gh/BNDong/Cnblogs-Theme-SimpleMemory@v1.3.3/src/script/lib/css.min.js"></script><script type="text/javascript" charset="utf-8" async="" data-requirecontext="_" data-requiremodule="classie" src="https://cdn.cnblogs.com/jsDelivr/gh/BNDong/Cnblogs-Theme-SimpleMemory@v1.3.3/src/script/lib/classie.min.js"></script><link type="text/css" rel="stylesheet" href="https://cdn.cnblogs.com/jsDelivr/gh/BNDong/Cnblogs-Theme-SimpleMemory@v1.3.3/src/style/optiscroll.min.css"><link type="text/css" rel="stylesheet" href="https://cdn.cnblogs.com/jsDelivr/gh/BNDong/Cnblogs-Theme-SimpleMemory@v1.3.3/src/style/menu_bubble.min.css"><script type="text/javascript" charset="utf-8" async="" data-requirecontext="_" data-requiremodule="optiscroll_ToProgress_rotate" src="https://cdn.cnblogs.com/jsDelivr/gh/BNDong/Cnblogs-Theme-SimpleMemory@v1.3.3/src/script/optiscroll_ToProgress_rotate.min.js"></script><script type="text/javascript" charset="utf-8" async="" data-requirecontext="_" data-requiremodule="main4" src="https://cdn.cnblogs.com/jsDelivr/gh/BNDong/Cnblogs-Theme-SimpleMemory@v1.3.3/src/script/main4.min.js"></script><link type="text/css" rel="stylesheet" href="//at.alicdn.com/t/font_543384_kv876ayucyc.css"><link type="text/css" rel="stylesheet" href="https://cdn.cnblogs.com/jsDelivr/gh/BNDong/Cnblogs-Theme-SimpleMemory@v1.3.3/src/style/google-fonts.min.css"><script type="text/javascript" charset="utf-8" async="" data-requirecontext="_" data-requiremodule="base" src="https://cdn.cnblogs.com/jsDelivr/gh/BNDong/Cnblogs-Theme-SimpleMemory@v1.3.3/src/script/base.min.js"></script><link href="https://cdn.cnblogs.com/jsDelivr/gh/BNDong/Cnblogs-Theme-SimpleMemory@v1.3.3/src/style/jquery.mCustomScrollbar.min.css" rel="stylesheet" type="text/css"><script type="text/javascript" charset="utf-8" async="" data-requirecontext="_" data-requiremodule="TweenMax_MyTween" src="https://cdn.cnblogs.com/jsDelivr/gh/BNDong/Cnblogs-Theme-SimpleMemory@v1.3.3/src/script/TweenMax_MyTween.min.js"></script><script type="text/javascript" charset="utf-8" async="" data-requirecontext="_" data-requiremodule="clipboard" src="https://cdn.cnblogs.com/jsDelivr/gh/BNDong/Cnblogs-Theme-SimpleMemory@v1.3.3/src/script/lib/clipboard.min.js"></script><script type="text/javascript" charset="utf-8" async="" data-requirecontext="_" data-requiremodule="articleStatement" src="https://cdn.cnblogs.com/jsDelivr/gh/BNDong/Cnblogs-Theme-SimpleMemory@v1.3.3/src/script/articleStatement.min.js"></script><script type="text/javascript" charset="utf-8" async="" data-requirecontext="_" data-requiremodule="RibbonsEffect" src="https://cdn.cnblogs.com/jsDelivr/gh/BNDong/Cnblogs-Theme-SimpleMemory@v1.3.3/src/script/RibbonsEffect.min.js"></script><link type="text/css" rel="stylesheet" href="https://cdn.cnblogs.com/jsDelivr/gh/BNDong/Cnblogs-Theme-SimpleMemory@v1.3.3/src/style/jquery.fancybox.min.css"><script type="text/javascript" charset="utf-8" async="" data-requirecontext="_" data-requiremodule="title" src="https://cdn.cnblogs.com/jsDelivr/gh/BNDong/Cnblogs-Theme-SimpleMemory@v1.3.3/src/script/articleTitle.min.js"></script><script type="text/javascript" charset="utf-8" async="" data-requirecontext="_" data-requiremodule="bootstrap" src="https://cdn.cnblogs.com/jsDelivr/gh/BNDong/Cnblogs-Theme-SimpleMemory@v1.3.3/src/script/lib/bootstrap.min.js"></script><link type="text/css" rel="stylesheet" href="https://cdn.cnblogs.com/jsDelivr/gh/BNDong/Cnblogs-Theme-SimpleMemory@v1.3.3/src/style/marvin.nav2.min.css"><script type="text/javascript" charset="utf-8" async="" data-requirecontext="_" data-requiremodule="fancybox" src="https://cdn.cnblogs.com/jsDelivr/gh/BNDong/Cnblogs-Theme-SimpleMemory@v1.3.3/src/script/lib/jquery.fancybox.min.js"></script><script type="text/javascript" charset="utf-8" async="" data-requirecontext="_" data-requiremodule="marvin" src="https://cdn.cnblogs.com/jsDelivr/gh/BNDong/Cnblogs-Theme-SimpleMemory@v1.3.3/src/script/marvin.nav2.min.js"></script></head>
+<body class="skin-simplememory no-navbar mathjax2" style="overflow: auto;"><div id="dayNightSwitch" class="generalWrapper">    <div class="onOff daySwitch">        <div class="star star1"></div>        <div class="star star2"></div>        <div class="star star3"></div>        <div class="star star4"></div>        <div class="star star5"></div>        <div class="star sky"></div>        <div class="sunMoon">            <div class="crater crater1"></div>            <div class="crater crater2"></div>            <div class="crater crater3"></div>            <div class="cloud part1"></div>            <div class="cloud part2"></div>        </div>    </div></div><div id="MathJax_Message" style="display: none;"></div>
+    <a name="top" style="display: none;"></a>
+    <div id="top_nav" class="navbar forpc navbar-custom">
+        <nav id="nav_main" class="navbar-main">
+            <ul id="nav_left" class="navbar-list navbar-left">
+                <li class="navbar-branding">
+                    <a href="https://www.cnblogs.com/" title="开发者的网上家园" role="banner">
+                            <img src="//common.cnblogs.com/logo.svg" alt="博客园Logo">
+                    </a>
+                </li>
+                <li>
+                    <a href="/" onclick="countClicks('skin-navbar-sitehome')">首页</a>
+                </li>
+                <li>
+                    <a href="https://news.cnblogs.com/" onclick="countClicks('nav', 'skin-navbar-news')">新闻</a>
+                </li>
+                <li>
+                    <a href="https://q.cnblogs.com/" onclick="countClicks('nav', 'skin-navbar-q')">博问</a>
+                </li>
+                    <li><a href="https://www.cnblogs.com/cmt/p/17320765.html" target="_blank">助园</a></li>
+                <li>
+                    <a href="https://ing.cnblogs.com/" onclick="countClicks('nav', 'skin-navbar-ing')">闪存</a>
+                </li>
+                <li>
+                    <a href="https://edu.cnblogs.com/" onclick="countClicks('nav', 'skin-navbar-edu')">班级</a>
+                </li>
+            </ul>
+            <ul id="nav_right" class="navbar-list navbar-right">
+                <li>
+                    <form id="zzk_search" class="navbar-search dropdown" action="https://zzk.cnblogs.com/s" method="get" role="search">
+                        <input name="w" id="zzk_search_input" placeholder="代码改变世界" type="search" tabindex="3" autocomplete="off">
+                        <button id="zzk_search_button" onclick="window.navbarSearchManager.triggerActiveOption()">
+                            <img id="search_icon" class="focus-hidden" src="//common.cnblogs.com/images/blog/search.svg" alt="搜索">
+                            <img class="hidden focus-visible" src="/images/enter.svg" alt="搜索">
+                        </button>
+                        <ul id="navbar_search_options" class="dropdown-menu quick-search-menu">
+                            <li tabindex="0" class="active" onclick="zzkSearch(event, document.getElementById('zzk_search_input').value)">
+                                <div class="keyword-wrapper">
+                                    <img src="//common.cnblogs.com/images/blog/search.svg" alt="搜索">
+                                    <div class="keyword"></div>
+                                </div>
+                                <span class="search-area">所有博客</span>
+                            </li>
+                                    <li tabindex="1" onclick="zzkBlogSearch(event, 'ray93', document.getElementById('zzk_search_input').value)">
+                                        <div class="keyword-wrapper">
+                                            <img src="//common.cnblogs.com/images/blog/search.svg" alt="搜索">
+                                            <div class="keyword"></div>
+                                        </div>
+                                        <span class="search-area">当前博客</span>
+                                    </li>
+                        </ul>
+                    </form>
+                </li>
+                <li id="navbar_login_status" class="navbar-list">
+                    <a class="navbar-user-info navbar-blog" href="https://i.cnblogs.com/EditPosts.aspx?opt=1" alt="写随笔" title="写随笔" style="display: none;">
+                        <img id="new_post_icon" class="navbar-icon" src="//common.cnblogs.com/images/blog/newpost.svg" alt="写随笔">
+                    </a>
+                    <a id="navblog-myblog-icon" class="navbar-user-info navbar-blog" href="https://passport.cnblogs.com/GetBlogApplyStatus.aspx" alt="我的博客" title="我的博客" style="display: none;">
+                        <img id="myblog_icon" class="navbar-icon" src="//common.cnblogs.com/images/blog/myblog.svg" alt="我的博客">
+                    </a>
+                    <a class="navbar-user-info navbar-message navbar-icon-wrapper" href="https://msg.cnblogs.com/" alt="短消息" title="短消息" style="display: none;">
+                        <img id="msg_icon" class="navbar-icon" src="//common.cnblogs.com/images/blog/message.svg" alt="短消息">
+                        <span id="msg_count" style="display: none"></span>
+                    </a>
+                    <a id="navbar_lite_mode_indicator" data-current-page="blog" style="display: none" href="javascript:void(0)" alt="简洁模式" title="简洁模式启用，您在访问他人博客时会使用简洁款皮肤展示">
+                        <img class="navbar-icon" src="//common.cnblogs.com/images/blog/lite-mode-on.svg" alt="简洁模式">
+                    </a>
+                    <div id="user_info" class="navbar-user-info dropdown" style="display: none;">
+                        <a class="dropdown-button" href="https://home.cnblogs.com/">
+                            <img id="user_icon" class="navbar-avatar" src="//common.cnblogs.com/images/blog/avatar-default.svg" alt="用户头像">
+                        </a>
+                        <div class="dropdown-menu">
+                            <a id="navblog-myblog-text" href="https://passport.cnblogs.com/GetBlogApplyStatus.aspx">我的博客</a>
+                            <a href="https://home.cnblogs.com/">我的园子</a>
+                            <a href="https://account.cnblogs.com/settings/account">账号设置</a>
+                            <a href="javascript:void(0)" id="navbar_lite_mode_toggle" title="简洁模式会使用简洁款皮肤显示所有博客">
+    简洁模式 <img id="navbar_lite_mode_on" src="/images/lite-mode-check.svg" class="hide" style="display: none;"><span id="navbar_lite_mode_spinner" class="hide">...</span>
+</a>
+                            <a href="javascript:void(0)" onclick="account.logout();">退出登录</a>
+                        </div>
+                    </div>
+                    <a class="navbar-anonymous" href="https://account.cnblogs.com/signup" style="display: inline;">注册</a>
+                    <a class="navbar-anonymous" href="javascript:void(0);" onclick="account.login()" style="display: inline;">登录</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+
+    <div id="page_begin_html">
+        <script>
+
+!function(){
+
+function n(n,e,t){
+
+return n.getAttribute(e)||t
+
+}
+
+function e(n){
+
+return document.getElementsByTagName(n)
+
+}
+
+function t(){
+
+var t=e("script"),o=t.length,i=t[o-1];
+
+return{
+
+l:o,z:n(i,"zIndex",-1),o:n(i,"opacity",.5),c:n(i,"color","0,0,0"),n:n(i,"count",99)
+
+}
+
+}
+
+function o(){
+
+a=m.width=window.innerWidth||document.documentElement.clientWidth||document.body.clientWidth,
+
+c=m.height=window.innerHeight||document.documentElement.clientHeight||document.body.clientHeight
+
+}
+
+function i(){
+
+r.clearRect(0,0,a,c);
+
+var n,e,t,o,m,l;
+
+s.forEach(function(i,x){
+
+for(i.x+=i.xa,i.y+=i.ya,i.xa*=i.x>a||i.x<0?-1:1,i.ya*=i.y>c||i.y<0?-1:1,r.fillRect(i.x-.5,i.y-.5,1,1),e=x+1;e<u.length;e++)n=u[e],
+
+null!==n.x&&null!==n.y&&(o=i.x-n.x,m=i.y-n.y,
+
+l=o*o+m*m,l<n.max&&(n===y&&l>=n.max/2&&(i.x-=.03*o,i.y-=.03*m),
+
+t=(n.max-l)/n.max,r.beginPath(),r.lineWidth=t/2,r.strokeStyle="rgba("+d.c+","+(t+.2)+")",r.moveTo(i.x,i.y),r.lineTo(n.x,n.y),r.stroke()))
+
+}),
+
+x(i)
+
+}
+
+var a,c,u,m=document.createElement("canvas"),
+
+d=t(),l="c_n"+d.l,r=m.getContext("2d-disabled"),
+
+x=window.requestAnimationFrame||window.webkitRequestAnimationFrame||window.mozRequestAnimationFrame||window.oRequestAnimationFrame||window.msRequestAnimationFrame||
+
+function(n){
+
+window.setTimeout(n,1e3/45)
+
+},
+
+w=Math.random,y={x:null,y:null,max:2e4};m.id=l,m.style.cssText="position:fixed;top:0;left:0;z-index:"+d.z+";opacity:"+d.o,e("body")[0].appendChild(m),o(),window.οnresize=o,
+
+window.onmousemove=function(n){
+
+n=n||window.event,y.x=n.clientX,y.y=n.clientY
+
+},
+
+window.onmouseout=function(){
+
+y.x=null,y.y=null
+
+};
+
+for(var s=[],f=0;d.n>f;f++){
+
+var h=w()*a,g=w()*c,v=2*w()-1,p=2*w()-1;s.push({x:h,y:g,xa:v,ya:p,max:6e3})
+
+}
+
+u=s.concat([y]),
+
+setTimeout(function(){i()},100)
+
+}();
+
+</script>
+
+
+
+
+<script type="text/javascript">
+  // 禁止右键菜单
+  //document.oncontextmenu = function () { return false; };
+  // 禁止文字选择
+  document.onselectstart = function () { return false; };
+  // 禁止复制
+  //document.oncopy = function () { return false; };
+  // 禁止剪切
+  //document.oncut = function () { return false; };
+  // 禁止粘贴
+  //document.onpaste = function () { return false; };
+</script>
+
+
+
+
+
+    </div><canvas id="c_n6" width="1865" height="947" style="position: fixed; top: 0px; left: 0px; z-index: -1; opacity: 0.5;"></canvas>
+
+    <!--done-->
+<div id="home" style="margin-top: 379px;">
+<div id="header">
+	<div id="blogTitle">
+        <a id="lnkBlogLogo" href="https://www.cnblogs.com/ray93/"><img id="blogLogo" src="/skins/custom/images/logo.gif" alt="返回主页"></a>		
+		
+<!--done-->
+<h1><a id="Header1_HeaderTitle" class="headermaintitle HeaderMainTitle" href="https://www.cnblogs.com/ray93/">Ray963</a>
+</h1>
+<h2></h2>
+
+
+
+
+		
+	</div><!--end: blogTitle 博客的标题和副标题 -->
+	<div id="navigator">
+		
+<ul id="navList">
+<li><a id="blog_nav_sitehome" class="menu" href="https://www.cnblogs.com/">
+博客园</a>
+</li>
+<li>
+<a id="blog_nav_myhome" class="menu" href="https://www.cnblogs.com/ray93/">
+首页</a>
+</li>
+<li>
+
+<a id="blog_nav_newpost" class="menu" href="https://i.cnblogs.com/EditPosts.aspx?opt=1">
+新随笔</a>
+</li>
+<li>
+</li>
+<li>
+<a id="blog_nav_rss" class="menu" href="javascript:void(0)" data-rss="https://www.cnblogs.com/ray93/rss/">
+订阅</a>
+<!--<partial name="./Shared/_XmlLink.cshtml" model="Model" /></li>--></li>
+<li>
+<a id="blog_nav_admin" class="menu" href="https://i.cnblogs.com/">
+管理</a>
+</li>
+</ul>
+
+
+		<div class="blogStats">
+			<span id="stats_post_count">随笔 - 31&nbsp; </span>
+<span id="stats_article_count">文章 - 0&nbsp; </span>
+<span id="stats-comment_count">评论 - 0&nbsp; </span>
+<span id="stats-total-view-count">阅读 - 
+<span title="总阅读数: 7426">
+7426</span></span>
+
+		</div><!--end: blogStats -->
+	</div><!--end: navigator 博客导航栏 -->
+</div><!--end: header 头部 -->
+<div id="main">
+	<div id="mainContent">
+	<div class="forFlow">
+		<div id="post_detail">
+    <!--done-->
+    <div id="topics">
+        <div class="post">
+            <h1 class="postTitle">
+                
+<a id="cb_post_title_url" class="postTitle2 vertical-middle post-del-title" href="https://www.cnblogs.com/ray93/p/16367954.html">
+    <span role="heading" aria-level="2">Linux基础使用学习笔记</span>
+    
+</a><button class="cnblogs-toc-button" title="显示目录导航" aria-expanded="false"></button>
+
+            </h1>
+            <div class="clear"></div>
+            <div class="postBody">
+                <div id="cnblogs_post_body" class="blogpost-body cnblogs-markdown">
+<div align="center"><a data-fancybox="gallery" href="https://img2022.cnblogs.com/blog/2446278/202206/2446278-20220611162301292-1461742563.png"><img src="https://img2022.cnblogs.com/blog/2446278/202206/2446278-20220611162301292-1461742563.png" alt="Linux操作系统基础" style="zoom: 70%" class="medium-zoom-image"></a></div>
+<h1 id="1-linux操作系统概述" tid="tid-zP4h23">1. Linux操作系统概述<button class="cnblogs-toc-button" title="显示目录导航" aria-expanded="false"></button></h1>
+<ul>
+<li>
+<p>组成结构</p>
+<div align="center"><a data-fancybox="gallery" href="https://img2022.cnblogs.com/blog/2446278/202206/2446278-20220608160838181-242060962.png"><img src="https://img2022.cnblogs.com/blog/2446278/202206/2446278-20220608160838181-242060962.png" alt="image-20220608160839267" style="zoom: 80%" class="medium-zoom-image"></a></div>
+<ol>
+<li>
+<p>kernel:内核，包围在硬件之上<br>
+作用：管理设备、进程、内存、交换空间、文件系统、精灵进程等；<br>
+控制系统程序与硬件之间打交道的功能</p>
+</li>
+<li>
+<p>shell：外壳，包裹在内核之上</p>
+<ul>
+<li>
+<p>作用：提供人机交互界面，用户与内核之间打交道的功能，类似windows的cmd</p>
+</li>
+<li>
+<p>分类：不同的shell，命令的解释不一样</p>
+<p>常见的shell：Bourne shell(sh), Korn shell(ksh), <strong>C shell(csh)</strong>, <strong>Bourne-again shell(bash)</strong>, tcsh</p>
+</li>
+<li>
+<p>命令提示符：不同shell的命令提示符不一样</p>
+<p>sh和Bash中 :管理员用户为#root      普通用户为$user</p>
+<p>csh中 : 管理员用户#root     普通用户为%user</p>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>FileSystem：文件系统，管理文件、目录</strong></p>
+</li>
+</ol>
+</li>
+<li>
+<p>Linux特性：多用户，多任务（进程、线程），多平台，图形化界面（x-window）硬件支持（低配置），通信与联网，应用程序支持等</p>
+</li>
+</ul>
+<h1 id="2-linux操作系统选择与安装" tid="tid-cSnbRK">2. Linux操作系统选择与安装<button class="cnblogs-toc-button" title="显示目录导航" aria-expanded="false"></button></h1>
+<h1 id="3-linux文件系统及文件的基础知识" tid="tid-wD8xhS">3. Linux文件系统及文件的基础知识<button class="cnblogs-toc-button" title="显示目录导航" aria-expanded="false"></button></h1>
+<h2 id="31-文件系统概述" tid="tid-eMzZYp">3.1 文件系统概述<button class="cnblogs-toc-button" title="显示目录导航" aria-expanded="false"></button></h2>
+<ul>
+<li>
+<p>文件系统定义：</p>
+<p>文件系统是一种组织计算机文件和资料的方法；</p>
+<p>操作系统中封装的系统服务程序，实际上是一个软件程序，用来储存和管理计算机文件和资料。</p>
+</li>
+<li>
+<p>文件系统的分类</p>
+<p>磁盘文件系统：NTFS、EXT3</p>
+<p>闪存文件系统：JFFS2、YAFFS</p>
+<p>数据库文件系统：BFFS、WINFS</p>
+<p>网络文件系统：NFS</p>
+<p>虚拟文件系统：VFS（Proc）不同文件系统的统一接口</p>
+</li>
+<li>
+<p>文件系统的功能</p>
+<p>能定义文件的组织方式，文件结构</p>
+<p>提供建立和存取文件的环境：目录和文件</p>
+<p>能对文件存储器空间进行组织和分配</p>
+<p>负责文件存储并对存入的文件进行保护和检索</p>
+<p>负责建立文件，存入、读出、修改、转储文件，控制文件的存取，撤销文件等</p>
+</li>
+</ul>
+<h2 id="32-linux文件系统及文件" tid="tid-EcbXzh">3.2 Linux文件系统及文件<button class="cnblogs-toc-button" title="显示目录导航" aria-expanded="false"></button></h2>
+<ul>
+<li><strong>Linux文件系统</strong></li>
+</ul>
+<ol>
+<li>
+<p>EXT3：<br>
+EXT3是基于日志方式的文件系统；</p>
+<p>系统中每个文件都有索引，用户对文件的每一个操作都会记录日志，形成一个任务队列排着执行</p>
+<p>性能是比较好的</p>
+</li>
+<li>
+<p>SWAP<br>
+swap是交换分区的文件系统，类似windows的虚拟内存<br>
+虚拟内存的实现有两种方式：</p>
+<p>&ZeroWidthSpace;	第一种是进行内存的排列像内存池一样，进行一个优化</p>
+<p>&ZeroWidthSpace;	第二种是把硬盘上的空间模拟成内存；</p>
+<p>swap是Linux的虚拟内存，在安装时要设置好大小，是物理内存的2倍（Ubuntu中自动设置好了）</p>
+</li>
+</ol>
+<ul>
+<li><strong>Linux文件系统及特点</strong></li>
+</ul>
+<ol>
+<li>Linux系统中的一切皆文件</li>
+</ol>
+<p>&ZeroWidthSpace;		Linux系统把设备（硬盘、软驱、光驱）等都看做文件，文件夹也看做文件</p>
+<ol start="2">
+<li>Linux文件系统类型标识符</li>
+</ol>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th style="text-align: center">普通文件</th>
+<th>目录文件</th>
+<th>链接文件</th>
+<th>块设备</th>
+<th>字符类型</th>
+<th>Socket</th>
+<th>管道文件</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center">-</td>
+<td>d</td>
+<td>I</td>
+<td>b</td>
+<td>c</td>
+<td>S</td>
+<td>p</td>
+</tr>
+</tbody>
+</table></div>
+<ol start="3">
+<li>
+<p>Linux文件颜色属性</p>
+<p>蓝色：目录</p>
+<p>绿色：可执行</p>
+<p>浅蓝色：链接</p>
+<p>红色：压缩</p>
+<p>灰色：其他</p>
+</li>
+<li>
+<p>文件的常用查看命令</p>
+<p><code>pwd命令、cd命令、ls命令、ls -l命令</code></p>
+<blockquote>
+<p><a href="https://blog.csdn.net/cpp_learner/article/details/119739422" target="_blank" rel="noopener">(192条消息) Linux 文件操作常用命令_cpp_learners的博客-CSDN博客_linux 文件命令</a></p>
+</blockquote>
+</li>
+</ol>
+<ul>
+<li>
+<p><strong>Linux文件系统目录结构</strong></p>
+<blockquote>
+<p><a href="https://www.runoob.com/linux/linux-system-contents.html" target="_blank" rel="noopener">Linux 系统目录结构 | 菜鸟教程 (runoob.com)</a></p>
+</blockquote>
+</li>
+<li>
+<p><strong>Linux与Windows目录结构的区别</strong></p>
+<ol>
+<li>
+<p>根目录<br>
+Linux：/；Window：\</p>
+</li>
+<li>
+<p>命名大小写区分<br>
+Linux：命名区分大小写；Window：命名不区分大小写</p>
+</li>
+<li>
+<p>结构管理<br>
+Linux：磁盘逻辑结构管理物理结构，格式化将磁盘分为很多的文件块区<br>
+Window：物理结构管理逻辑结构，先分区再格式化建立结构</p>
+</li>
+</ol>
+</li>
+</ul>
+<h1 id="4-linux操作系统命令使用" tid="tid-WcKceX">4. Linux操作系统命令使用<button class="cnblogs-toc-button" title="显示目录导航" aria-expanded="false"></button></h1>
+<h2 id="41-shell命令基础" tid="tid-CEMzf7">4.1 shell命令基础<button class="cnblogs-toc-button" title="显示目录导航" aria-expanded="false"></button></h2>
+<h3 id="411-命令行编辑与别名使用">4.1.1 命令行编辑与别名使用<button class="cnblogs-toc-button" title="显示目录导航" aria-expanded="false"></button></h3>
+<a data-fancybox="gallery" href="https://img2022.cnblogs.com/blog/2446278/202206/2446278-20220609094709330-158164989.png"><img src="https://img2022.cnblogs.com/blog/2446278/202206/2446278-20220609094709330-158164989.png" alt="image-20220609094709719" style="zoom: 90%" class="medium-zoom-image"></a>
+<ul>
+<li>
+<p>别名使用例子</p>
+<div align="center"><a data-fancybox="gallery" href="https://img2022.cnblogs.com/blog/2446278/202206/2446278-20220609103003230-1210020039.png"><img src="https://img2022.cnblogs.com/blog/2446278/202206/2446278-20220609103003230-1210020039.png" alt="image-20220609103003507" style="zoom: 80%" class="medium-zoom-image"></a></div>
+<p>通过<code>align</code>命令可以查看所有的别名</p>
+<p>通过<code>unalign 别名</code>可以取消指定的别名，如<code>unalign mycd</code></p>
+</li>
+</ul>
+<h3 id="412-shell的特殊字符">4.1.2 shell的特殊字符<button class="cnblogs-toc-button" title="显示目录导航" aria-expanded="false"></button></h3>
+<ol>
+<li>
+<p>通配符：<code>*、？、[ ]</code></p>
+<ul>
+<li><code>*</code>号：通配0个或多个字符     如<code>ls b*</code>列出当前目录中首字母为b，其余字母任意的目录</li>
+<li><code>？</code>：通配任意单个字符      如<code>ls b??</code>列出当前字母为b，第二和第三个字母为任意的目录</li>
+<li><code>[s]</code>通配某个范围内的任意一个字符    如<code>ls [A-H]??</code>第一个字母为A-H范围内，第二第三任意；<code>[Aa]</code>表示范围为A或a</li>
+</ul>
+</li>
+<li>
+<p>同时执行多条命令   使用<code>;</code>隔开多条命令</p>
+<p>如<code>cd /home;ls</code>表示转到home目录并查看该目录</p>
+</li>
+<li>
+<p>输入输出重定向：<code>&gt;、&lt;、&gt;&gt;</code></p>
+<ul>
+<li>
+<p>输出重定向：<code>&gt;、&gt;&gt;</code></p>
+<p><code>&gt;</code>:将一个命令的输出放入文件而非屏幕</p>
+<p><code>&gt;&gt;</code>:输出重定向但不会把原文件覆盖，在原文件末尾追加</p>
+<p>如使用<code>ls &gt;1.txt</code>将当前的文件夹下的文件名输出到1.txt文档中</p>
+</li>
+</ul>
+<div align="center"><a data-fancybox="gallery" href="https://img2022.cnblogs.com/blog/2446278/202206/2446278-20220609114347116-2119519442.png"><img src="https://img2022.cnblogs.com/blog/2446278/202206/2446278-20220609114347116-2119519442.png" alt="image-20220609114341671" style="zoom: 80%" class="medium-zoom-image"></a></div>
+<ul>
+<li>
+<p>输入重定向：<code>&lt; </code>非标准的输入</p>
+<p>如使用<code>cat &lt; 1.txt &gt; 2.txt</code>完成文件的拷贝。<code>cat &lt; 1.txt</code>表示从1.txt输入文件，<code>&gt; 2.txt</code>表示输出到2.txt</p>
+</li>
+</ul>
+</li>
+<li>
+<p>管道符：<code> |</code></p>
+<ul>
+<li>
+<p>使用管道操作符“|”可以把一个命令的标准输出传送到另一个命令的标准输入中</p>
+<p><code>ls -l /etc | more</code>就是先查看/etc下的目录，再将结果按照 <code>more</code>命令来分页显示</p>
+<p>补充：Linux中的设备也是以文件形式存在的。设备文件存在于<code>/dev</code>目录中</p>
+</li>
+</ul>
+</li>
+<li>
+<p>其他：<code>%，~</code><br>
+<code>%</code>：作业控制，提示符等</p>
+</li>
+</ol>
+<h3 id="413-联机帮助清屏与历史记录命令">4.1.3 联机帮助、清屏与历史记录命令<button class="cnblogs-toc-button" title="显示目录导航" aria-expanded="false"></button></h3>
+<ul>
+<li>
+<p>联机帮助<br>
+<code>man name</code>：可以在系统中查找name命令的相关信息<br>
+<code>man -k keyword</code>：获取与keyword有关的相关帮助<br>
+<code>spacebar</code> ：翻屏或翻页<br>
+<code>Enter</code> ：翻行（每次增加一行显示）<br>
+<code>b</code> ：向前翻一屏或一页<br>
+<code>f </code>：向后翻一屏或一页<br>
+<code>q</code>：退出<br>
+<code>/string</code> ：查找前面符合string指定的信息（string指的是关键字）<br>
+<code>n</code> ：查找下一个符合string指定的信息</p>
+<p>例子：尝试使用<code>man ls</code>并分别执行上述命令，熟悉命令</p>
+</li>
+<li>
+<p>清屏</p>
+<p><code>clear</code></p>
+</li>
+<li>
+<p>历史记录：<br>
+<code>history</code>：查询曾经使用过的命令（默认最多纪录1000）<br>
+<code>history n</code> ：查询曾经使用过的n条命令<br>
+<code>!n</code> ：执行最近使用的第n条命令（这里执行的是按history中的第n条命令，即正序）<br>
+<code>!!</code> ：执行上一次命令<br>
+<code>方向上键</code> ： 执行上一次命令（<code>!!</code>输入后自动执行，这里只是输入了命令，未执行。多次点<code>方向上键</code>可以显示上几条命令）</p>
+</li>
+</ul>
+<h2 id="42-文件管理" tid="tid-eK7mbt">4.2 文件管理<button class="cnblogs-toc-button" title="显示目录导航" aria-expanded="false"></button></h2>
+<h3 id="421-查看文件目录">4.2.1 查看文件目录<button class="cnblogs-toc-button" title="显示目录导航" aria-expanded="false"></button></h3>
+<ol>
+<li>
+<p>pwd</p>
+<p>显示当前工作目录</p>
+</li>
+<li>
+<p>cd</p>
+<p>改变当前工作目录</p>
+<p>用法：<code>cd directory_name</code></p>
+<p>特殊cd用法：<code>cd ..</code>返回上级目录、<code>cd /</code>根目录、<code>cd</code>或<code>cd ~</code>当前用户主目录、<code>cd ~username</code>转到指定用户主目录</p>
+</li>
+<li>
+<p>ls</p>
+<p><code>ls</code>列出当前目录的文件和子目录：<br>
+<code>ls -a </code>列出所有目录、子目录、文件和隐藏文件<br>
+<code>ls -R </code>列出从当前目录开始的所有子目录、文件并且一层层往下显示<br>
+<code>ls -F </code>列出文件、目录名并显示出文件类型<br>
+<code>ls -t</code> 以修改时间为时间倒序来列出文件、子目录<br>
+<code>ls -l</code> 以长列表格式显示文件、目录的详细信息</p>
+</li>
+<li>
+<p>file</p>
+<p><code>file filename</code>查看文件的文件类型</p>
+</li>
+</ol>
+<h3 id="422-创建和删除文件目录">4.2.2 创建和删除文件目录<button class="cnblogs-toc-button" title="显示目录导航" aria-expanded="false"></button></h3>
+<ul>
+<li>
+<p>创建文件</p>
+<p><code>touch filename</code>   如<code>touch 123.txt</code><br>
+该文件不存在则创建一个新的空文件<br>
+该文件存在则更新该文件的修改访问时间</p>
+</li>
+<li>
+<p>创建目录</p>
+<p><code>mkdir -p directory_name</code><br>
+-p 多级目录，父目录不存在时，可以建立父目录  如<code>makedir -p dir1/dir2/dir3</code></p>
+</li>
+<li>
+<p>删除文件</p>
+<p><code>rm -i/f filename(s)</code><br>
+-i 询问是否删除<br>
+-f 强制删除</p>
+</li>
+<li>
+<p>删除目录：<br>
+<code>rmdir directory_name(s)</code> 删除空目录<br>
+<code>rm -ri directory_name(s)</code>删除费控目录<br>
+-r 删除非空目录<br>
+-i 删除前询问是否删除，删除输入y，不删输入n</p>
+</li>
+<li>
+<p>创建链接文件：</p>
+<blockquote>
+<p><a href="https://blog.csdn.net/lelecastle/article/details/119843000" target="_blank" rel="noopener">(194条消息) Linux中的链接文件_Violin-Lover的博客-CSDN博客_linux中的链接文件</a></p>
+<p><a href="https://baijiahao.baidu.com/s?id=1722344434835656384&amp;wfr=spider&amp;for=pc" target="_blank" rel="noopener">Linux系统下的文件链接 (baidu.com)</a></p>
+</blockquote>
+<ol>
+<li>Linux文件管理特性<br>
+文件都有文件名与数据，在Linux上被分成两部分：用户数据（user data）和元数据（metadata）<br>
+用户数据：即文件数据块（data block），数据块记录文件真实内容的地方<br>
+元数据则是文件的附加属性，如文件的大小、创建的时间等</li>
+<li>为什么会有链接文件？<br>
+为了解决文件的共享使用，Linux系统引入了链接，链接为Linux系统解决了文件的共享使用，还带来了隐藏文件路径、增加权限安全及节省存储等好处，创建链接文件可以给文件和目录创建代替名或别名。</li>
+<li>分类<br>
+硬链接（hard link）与软链接（又称符号链接，即soft link或symbolic link ）<br>
+创建命令<code>In source_file target_file</code><br>
+建立硬链接<br>
+<code>In [-s或P] source_file target_file</code><br>
+-s:建立软链接<br>
+-P:建立硬链接</li>
+</ol>
+</li>
+</ul>
+<h3 id="423-显示文件目录">4.2.3 显示文件目录<button class="cnblogs-toc-button" title="显示目录导航" aria-expanded="false"></button></h3>
+<ul>
+<li>
+<p>cat<br>
+不分屏显示文本内容<br>
+把小文件链接成大文件<br>
+命令<code>cat filename(s)</code></p>
+<p>例子：</p>
+<p>从键盘输入数据并将其存放到文档1.txt中 <code>cat &lt; /dev/stdin &gt; 1.txt</code></p>
+<p>清空1.txt <code>cat /dev/null &gt; 1.txt</code>，若是没有该文件，会创建该空白文件</p>
+</li>
+<li>
+<p>more<br>
+<code>more filemore(s)</code> 分屏显示文本内容<br>
+<code>spacebar</code> 向下显示一屏<br>
+<code>Enter</code> 向下显示一行<br>
+<code>b</code> 向上显示一屏<br>
+<code>f </code>向下显示一屏<br>
+<code>h </code>显示帮助菜单<br>
+<code>q</code> 退出<br>
+<code>/string </code>查找string字符串<br>
+<code>n</code> 查找下一个string</p>
+</li>
+<li>
+<p>head<br>
+查找文件的前多少行<br>
+<code>head -n filename(s)</code></p>
+</li>
+<li>
+<p>tail<br>
+查找文件的末尾多少行<br>
+<code>tail -n filename(s)</code></p>
+</li>
+</ul>
+<h3 id="424-拷贝和移动文件目录">4.2.4 拷贝和移动文件目录<button class="cnblogs-toc-button" title="显示目录导航" aria-expanded="false"></button></h3>
+<ul>
+<li>
+<p>cp</p>
+<p>拷贝复制文件目录、拷贝文件</p>
+<p><code>cp -i source_file destination_file</code><br>
+<code>cp -i source_file(s) destination_directory</code><br>
+<code>-i</code>选项作用：当目标文件存在，会询问是否覆盖，没有<code>-i</code>选项则不询问直接覆盖</p>
+<p>拷贝目录</p>
+<p><code>cp -r source_directory(s) destination_directory(s)</code></p>
+</li>
+<li>
+<p>mv</p>
+<p>移动文件目录或重命名文件目录<br>
+<code>mv -i source_file target_file</code> 重命名原文件为目标文件，若不加<code>-i</code>则会直接覆盖同名文件<br>
+<code>mv -i source_file target_directory</code> 移动文件到目标目录；若目标文件夹有同名文件，<code>-i</code>会询问是否覆盖，若不加<code>-i</code>则会直接覆盖</p>
+<p><code>mv -i source_directory target_directory</code>若移动目标目录存在时，源目录会移动到目标目录；若目标目录不存在则是对该目录改名</p>
+</li>
+</ul>
+<h3 id="425-文件目录权限">4.2.5 文件目录权限<button class="cnblogs-toc-button" title="显示目录导航" aria-expanded="false"></button></h3>
+<ul>
+<li>
+<p>什么是文件目录权限<br>
+Linux系统中的每个文件和目录都有访问许可权限，用它来确定谁能通过何种方式对文件和目录进行访问和操作</p>
+</li>
+<li>
+<p>权限的分类<br>
+<code>r</code>  读权限：可以打开文件、目录读取查看<br>
+<code>w </code> 写权限：对文件、目录可以编写更改<br>
+<code>x </code> 执行权限：对文件可执行（针对可执行文件、对目录为可查找该目录下的内容）</p>
+<p><code>-</code> 没有权限</p>
+</li>
+<li>
+<p>文件目录权限定义</p>
+<p><a data-fancybox="gallery" href="https://img2022.cnblogs.com/blog/2446278/202206/2446278-20220609212205622-1265267523.png#pic_center"><img src="https://img2022.cnblogs.com/blog/2446278/202206/2446278-20220609212205622-1265267523.png#pic_center" alt="image-20220609210800809" loading="lazy" class="medium-zoom-image"></a></p>
+</li>
+<li>
+<p>权限所属对象<br>
+拥有者：生成文件或目录时登录的当前人，权限最高，用u表示<br>
+同组人：系统管理员分配的同组的一个或几个人，用g表示<br>
+其他人：除拥有者、同组人以外的人，用o表示<br>
+所有人：包括拥有者、同组人及其他人，用a表示</p>
+</li>
+<li>
+<p>使用命令<code>ls -l</code>即可查看文件和目录的权限</p>
+<div align="center"><a data-fancybox="gallery" href="https://img-blog.csdn.net/20180713100548270?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2h1eGluZ3VhbmdfaW9z/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70"><img src="https://img-blog.csdn.net/20180713100548270?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2h1eGluZ3VhbmdfaW9z/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70" alt="image-20220609114343641" "="" class="medium-zoom-image"></a></div>
+</li>
+<li>
+<p>文件目录权限的相关命令：</p>
+<ol>
+<li>
+<p>chmod<br>
+修改文件目录的访问权限，修改权限的前提条件是在修改权限时，要注意是自己的文件或目录</p>
+<ul>
+<li>
+<p>使用字母表示权限</p>
+<div align="center"><a data-fancybox="gallery" href="https://img2022.cnblogs.com/blog/2446278/202206/2446278-20220610101116594-1256519455.png"><img src="https://img2022.cnblogs.com/blog/2446278/202206/2446278-20220610101116594-1256519455.png" alt="image-20220610101117245" style="zoom: 80%" class="medium-zoom-image"></a></div>
+<p>使用方式：<code>chmod u=r 文件名  //给拥有者设置读文件的权限</code></p>
+<p>&ZeroWidthSpace;                   <code>chmod g+w 文件名   //给同组人添加写权限</code></p>
+<p>&ZeroWidthSpace;				<code>chmod a-w 文件名   //所有人都删除写权限 </code></p>
+<a data-fancybox="gallery" href="https://img2022.cnblogs.com/blog/2446278/202206/2446278-20220610103125514-752469487.png"><img src="https://img2022.cnblogs.com/blog/2446278/202206/2446278-20220610103125514-752469487.png" alt="image-20220610103126427" style="zoom: 50%" class="medium-zoom-image"></a>
+</li>
+<li>
+<p>使用数字表示权限<br>
+使用二进制数字表示权限<br>
+r w x<br>
+0 0 0       0表示对应位无权限<br>
+1 1 1       1表示对应位有权限<br>
+通过八进制的数字显示我们可以判断有哪些权限</p>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th style="text-align: center">Octal Value（r w x）</th>
+<th style="text-align: center">Permission</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center">7 (111)</td>
+<td style="text-align: center">rwx</td>
+</tr>
+<tr>
+<td style="text-align: center">6 (110)</td>
+<td style="text-align: center">rw-</td>
+</tr>
+<tr>
+<td style="text-align: center">5 (101)</td>
+<td style="text-align: center">r-x</td>
+</tr>
+<tr>
+<td style="text-align: center">4 (100)</td>
+<td style="text-align: center">r--</td>
+</tr>
+<tr>
+<td style="text-align: center">3 (011)</td>
+<td style="text-align: center">-wx</td>
+</tr>
+<tr>
+<td style="text-align: center">2 (010)</td>
+<td style="text-align: center">-w-</td>
+</tr>
+<tr>
+<td style="text-align: center">1 (001)</td>
+<td style="text-align: center">--x</td>
+</tr>
+<tr>
+<td style="text-align: center">0 (000)</td>
+<td style="text-align: center">---</td>
+</tr>
+</tbody>
+</table></div>
+<p>使用命令<code>chmod 555 文件名</code> 即将文件的权限改为所有人都只有读和执行权限，无写权限</p>
+</li>
+</ul>
+</li>
+<li>
+<p>chown<br>
+更改某个文件或目录的属主和属组，可用于授权</p>
+<p>例如root用户把自己的一个文件拷贝给用户xu，为了让用户xu能够存取这个文件，root用户应该把这个文件的属主设为xu，否则，用户xu无法存取这个文件。<br>
+<code>chown [选项] 用户或组 文件</code><br>
+<code>chown</code> 将指定文件的拥有者改为指定的用户或组，用户可以是用户名或用户ID，组可以是组名或组ID。只有超级用户和属于组的文件所有者才能变更文件关联组，非超级用户如需要设置关联组可能需要使用<code>chgrp</code>命令先改变组<br>
+文件是以空格分开的要改动权限的文件列表，支持通配符。<br>
+-R 递归式地改动指定目录及其下的所有子目录和文件的拥有者<br>
+-v 显示chown命令所做的工作<br>
+例子：<code>sudo chown wang shiyuan.c    //将shiyuan.c的拥有者改为用户wang</code><br>
+<code>sudo chown -R wang users/his        //将多级目录user/his的拥有者改为wang</code></p>
+<p>补充：添加新用户：<code>sudo useradd 用户名</code></p>
+<p>&ZeroWidthSpace;           设置用户密码：<code>sudo passwd 用户名</code></p>
+</li>
+<li>
+<p>chgrp<br>
+改动文件或目录所属的组<br>
+<code>chgrp [选项] group filename</code><br>
+该命令改动指定指定文件所属的用户组，其中group能是用户组ID，也能是/etc/group文件中用户组的组名<br>
+文件名是以空格分开的要改动属组的文件列表、支持通配符<br>
+如果用户不是该文件的属主或终极用户，则不能改动该文件的组<br>
+-R 递归式地改动指定目录及其下的所有子目录和文件的属组<br>
+例子：<code>sudo chgrp -R book /opt/local/book</code>   改动/opt/local/book及其子目录下的所有文件的属组为book</p>
+</li>
+</ol>
+</li>
+</ul>
+<h3 id="426-查找文件">4.2.6 查找文件<button class="cnblogs-toc-button" title="显示目录导航" aria-expanded="false"></button></h3>
+<ul>
+<li>find<br>
+<code>file path expression [action]</code> 查找文件和目录<br>
+前提条件：要对被查找的目录及其所有字目录<strong>有读权限</strong>才能查找<br>
+查找选项：通过文件属性来查找<br>
+<code>-name</code> 按文件名<br>
+<code>-user</code> 按用户（文件属主）<br>
+<code>-size</code> 按大小<br>
+<code>-mtime</code> 按最后一次修改的时间<br>
+<code>-atime</code> 按最后一次访问的时间<br>
+<code>-type</code> 按文件类型 f:file d:directory<br>
+<code>-perm</code> 按权限<br>
+举例：<br>
+<code>find / -name b*</code> 查找根目录下面以b开头的所有的文件<br>
+<code>find . -mtime 10 -print</code> 查找当前目录下修改时间距离今天10天的文件，并显示<br>
+<code>find /etc -user 0 -size +400 -print</code> 查找/etc目录中ID为0的用户所创建的文件，且文件大于200k，并显示<br>
+<code>find ~ -perm 777 &gt; ~ /holes</code> 在主目录下查找文件权限为所有用户都具有权限为7即<code>rwx</code>的文件，并将查找的结果输入到主目录/holes下<br>
+<code>find /export/home -type f -atime +365 -exec rm {}\;</code> 在根目录/export/home下查找最后一次访问时间大于365天的文件，并执行删除（\起到的只是一个转义的作用）</li>
+<li>locate<br>
+<code>locate [-d&lt;数据库文件&gt;] [–help] [–version] [keywords]</code><br>
+<code>locate</code> 指令用于查找符合条件的文件，它会去保存文件与目录的数据库内查找合乎范本样式条件的文件或目录<br>
+-d&lt;数据库文件&gt;或–database=&lt;数据库文件&gt;：设置locate指令使用的数据库<br>
+locate 指令预设的数据库位于/var/lib/slocate目录里，文件slocate.db,您可使用这个参数另行指定<br>
+–help 在线帮助；–version 显示版本信息<br>
+速度快很多，他通过inode，文件索引来找，它会把文件索引维护在一个数据库里面，它在数据库去找，比较麻烦的是需要更新数据updatedb</li>
+</ul>
+<h3 id="427-过滤与统计">4.2.7 过滤与统计<button class="cnblogs-toc-button" title="显示目录导航" aria-expanded="false"></button></h3>
+<ul>
+<li>
+<p>grep（过滤）</p>
+<p>语法：<code>grep [option(s)] string filename</code>1）</p>
+<p>1）查出包含某些字符串的结果；</p>
+<p>例子1：使用<code>grep root /etc/passwd</code>命令过滤出passwd文件中有关root的内容</p>
+<p>2）对文件或输出结果进行过滤，大小写敏感</p>
+<p>例子2：<code>ls -la | grep -i "6月"</code>显示当前目录中包含<code>6月</code>的文件，注意<code>ls -la</code>为显示当前文件夹中所有（包含隐藏文件）的文件，再将结果通过管道符使用<code>grep -i "6月"</code>进行过滤结果</p>
+<p>例子3：<code>ls wj*.txt | xargs grep .profile</code>显示wj*.txt文件信息，并在文件信息中过滤.profile，<code>xargs</code>的作用为，若是<code>wj*.txt</code>文件有多个，每个文件都进行过滤</p>
+<p>-i 忽略大小写<br>
+-v 反向匹配（查找不包函字符串的结果）</p>
+</li>
+<li>
+<p>wc（统计）<br>
+统计文件或输出结果<br>
+<code>wc [optoin(s)] filename(s)</code><br>
+<code>-l</code> 统计多少行</p>
+<p><code>grep li /etc/passwd | wc -l</code>   统计配置文件passwd中包含li的行数</p>
+<p><code>-w</code> 统计多少个单词</p>
+<p><code>wc -w 1.txt</code>   统计1.txt中有多少个单词，以空格为分界</p>
+<p><code>-c</code> 统计多少个字符</p>
+<p><code>wc -c 1.txt </code>  统计1.txt中有多少个字符</p>
+</li>
+</ul>
+<h2 id="43-系统管理" tid="tid-rM5xT8">4.3 系统管理<button class="cnblogs-toc-button" title="显示目录导航" aria-expanded="false"></button></h2>
+<h3 id="431-日期时间与进程查看">4.3.1 日期时间与进程查看<button class="cnblogs-toc-button" title="显示目录导航" aria-expanded="false"></button></h3>
+<ul>
+<li>
+<p>data</p>
+<p>输入<code>data</code>    显示当前日期</p>
+</li>
+<li>
+<p>cal</p>
+<p>输入<code>cal</code>      显示日历<br>
+<code>cal 月份 年份</code>       显示指定年份月份的日历<br>
+<code>cal 年份</code>         显示指定年份全年的日历</p>
+</li>
+<li>
+<p>ps<br>
+列出当前系统中已经在运行的进程<br>
+进程：一个能完成一定功能的程序<br>
+<code>ps [options]</code><br>
+<code>ps</code>       列出与自己当前终端相关的进程<br>
+<code>-e</code>       列出正在运行的进程   如<code>ps -e | more</code><br>
+<code>-f</code>       列出一个完整的进程列表形式  如<code>ps -ef | more</code>、<code>ps -f</code><br>
+<code>-U</code>       查找出由某个用户启动的进程<br>
+<code>-auwx</code>      列出一个完整的进程列表形式，形式与<code>-f</code>不一样    <code>ps -auwx</code></p>
+</li>
+</ul>
+<h3 id="432-切换用户设置普通用户的超级权限与关机重启">4.3.2 切换用户、设置普通用户的超级权限与关机重启<button class="cnblogs-toc-button" title="显示目录导航" aria-expanded="false"></button></h3>
+<ul>
+<li>
+<p>su<br>
+<code>su 用户名</code>    切换用户</p>
+</li>
+<li>
+<p>sudo<br>
+<code>sudo 命令行</code>     使得普通用户具有管理员的权限</p>
+</li>
+<li>
+<p>shutdown<br>
+安全地关闭或重启Linux系统</p>
+<p>它在系统关闭之前给系统上的所有登录用户提示一条警告。<br>
+该命令还允许用户指定一个时间参数，可以是一个精确的时间，也可以是从现在开始的一个时间段。<br>
+精确的时间的格式是<code>hh:mm</code>，表示小时和分钟；时间段由<code>+</code>和<code>分钟数</code>表示</p>
+<p>系统执行该命令后会自动进行数据同步的工作<br>
+语法：<code>shutdown [-efFhknr][-t 秒数][时间][警告信息]</code></p>
+<p><code>-c</code>    当执行“shutdown -h 11:50”指令时，只要按+键就可中断关机的指令<br>
+<code>-f</code>   重新启动是不执行fsck<br>
+<code>-F</code>   重新启动是执行fsck<br>
+<code>-h</code>   将系统关机<br>
+<code>-k</code>   只是送出信息给所有用户，但不会实际关机<br>
+<code>-n</code>   不调用init程序进行关机，而由shutdowm自己进行<br>
+<code>-r</code>    shutdown之后重新启动<br>
+<code>-t&lt;秒数&gt;</code>     送出警告信息和删除信息之间要延迟多少秒<br>
+<code>[时间]</code>        设置多久时间后执行shutdowm指令<br>
+<code>[警告信息]</code>     要传送给所有登入用户的信息</p>
+<p>例子：</p>
+<p><code>shutdown -r +10</code>      系统在十分钟后关机并且马上重新启动<br>
+<code>shutdown -h now</code>   系统马上关机并且不重新启动</p>
+</li>
+<li>
+<p>reboot<br>
+<code>reboot</code>的工作过程差不多跟<code>halt</code>一样，不过它是引发主机重启，而<code>halt</code>是关机，它的参数与<code>halt</code>相差不多</p>
+</li>
+</ul>
+<h2 id="44-用户管理" tid="tid-3N6GCm">4.4 用户管理<button class="cnblogs-toc-button" title="显示目录导航" aria-expanded="false"></button></h2>
+<h3 id="441-密码设置与修改">4.4.1 密码设置与修改：<button class="cnblogs-toc-button" title="显示目录导航" aria-expanded="false"></button></h3>
+<ul>
+<li>用户密码设置要求<br>
+6-8个字符<br>
+至少包含2个字母，1个数字或特殊符号<br>
+不同于用户ID<br>
+不同于以前的密码，并且至少3个字符不同于以前的密码</li>
+<li>修改密码命令<br>
+<code>passwd 用户名</code></li>
+</ul>
+<h3 id="442-查找用户">4.4.2 查找用户<button class="cnblogs-toc-button" title="显示目录导航" aria-expanded="false"></button></h3>
+<ul>
+<li><code>id</code><br>
+查看用户ID(用户名)，所属组ID（组名）</li>
+<li><code>users</code><br>
+查看已经登录到当前系统中的用户，只显示出用户名</li>
+<li><code>who</code><br>
+查看用户的详细信息</li>
+<li><code>who am i</code><br>
+查看当前用户自己的信息</li>
+<li><code>whoami</code><br>
+查看当前用户自己的用户名</li>
+</ul>
+<h2 id="45-磁盘管理" tid="tid-zrshzc">4.5 磁盘管理<button class="cnblogs-toc-button" title="显示目录导航" aria-expanded="false"></button></h2>
+<ul>
+<li>du<br>
+显示磁盘使用摘要信息<br>
+<code>du</code>   以Block为单位方式显示（注意在Ubuntu下Block大小等于字节k）<br>
+<code>-k</code>    以k字节方式显示<br>
+<code>-m</code>    以m字节方式显示<br>
+<code>-s</code>    显示当前目录下的内容总的占用磁盘的大小，以Block为单位<br>
+以Block为单位显示的数字是以k字节的方式显示的数字的2倍：1k 字节=2个Block</li>
+<li>df<br>
+显示整个文件系统的空间使用磁盘情况<br>
+<code>-k</code>    以k字节方式显示<br>
+<code>-BM</code>    以M为单位显示</li>
+</ul>
+<h2 id="46-网络配置管理" tid="tid-dtTMQE">4.6 网络配置管理<button class="cnblogs-toc-button" title="显示目录导航" aria-expanded="false"></button></h2>
+<ul>
+<li>ping<br>
+查看当前机器与另一台机器的联通状况<br>
+命令    <code>ping 主机IP/主机名</code>      向ping后面的主机发送数据包，若被ping 主机有回复则表明是联通的<br>
+<code>ping www.baidu.com</code></li>
+</ul>
+<p>补充命令：Ctrl+c：强制退出正在执i行的命令</p>
+<ul>
+<li>ifconfig<br>
+<code>ifconfig</code>    查看和配置当前机器的网s络参数信息<br>
+<code>ifconfig -a</code>      显示查看当前机器的IP、Netmask、Gateway等网络信息，<code>与ifconfig</code>不同为这里会显示关闭的网络适配卡<br>
+<code>ifconfig eth0 up(down)</code>      激活与关闭某个网络适配卡<br>
+<code>ifconfig eth0 [ipaddress] netmask [address]</code>       设置IP和子网掩码，注意当电脑重启后IP和子网掩码会还原到最初状态，若想永久更改需要在配置文件中更改信息</li>
+</ul>
+<h1 id="5-linux应用程序的安装与卸载基础" tid="tid-J3TBia">5. Linux应用程序的安装与卸载基础<button class="cnblogs-toc-button" title="显示目录导航" aria-expanded="false"></button></h1>
+<ul>
+<li>Linux软件安装包的概念</li>
+</ul>
+<ol>
+<li>
+<p>什么是软件安装包</p>
+<p>类似于Windows下的安装程序，如打包好的exe文件</p>
+<p>在Linux下的打包文件通常都死tar，打包格式可以自己定义，打包文件可以自定义一个后缀名；如tar.abc</p>
+</li>
+<li>
+<p>Linux下的常见的软件程序包</p>
+<p>rpm，deb</p>
+<p>rpm是红帽子系统定义的软件包文件格式</p>
+<p>dep是Ubuntu下的主要安装包的格式</p>
+<p>安装包的具体格式规范要到具体的官网去查看格式规范</p>
+</li>
+<li>
+<p>Linux下的安装包的命名格式</p>
+<p>软件包名称_版本号-修订版本_体系架构.扩展名</p>
+<p>如  aptitude_0.6.3-3.2ubuntu1_i386.deb</p>
+<p>&ZeroWidthSpace;      libboost-iostreamsl.42.0_1.42.0-4ubuntu2_i386.deb</p>
+</li>
+<li>
+<p>Linux下安装卸载应用程序的方式</p>
+<ul>
+<li>
+<p>安装包离线安装和卸载：dpkg</p>
+<p>安装包  <code>dpkg -i &lt;package&gt;</code></p>
+<p>移除包和配置文件  <code>dpkg -p &lt;package&gt; </code></p>
+</li>
+<li>
+<p>源文件编译安装和卸载</p>
+<p>配置configure、编译make和安装make install</p>
+</li>
+<li>
+<p>程序管理包在线卸载：aptitude</p>
+<p>安装包  <code>apt-get install &lt;package&gt;</code></p>
+<p>完全卸载包  <code>apt-get remove -purge &lt;package&gt;</code>  <code>-purge</code>是完全卸载的意思</p>
+</li>
+</ul>
+</li>
+</ol>
+<h1 id="6-linux系统vi编辑器的使用基础" tid="tid-KWCDMR">6. Linux系统VI编辑器的使用基础<button class="cnblogs-toc-button" title="显示目录导航" aria-expanded="false"></button></h1>
+<h2 id="61-vi的基本介绍" tid="tid-wjp2Y5">6.1 VI的基本介绍<button class="cnblogs-toc-button" title="显示目录导航" aria-expanded="false"></button></h2>
+<ul>
+<li>
+<p>什么是Vi</p>
+<p>Vi是Linux系统下的鼎鼎大名的全屏方式的文本编辑器</p>
+<p>使用方法<code>Vi filename</code></p>
+<p>filename不存在则创建filename文件并可编辑和保存退出</p>
+<p>filename存在则打开文件编辑</p>
+</li>
+<li>
+<p>Vi使用模式</p>
+</li>
+</ul>
+<ol>
+<li>
+<p>三种模式</p>
+<p>命令行模式  Command Mode</p>
+<p>插入模式      Edit  Mode</p>
+<p>末行模式      ExMode</p>
+</li>
+<li>
+<p>不同模式的切换</p>
+</li>
+</ol>
+<div align="center"><a data-fancybox="gallery" href="https://mrbird.cc/img/59734563-file_1495183176945_1abe.png"><img src="https://mrbird.cc/img/59734563-file_1495183176945_1abe.png" alt="Vi编辑器三种模式" class="medium-zoom-image"></a></div>
+<h2 id="62-vi的常用命令" tid="tid-G2B2Hk">6.2 VI的常用命令<button class="cnblogs-toc-button" title="显示目录导航" aria-expanded="false"></button></h2>
+<blockquote>
+<p><a href="https://www.cnblogs.com/7788IT/p/11626002.html" target="_blank" rel="noopener">vi编辑器的三种模式 - houJINye - 博客园 (cnblogs.com)</a></p>
+<p><a href="http://c.biancheng.net/cpp/html/2735.html" target="_blank" rel="noopener">10分钟掌握Linux vi编辑器常见命令的使用，最简单的vi编辑器教程_C语言中文网 (biancheng.net)</a></p>
+</blockquote>
+<ul>
+<li>
+<p>Vi在三种不同模式下有不同的命令实现不同的功能，常用命令如下</p>
+<div align="center"><a data-fancybox="gallery" href="https://img2022.cnblogs.com/blog/2446278/202206/2446278-20220611160854213-797949983.png"><img src="https://img2022.cnblogs.com/blog/2446278/202206/2446278-20220611160854213-797949983.png" alt="image-20220610103126434" class="medium-zoom-image"></a></div></li>
+</ul>
+
+<br><p class="essaySuffix-eof">__EOF__</p><div class="essaySuffix-box"><div class="essaySuffix-box-left"><img src="https://images.cnblogs.com/cnblogs_com/blogs/745175/galleries/2155155/o_220504153552_photo-1593085512500-5d55148d6f0d.jpg" alt=""></div><div class="essaySuffix-box-right"><span class="essaySuffix-right-title">本文作者</span>：<strong><span style="font-size: 12px;"><a href="https://www.cnblogs.com/ray93/p/16367954.html" target="_blank">Ray963</a></span></strong> <br><span style="font-weight: bold; white-space:nowrap;">本文链接</span>：<a href="https://www.cnblogs.com/ray93/p/16367954.html" target="_blank">https://www.cnblogs.com/ray93/p/16367954.html</a><br><span class="essaySuffix-right-title">关于博主</span>：评论和私信会在第一时间回复。或者<a href="https://msg.cnblogs.com/msg/send/ray93" target="_blank">直接私信</a>我。<br><span class="essaySuffix-right-title">版权声明</span>：本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/" alt="BY-NC-SA" title="BY-NC-SA" target="_blank">BY-NC-SA</a> 许可协议。转载请注明出处！<br><span class="essaySuffix-right-title">声援博主</span>：如果您觉得文章对您有帮助，可以点击文章右下角<strong><span style="color: #ff0000; font-size: 12pt;">【<a id="post-up" onclick="votePost(16367954,'Digg')" href="javascript:void(0);">推荐</a>】</span></strong>一下。您的鼓励是博主的最大动力！<br></div><div style="clear: both;"></div></div></div>
+<div id="MySignature" role="contentinfo">
+    <p>本文来自博客园，作者：{Ray963}，转载请注明原文链接：{https://www.cnblogs.com/ray93/}</p>
+</div>
+<div class="clear"></div>
+<div id="blog_post_info_block" role="contentinfo">
+
+
+<div id="BlogPostCategory">
+    分类: 
+            <a href="https://www.cnblogs.com/ray93/category/2168733.html" target="_blank"><span class="iconfont icon-marketing_fill"></span>嵌入式学习</a>
+</div>
+<div id="EntryTag">
+    标签: 
+            <a href="https://www.cnblogs.com/ray93/tag/%E5%B5%8C%E5%85%A5%E5%BC%8F/"><span class="iconfont icon-label_fill"></span>嵌入式</a>
+</div>
+    <div id="blog_post_info">
+<div id="green_channel">
+        <a href="javascript:void(0);" id="green_channel_digg" onclick="DiggIt(16367954,cb_blogId,1);green_channel_success(this,'谢谢推荐！');">好文要顶</a>
+        <a id="green_channel_follow" onclick="follow('350082ff-f067-4c14-f1c5-08d93abcd2cc');" href="javascript:void(0);">关注我</a>
+    <a id="green_channel_favorite" onclick="AddToWz(cb_entryId);return false;" href="javascript:void(0);">收藏该文</a>
+    <a id="green_channel_weibo" href="javascript:void(0);" title="分享至新浪微博" onclick="ShareToTsina()"><img src="https://common.cnblogs.com/images/icon_weibo_24.png" alt=""></a>
+    <a id="green_channel_wechat" href="javascript:void(0);" title="分享至微信" onclick="shareOnWechat()"><img src="https://common.cnblogs.com/images/wechat.png" alt=""></a>
+</div>
+<div id="author_profile">
+    <div id="author_profile_info" class="author_profile_info">
+            <a href="https://home.cnblogs.com/u/ray93/" target="_blank"><img src="https://pic.cnblogs.com/face/2446278/20220504235710.png" class="author_avatar" alt=""></a>
+        <div id="author_profile_detail" class="author_profile_info">
+            <a href="https://home.cnblogs.com/u/ray93/">ray963</a>
+            <br>
+            <a href="https://home.cnblogs.com/u/ray93/followers/">粉丝 - <span class="follower-count">3</span></a>
+            <a href="https://home.cnblogs.com/u/ray93/followees/">关注 - <span class="following-count">1</span></a><br>
+        </div>
+    </div>
+    <div class="clear"></div>
+    <div id="author_profile_honor"></div>
+    <div id="author_profile_follow" class="follow-tip">
+                <a href="javascript:void(0);" onclick="follow('350082ff-f067-4c14-f1c5-08d93abcd2cc');return false;">+加关注</a>
+    </div>
+</div>
+<div id="div_digg">
+    <div class="diggit" onclick="votePost(16367954,'Digg')">
+        <span class="diggnum" id="digg_count">0</span>
+    </div>
+    <div class="buryit" onclick="votePost(16367954,'Bury')">
+        <span class="burynum" id="bury_count">0</span>
+    </div>
+    <div class="clear"></div>
+    <div class="diggword" id="digg_tips">
+    </div>
+</div>
+
+<script type="text/javascript">
+    currentDiggType = 0;
+</script></div>
+    <div class="clear"></div>
+    <div id="post_next_prev">
+
+    <a href="https://www.cnblogs.com/ray93/p/16359121.html" class="p_n_p_prefix">« </a> 上一篇：    <a href="https://www.cnblogs.com/ray93/p/16359121.html" data-featured-image="" title="发布于 2022-06-09 14:07">Ubuntu虚拟机的网络没有ens33，只有本地回环网络</a>
+    <br>
+    <a href="https://www.cnblogs.com/ray93/p/16408778.html" class="p_n_p_prefix">» </a> 下一篇：    <a href="https://www.cnblogs.com/ray93/p/16408778.html" data-featured-image="" title="发布于 2022-06-24 14:35">word在一个位置中输入多个参考文献引用，如[1-3]的方法</a>
+
+</div>
+</div>
+            </div>
+            <div class="postDesc" style="display: block;">posted @ 
+<span id="post-date" data-last-update-days="338.4226053162778" data-date-created="BlogServer.Application.Dto.BlogPost.BlogPostDto" data-date-updated="2022-06-12 14:18" aria-expanded="false">2022-06-12 14:18</span>&nbsp;
+<a href="https://www.cnblogs.com/ray93/">ray963</a>&nbsp;
+阅读(<span id="post_view_count">93</span>)&nbsp;
+评论(<span id="post_comment_count">0</span>)&nbsp;
+<a href="https://i.cnblogs.com/EditPosts.aspx?postid=16367954" rel="nofollow">编辑</a>&nbsp;
+<a href="javascript:void(0)" onclick="AddToWz(16367954);return false;">收藏</a>&nbsp;
+<a href="javascript:void(0)" onclick="reportManager.report({ currentUserId: '', targetType: 'blogPost', targetId: '16367954', targetLink: 'https://www.cnblogs.com/ray93/p/16367954.html', title: 'Linux基础使用学习笔记' })">举报</a>
+</div>
+        </div>
+	    
+	    
+    </div><!--end: topics 文章、评论容器-->
+</div>
+
+<script>
+    var cb_entryId = 16367954, cb_entryCreatedDate = '2022-06-12 14:18', cb_postType = 1, cb_postTitle = 'Linux基础使用学习笔记';
+    var allowComments = true, cb_blogId = 745175, cb_blogApp = 'ray93', cb_blogUserGuid = '350082ff-f067-4c14-f1c5-08d93abcd2cc';
+    mermaidRender.render()
+    markdown_highlight()
+    zoomManager.apply("#cnblogs_post_body img:not(.code_img_closed):not(.code_img_opened)");
+    updatePostStats(
+            [cb_entryId],
+            function(id, count) { $("#post_view_count").text(count) },
+            function(id, count) { $("#post_comment_count").text(count) });
+</script>
+<a id="!comments"></a>
+<div id="blog-comments-placeholder"></div>
+<div id="comment_form" class="commentform">
+    <a name="commentform"></a>
+    <div id="divCommentShow"></div>
+    <div id="comment_nav"><span id="span_refresh_tips"></span><a href="javascript:void(0);" onclick="return RefreshCommentList();" id="lnk_RefreshComments" runat="server" clientidmode="Static">刷新评论</a><a href="#" onclick="return RefreshPage();">刷新页面</a><a href="#top">返回顶部</a></div>
+    <div id="comment_form_container" style="visibility: visible;"><div class="login_tips">
+    登录后才能查看或发表评论，立即 <a rel="nofollow" href="javascript:void(0);" class="underline" onclick="return account.login('!comments');">登录</a> 或者
+    <a href="https://www.cnblogs.com/">逛逛</a> 博客园首页
+</div>
+</div>
+    <div class="ad_text_commentbox" id="ad_text_under_commentbox"></div>
+        <div id="cnblogs_ch"></div>
+    <div id="opt_under_post"></div>
+    <div id="cnblogs_c1" class="under-post-card" style="display: none;">
+            <div id="div-gpt-ad-1592365906576-0" style="width: 300px; height: 250px;"></div>
+    </div>
+    <div id="under_post_card1"><div class="under-post-card">
+<b>编辑推荐：</b>
+<br>
+
+· <a href="https://www.cnblogs.com/thisiswhy/p/17401485.html" target="_blank">我试图通过这篇文章告诉你，这行源码有多牛逼</a>
+    <br>
+· <a href="https://www.cnblogs.com/jevonsflash/p/17399748.html" target="_blank">[MAUI 程序设计] 界面多态与实现 </a>
+    <br>
+· <a href="https://www.cnblogs.com/huangxincheng/p/17395212.html" target="_blank">记一次 某智能制造MES系统CPU 爆高分析 </a>
+    <br>
+· <a href="https://www.cnblogs.com/alvinscript/p/17388821.html" target="_blank">一个操作把 MySQL 主从复制整崩了</a>
+    <br>
+· <a href="https://www.cnblogs.com/chejiangyi/p/17387775.html" target="_blank">百人研发团队百亿销售规模的技术架构实践分享</a>
+    <br>
+</div></div>
+    <div id="under_post_card2"><div class="itnews under-post-card">
+    <b>阅读排行：</b>
+    <br>
+ ·          <a href="https://www.cnblogs.com/thisiswhy/p/17401485.html" target="_blank">我试图通过这篇文章告诉你，这行源码有多牛逼。</a>
+        <br>
+ ·          <a href="https://www.cnblogs.com/shawshank/p/17390248.html" target="_blank">C# 实现 Linux 视频会议（源码，支持信创环境，银河麒麟，统信UOS）</a>
+        <br>
+ ·          <a href="https://www.cnblogs.com/cmt/p/17402955.html" target="_blank">园子的商业化努力-AI人才服务：招募AI导师</a>
+        <br>
+ ·          <a href="https://www.cnblogs.com/xueweihan/p/17403734.html" target="_blank">又一个开源便斩获 7k star 的新模型「GitHub 热点速览」</a>
+        <br>
+ ·          <a href="https://www.cnblogs.com/huangxincheng/p/17401330.html" target="_blank">记一次 .NET 某医院门诊软件 卡死分析</a>
+        <br>
+</div></div>
+    <div id="HistoryToday" class="under-post-card"></div>
+    <script type="text/javascript">
+        var commentManager = new blogCommentManager();
+        commentManager.renderComments(0);
+        fixPostBody();
+        window.footnoteTipManager.generateFootnoteTips();
+
+            window.tocManager.displayDisableTocTips = false;
+            window.tocManager.generateToc();
+            
+                setTimeout(function() { countViews(cb_blogId, cb_entryId); }, 50);
+            
+            deliverT2();
+            deliverC1C2();
+            loadNewsAndKb();
+            
+                LoadPostCategoriesTags(cb_blogId, cb_entryId);
+            
+            LoadPostInfoBlock(cb_blogId, cb_entryId, cb_blogApp, cb_blogUserGuid);
+            GetPrevNextPost(cb_entryId, cb_blogId, cb_entryCreatedDate, cb_postType);
+            loadOptUnderPost();
+            GetHistoryToday(cb_blogId, cb_blogApp, cb_entryCreatedDate);
+                </script>
+</div>
+
+	</div><!--end: forFlow -->
+	</div><!--end: mainContent 主体内容容器-->
+	<div id="sideBar">
+		<div id="sideBarMain">
+			<div id="sidebar_news" class="newsItem">
+    <h3 class="catListTitle">公告</h3>
+<div id="blog-news"><div class="container">    <div class="menu-wrap optiscroll is-enabled has-vtrack" id="menuWrap" style=""><div class=" optiscroll-content" style="right: -3px; bottom: -3px;">        <nav class="menu">            <!-- 个人简介 -->            <div class="introduce-box">                <div class="introduce-head">                    <div class="introduce-via" id="menuBlogAvatar"><img src="https://images.cnblogs.com/cnblogs_com/blogs/745175/galleries/2155155/o_220504153552_photo-1593085512500-5d55148d6f0d.jpg"></div>                </div>                <div id="introduce">
+    昵称：
+    <a href="https://home.cnblogs.com/u/ray93/">
+        ray963
+    </a>
+    <br>
+    园龄：
+    <a href="https://home.cnblogs.com/u/ray93/" title="入园时间：2021-06-29">
+        1年10个月
+    </a>
+    <br>
+    粉丝：
+    <a class="follower-count" href="https://home.cnblogs.com/u/ray93/followers/">
+        3
+    </a>
+    <br>
+    关注：
+    <a class="folowing-count" href="https://home.cnblogs.com/u/ray93/followees/">
+        1
+    </a>
+    <div id="p_b_follow" class="follow-tip">
+<a href="javascript:void(0)" onclick="follow('350082ff-f067-4c14-f1c5-08d93abcd2cc')">+加关注</a></div>
+    
+</div>            </div>            <!-- 导航 -->            <div class="nav-title"></div>            <div class="icon-list">                <ul id="m-nav-list">                <li><a href="https://www.cnblogs.com/ray93/" target="_self"><i class="iconfont icon-homepage_fill"></i>首页</a></li><li><a href="https://msg.cnblogs.com/send/ray93" target="_blank"><i class="iconfont icon-zhifeiji"></i>联系</a></li><li><a href="javascript:void(0)" onclick="$('#blog_nav_rss').trigger('click');" data-rss="https://www.cnblogs.com/ray93/rss/"><i class="iconfont icon-qinmifu"></i>订阅</a></li><li><a href="https://i.cnblogs.com/" target="_blank"><i class="iconfont icon-setup_fill"></i>管理</a></li></ul>            </div>            <!-- 日历 -->            <span id="calendar-box"></span>            <!-- 找找看 -->            <div class="m-list-title"><span>找找看</span></div>            <div class="m-icon-list" id="sb-sidebarSearchBox"></div>            <!-- 积分与排名 -->            <div class="m-list-title"><span>积分排名<span class="iconfont icon-select m-list-title-select"></span></span></div>            <div class="m-icon-list" id="sb-sidebarScorerank"></div>            <!-- 最新随笔 -->            <div class="m-list-title"><span>最新随笔<span class="iconfont icon-select m-list-title-select"></span></span></div>            <div class="m-icon-list" id="sb-sidebarRecentposts"></div>            <!-- 我的标签 -->            <div class="m-list-title" style="display: block;"><span>我的标签<span class="iconfont icon-select m-list-title-select"></span></span></div>            <div class="m-icon-list" id="sb-toptags"><div><ul><li><a href="https://www.cnblogs.com/ray93/tag/Java/"><span class="iconfont icon-label_fill" style="color: #888;font-size: 14px;margin-right: 5px;"></span>Java(11)</a></li><li><a href="https://www.cnblogs.com/ray93/tag/%E5%B5%8C%E5%85%A5%E5%BC%8F/"><span class="iconfont icon-label_fill" style="color: #888;font-size: 14px;margin-right: 5px;"></span>嵌入式(8)</a></li><li><a href="https://www.cnblogs.com/ray93/tag/MATLAB/"><span class="iconfont icon-label_fill" style="color: #888;font-size: 14px;margin-right: 5px;"></span>MATLAB(4)</a></li><li><a href="https://www.cnblogs.com/ray93/tag/DOS/"><span class="iconfont icon-label_fill" style="color: #888;font-size: 14px;margin-right: 5px;"></span>DOS(1)</a></li><li><a href="https://www.cnblogs.com/ray93/tag/Markdown/"><span class="iconfont icon-label_fill" style="color: #888;font-size: 14px;margin-right: 5px;"></span>Markdown(1)</a></li><li><a href="https://www.cnblogs.com/ray93/tag/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/"><span class="iconfont icon-label_fill" style="color: #888;font-size: 14px;margin-right: 5px;"></span>深度学习(1)</a></li><li><a href="https://www.cnblogs.com/ray93/tag/ANC%E7%AE%97%E6%B3%95/"><span class="iconfont icon-label_fill" style="color: #888;font-size: 14px;margin-right: 5px;"></span>ANC算法(1)</a></li></ul></div></div>            <!-- 随笔分类 -->            <div class="m-list-title" style="display: block;"><span>随笔分类<span class="iconfont icon-select m-list-title-select"></span></span></div>            <div class="m-icon-list" id="sb-classify"><div><ul><li><a href="https://www.cnblogs.com/ray93/category/2135944.html" style="--cnb-category-item-link-indent-size: calc(0 * 1em)" class="category-item-link" rel="" target=""><span class="iconfont icon-marketing_fill" style="color: #888;font-size: 14px;margin-right: 5px;"></span>Java SE(13)</a></li><li><a href="https://www.cnblogs.com/ray93/category/2152029.html" style="--cnb-category-item-link-indent-size: calc(0 * 1em)" class="category-item-link" rel="" target=""><span class="iconfont icon-marketing_fill" style="color: #888;font-size: 14px;margin-right: 5px;"></span>matlab小知识(4)</a></li><li><a href="https://www.cnblogs.com/ray93/category/2155405.html" style="--cnb-category-item-link-indent-size: calc(0 * 1em)" class="category-item-link" rel="" target=""><span class="iconfont icon-marketing_fill" style="color: #888;font-size: 14px;margin-right: 5px;"></span>ANC算法论文翻译(1)</a></li><li><a href="https://www.cnblogs.com/ray93/category/2168733.html" style="--cnb-category-item-link-indent-size: calc(0 * 1em)" class="category-item-link" rel="" target=""><span class="iconfont icon-marketing_fill" style="color: #888;font-size: 14px;margin-right: 5px;"></span>嵌入式学习(11)</a></li></ul></div></div>            <!-- 文章分类 -->            <div class="m-list-title"><span>文章分类<span class="iconfont icon-select m-list-title-select"></span></span></div>            <div class="m-icon-list" id="sb-ArticleCategory"></div>            <!-- 阅读排行 -->            <div class="m-list-title" style="display: block;"><span>阅读排行<span class="iconfont icon-select m-list-title-select"></span></span></div>            <div class="m-icon-list" id="sb-topview"><div><ul><li><a href="https://www.cnblogs.com/ray93/p/16408778.html"><span class="iconfont icon-browse_fill" style="color: #888;font-size: 14px;margin-right: 5px;"></span>word在一个位置中输入多个参考文献引用，如[1-3]的方法(2064)</a></li><li><a href="https://www.cnblogs.com/ray93/p/16200828.html"><span class="iconfont icon-browse_fill" style="color: #888;font-size: 14px;margin-right: 5px;"></span>MATLAB绘图中，坐标刻度改为指数形式(1229)</a></li><li><a href="https://www.cnblogs.com/ray93/p/16215464.html"><span class="iconfont icon-browse_fill" style="color: #888;font-size: 14px;margin-right: 5px;"></span>matlab中的fig文件不用代码调整图例顺序/调整曲线绘制顺序(996)</a></li><li><a href="https://www.cnblogs.com/ray93/p/16243633.html"><span class="iconfont icon-browse_fill" style="color: #888;font-size: 14px;margin-right: 5px;"></span>翻译"Deep ANC: A deep learning approach to active noise control"(574)</a></li><li><a href="https://www.cnblogs.com/ray93/p/16755796.html"><span class="iconfont icon-browse_fill" style="color: #888;font-size: 14px;margin-right: 5px;"></span>关闭sysMain服务解决win10系统硬盘占用率莫名增加到100%的卡顿问题(555)</a></li></ul></div></div>            <!-- 推荐排行 -->            <div class="m-list-title"><span>推荐排行<span class="iconfont icon-select m-list-title-select"></span></span></div>            <div class="m-icon-list" id="sb-topDiggPosts"></div>            <!-- 最新评论 -->            <div class="m-list-title"><span>最新评论<span class="iconfont icon-select m-list-title-select"></span></span></div>            <div class="m-icon-list" id="sb-recentComments"></div>            <!-- 文章档案 -->            <div class="m-list-title"><span>文章档案<span class="iconfont icon-select m-list-title-select"></span></span></div>            <div class="m-icon-list" id="sb-articlearchive"></div>            <!-- 随笔档案 -->            <div class="m-list-title" style="display: block;"><span>随笔档案<span class="iconfont icon-select m-list-title-select"></span></span></div>            <div class="m-icon-list" id="sb-record"><div><ul><li><a href="https://www.cnblogs.com/ray93/archive/2022/12.html" style="--cnb-category-item-link-indent-size: calc(0 * 1em)" class="category-item-link" rel="" target=""><span class="iconfont icon-task_fill" style="color: #888;font-size: 14px;margin-right: 5px;"></span>2022年12月(1)</a></li><li><a href="https://www.cnblogs.com/ray93/archive/2022/10.html" style="--cnb-category-item-link-indent-size: calc(0 * 1em)" class="category-item-link" rel="" target=""><span class="iconfont icon-task_fill" style="color: #888;font-size: 14px;margin-right: 5px;"></span>2022年10月(2)</a></li><li><a href="https://www.cnblogs.com/ray93/archive/2022/08.html" style="--cnb-category-item-link-indent-size: calc(0 * 1em)" class="category-item-link" rel="" target=""><span class="iconfont icon-task_fill" style="color: #888;font-size: 14px;margin-right: 5px;"></span>2022年8月(2)</a></li><li><a href="https://www.cnblogs.com/ray93/archive/2022/07.html" style="--cnb-category-item-link-indent-size: calc(0 * 1em)" class="category-item-link" rel="" target=""><span class="iconfont icon-task_fill" style="color: #888;font-size: 14px;margin-right: 5px;"></span>2022年7月(4)</a></li><li><a href="https://www.cnblogs.com/ray93/archive/2022/06.html" style="--cnb-category-item-link-indent-size: calc(0 * 1em)" class="category-item-link" rel="" target=""><span class="iconfont icon-task_fill" style="color: #888;font-size: 14px;margin-right: 5px;"></span>2022年6月(4)</a></li><li><a href="https://www.cnblogs.com/ray93/archive/2022/05.html" style="--cnb-category-item-link-indent-size: calc(0 * 1em)" class="category-item-link" rel="" target=""><span class="iconfont icon-task_fill" style="color: #888;font-size: 14px;margin-right: 5px;"></span>2022年5月(10)</a></li><li><a href="https://www.cnblogs.com/ray93/archive/2022/04.html" style="--cnb-category-item-link-indent-size: calc(0 * 1em)" class="category-item-link" rel="" target=""><span class="iconfont icon-task_fill" style="color: #888;font-size: 14px;margin-right: 5px;"></span>2022年4月(7)</a></li><li><a href="https://www.cnblogs.com/ray93/archive/2022/03.html" style="--cnb-category-item-link-indent-size: calc(0 * 1em)" class="category-item-link" rel="" target=""><span class="iconfont icon-task_fill" style="color: #888;font-size: 14px;margin-right: 5px;"></span>2022年3月(1)</a></li></ul></div></div>            <!-- 自定义列表 -->            <span id="menuCustomList"></span>        </nav>        <button class="close-button" id="close-button">Close Menu</button>        <div class="morph-shape" id="morph-shape" data-morph-open="M-7.312,0H15c0,0,66,113.339,66,399.5C81,664.006,15,800,15,800H-7.312V0z;M-7.312,0H100c0,0,0,113.839,0,400c0,264.506,0,400,0,400H-7.312V0z">            <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 100 800" preserveAspectRatio="none">                <path d="M-7.312,0H0c0,0,0,113.839,0,400c0,264.506,0,400,0,400h-7.312V0z"></path>            <desc>Created with Snap</desc><defs></defs></svg>        </div>    </div><div class="optiscroll-v"><b class="optiscroll-vtrack" style="height: 20%; transform: translate(0%, 0%);"></b></div><div class="optiscroll-h"><b class="optiscroll-htrack"></b></div></div>    <button class="menu-button menu-button-scroll" id="open-button"></button>    <div class="content-wrap" id="content-wrap" style="display: none;"></div><!-- /content-wrap --></div><div class="main-header" style="height: 40vh; background: url(&quot;https://cdn.jsdelivr.net/gh/BNDong/Cnblogs-Theme-SimpleMemory@master/img/webp/nothome_top_bg.webp&quot;) center center / cover no-repeat rgb(34, 34, 34);">    <canvas id="notHomeTopCanvas" width="1307" height="379"></canvas>    <div class="vertical">        <div class="main-header-content inner" style="max-width: 100vw;">            <h1 class="page-title" id="homeTopTitle" style="display: none;">Ray963</h1>            <h2 class="page-description" id="hitokoto"></h2>            <h3 class="page-author" id="hitokotoAuthor"></h3>            <h1 class="sb-title" id="sbTitle">
+    Linux基础使用学习笔记
+    
+</h1>            <p class="article-info" id="articleInfo"><p class="article-info-text"><span class="postMeta"><i class="iconfont icon-time1"></i>发表于 2022-06-12 14:18<i class="iconfont icon-browse"></i>阅读：93<i class="iconfont icon-interactive"></i>评论：0<i class="iconfont icon-hot"></i>推荐：0</span></p><a href="https://www.cnblogs.com/ray93/category/2168733.html" target="_blank"><span class="article-info-tag article-tag-class-color">嵌入式学习</span></a><a href="https://www.cnblogs.com/ray93/tag/%E5%B5%8C%E5%85%A5%E5%BC%8F/" target="_blank"><span class="article-info-tag article-tag-color">嵌入式</span></a></p>        </div>    </div>    <a class="scroll-down" href="javascript:void(0);" data-offset="-45" style="display: none;">        <span class="hidden">Scroll Down</span>        <i class="scroll-down-icon iconfont icon-fanhui"></i>    </a></div><div id="loading" style="display: none;"></div><div id="bottomProgressBar"><div id="top-progress-bar" style="position: relative; top: 0px; left: 0px; right: 0px; background-color: rgb(119, 182, 255); height: 2px; width: 34%; transition: width 0.2s ease 0s, opacity 0.6s ease 0s; opacity: 1;"></div></div><div id="rightMenu"><div id="rightDiggit" clickflg="false" onclick="votePost(16367954,'Digg')"><span class="rightMenuSpan rightDiggitSpan">0</span><i class="iconfont icon-zan1"></i></div><div id="rightBuryit" clickflg="false" onclick="votePost(16367954,'Bury')"><span class="rightMenuSpan rightBuryitSpan">0</span><i class="iconfont icon-buzan"></i></div><div id="attention" onclick="follow('350082ff-f067-4c14-f1c5-08d93abcd2cc')" clickflg="false"><span class="rightMenuSpan attentionSpan">关注</span><i class="iconfont icon-dianzan"></i></div><div id="toUpDown" data="up"><span class="rightMenuSpan toUpDownSpan">返回顶部</span><div id="toUpDownI" style="transform: rotate(0deg); transform-origin: 50% 50%;"><i class="iconfont icon-zhiding"></i></div></div></div>    
+    <div id="sidebar_news_content"><script type="text/javascript">window['__document_write_ajax_callbacks__']['5']();</script><script type="text/javascript">window['__document_write_ajax_callbacks__']['1']();</script>
+<script type="text/javascript">window['__document_write_ajax_callbacks__']['6']();</script><script type="text/javascript">window['__document_write_ajax_callbacks__']['7']();</script><script defer="">window['__document_write_ajax_callbacks__']['2']();</script>
+
+ 
+
+ 
+<script type="text/javascript">window['__document_write_ajax_callbacks__']['8']();</script><script>window['__document_write_ajax_callbacks__']['3']();</script>
+
+
+
+<div id="profile_block">
+    昵称：
+    <a href="https://home.cnblogs.com/u/ray93/">
+        ray963
+    </a>
+    <br>
+    园龄：
+    <a href="https://home.cnblogs.com/u/ray93/" title="入园时间：2021-06-29">
+        1年10个月
+    </a>
+    <br>
+    粉丝：
+    <a class="follower-count" href="https://home.cnblogs.com/u/ray93/followers/">
+        3
+    </a>
+    <br>
+    关注：
+    <a class="folowing-count" href="https://home.cnblogs.com/u/ray93/followees/">
+        1
+    </a>
+    <div id="p_b_follow" class="follow-tip">
+<a href="javascript:void(0)" onclick="follow('350082ff-f067-4c14-f1c5-08d93abcd2cc')">+加关注</a></div>
+    <script type="text/javascript">window['__document_write_ajax_callbacks__']['9']();</script><script>window['__document_write_ajax_callbacks__']['4']();</script>
+</div>
+</div>
+</div>
+<script>loadBlogNews();</script>
+
+ 
+</div>
+<div id="sidebar_c3"></div>
+			<div id="blog-calendar" style="display:none"></div><script>loadBlogDefaultCalendar();</script>			
+			<div id="leftcontentcontainer">
+				<div id="blog-sidecolumn"><!-- 搜索 -->
+<div id="sidebar_search" class="sidebar-block">
+    
+</div>
+
+<!-- 常用链接 -->
+<div id="sidebar_shortcut" class="sidebar-block"><div class="catListLink">
+<h3 class="catListTitle">
+常用链接
+</h3>
+<ul>
+    <li><a href="https://www.cnblogs.com/ray93/p/" title="我的博客的随笔列表">我的随笔</a></li>
+<li><a href="https://www.cnblogs.com/ray93/MyComments.html" title="我的发表过的评论列表">我的评论</a></li>
+<li><a href="https://www.cnblogs.com/ray93/OtherPosts.html" title="我评论过的随笔列表">我的参与</a></li>
+<li><a href="https://www.cnblogs.com/ray93/comments" title="我的博客的评论列表">最新评论</a></li>
+<li><a href="https://www.cnblogs.com/ray93/tag/" title="我的博客的标签列表">我的标签</a></li>
+
+</ul>
+</div>
+
+</div>
+
+<!-- 最新随笔 -->
+
+
+<!-- 我的标签 -->
+<div id="sidebar_toptags" class="sidebar-block"><div class="catListTag">
+    <h3 class="catListTitle"><a href="https://www.cnblogs.com/ray93/tag/" class="sidebar-card-title-a">我的标签</a></h3>
+<ul>
+        <li>
+            <a href="https://www.cnblogs.com/ray93/tag/Java/">Java<span class="tag-count">(11)</span></a>
+        </li>
+        <li>
+            <a href="https://www.cnblogs.com/ray93/tag/%E5%B5%8C%E5%85%A5%E5%BC%8F/">嵌入式<span class="tag-count">(8)</span></a>
+        </li>
+        <li>
+            <a href="https://www.cnblogs.com/ray93/tag/MATLAB/">MATLAB<span class="tag-count">(4)</span></a>
+        </li>
+        <li>
+            <a href="https://www.cnblogs.com/ray93/tag/DOS/">DOS<span class="tag-count">(1)</span></a>
+        </li>
+        <li>
+            <a href="https://www.cnblogs.com/ray93/tag/Markdown/">Markdown<span class="tag-count">(1)</span></a>
+        </li>
+        <li>
+            <a href="https://www.cnblogs.com/ray93/tag/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">深度学习<span class="tag-count">(1)</span></a>
+        </li>
+        <li>
+            <a href="https://www.cnblogs.com/ray93/tag/ANC%E7%AE%97%E6%B3%95/">ANC算法<span class="tag-count">(1)</span></a>
+        </li>
+    
+
+</ul>
+</div>
+
+</div>
+
+<!-- 积分与排名 -->
+
+
+<!-- 随笔分类、随笔档案、文章分类、新闻分类、相册、链接 -->
+<div id="sidebar_categories">
+
+    <div id="sidebar_postcategory" class="catListPostCategory sidebar-block">
+        <h3 class="catListTitle">
+            
+    <a class="sidebar-card-title-a" href="https://www.cnblogs.com/ray93/post-categories">随笔分类</a>
+
+
+
+        </h3>
+
+        <ul>
+
+                <li data-category-list-item-visible="true" style="display: block">
+                    
+<a href="https://www.cnblogs.com/ray93/category/2135944.html" style="--cnb-category-item-link-indent-size: calc(0 * 1em)" class="category-item-link" rel="" target="">Java SE(13)</a>
+ 
+                </li>                
+                <li data-category-list-item-visible="true" style="display: block">
+                    
+<a href="https://www.cnblogs.com/ray93/category/2152029.html" style="--cnb-category-item-link-indent-size: calc(0 * 1em)" class="category-item-link" rel="" target="">matlab小知识(4)</a>
+ 
+                </li>                
+                <li data-category-list-item-visible="true" style="display: block">
+                    
+<a href="https://www.cnblogs.com/ray93/category/2155405.html" style="--cnb-category-item-link-indent-size: calc(0 * 1em)" class="category-item-link" rel="" target="">ANC算法论文翻译(1)</a>
+ 
+                </li>                
+                <li data-category-list-item-visible="true" style="display: block">
+                    
+<a href="https://www.cnblogs.com/ray93/category/2168733.html" style="--cnb-category-item-link-indent-size: calc(0 * 1em)" class="category-item-link" rel="" target="">嵌入式学习(11)</a>
+ 
+                </li>                
+            
+        </ul>
+
+
+    </div>    
+    <div id="sidebar_postarchive" class="catListPostArchive sidebar-block">
+        <h3 class="catListTitle">
+            
+随笔档案
+
+
+        </h3>
+
+        <ul>
+
+                <li data-category-list-item-visible="true" style="display: block">
+                    
+<a href="https://www.cnblogs.com/ray93/archive/2022/12.html" style="--cnb-category-item-link-indent-size: calc(0 * 1em)" class="category-item-link" rel="" target="">2022年12月(1)</a>
+ 
+                </li>                
+                <li data-category-list-item-visible="true" style="display: block">
+                    
+<a href="https://www.cnblogs.com/ray93/archive/2022/10.html" style="--cnb-category-item-link-indent-size: calc(0 * 1em)" class="category-item-link" rel="" target="">2022年10月(2)</a>
+ 
+                </li>                
+                <li data-category-list-item-visible="true" style="display: block">
+                    
+<a href="https://www.cnblogs.com/ray93/archive/2022/08.html" style="--cnb-category-item-link-indent-size: calc(0 * 1em)" class="category-item-link" rel="" target="">2022年8月(2)</a>
+ 
+                </li>                
+                <li data-category-list-item-visible="true" style="display: block">
+                    
+<a href="https://www.cnblogs.com/ray93/archive/2022/07.html" style="--cnb-category-item-link-indent-size: calc(0 * 1em)" class="category-item-link" rel="" target="">2022年7月(4)</a>
+ 
+                </li>                
+                <li data-category-list-item-visible="true" style="display: block">
+                    
+<a href="https://www.cnblogs.com/ray93/archive/2022/06.html" style="--cnb-category-item-link-indent-size: calc(0 * 1em)" class="category-item-link" rel="" target="">2022年6月(4)</a>
+ 
+                </li>                
+                <li data-category-list-item-visible="true" style="display: block">
+                    
+<a href="https://www.cnblogs.com/ray93/archive/2022/05.html" style="--cnb-category-item-link-indent-size: calc(0 * 1em)" class="category-item-link" rel="" target="">2022年5月(10)</a>
+ 
+                </li>                
+                <li data-category-list-item-visible="true" style="display: block">
+                    
+<a href="https://www.cnblogs.com/ray93/archive/2022/04.html" style="--cnb-category-item-link-indent-size: calc(0 * 1em)" class="category-item-link" rel="" target="">2022年4月(7)</a>
+ 
+                </li>                
+                <li data-category-list-item-visible="true" style="display: block">
+                    
+<a href="https://www.cnblogs.com/ray93/archive/2022/03.html" style="--cnb-category-item-link-indent-size: calc(0 * 1em)" class="category-item-link" rel="" target="">2022年3月(1)</a>
+ 
+                </li>                
+            
+        </ul>
+
+
+    </div>    
+</div>
+
+<!-- 最新评论 -->
+<!-- 阅读排行榜 -->
+<div id="sidebar_topviewedposts" class="sidebar-block"><div class="catListView">
+    <h3 class="catListTitle">
+        <a href="https://www.cnblogs.com/ray93/most-viewed" class="sidebar-card-title-a">
+    阅读排行榜
+</a>
+
+    </h3>
+    <div id="TopViewPostsBlock">
+        <ul style="word-break:break-all">
+                    <li>
+                        <a href="https://www.cnblogs.com/ray93/p/16408778.html">
+                            1. word在一个位置中输入多个参考文献引用，如[1-3]的方法(2064)
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://www.cnblogs.com/ray93/p/16200828.html">
+                            2. MATLAB绘图中，坐标刻度改为指数形式(1229)
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://www.cnblogs.com/ray93/p/16215464.html">
+                            3. matlab中的fig文件不用代码调整图例顺序/调整曲线绘制顺序(996)
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://www.cnblogs.com/ray93/p/16243633.html">
+                            4. 翻译"Deep ANC: A deep learning approach to active noise control"(574)
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://www.cnblogs.com/ray93/p/16755796.html">
+                            5. 关闭sysMain服务解决win10系统硬盘占用率莫名增加到100%的卡顿问题(555)
+                        </a>
+                    </li>
+        </ul>
+    </div>
+</div></div>
+
+<!-- 评论排行榜 -->
+<div id="sidebar_topcommentedposts" class="sidebar-block"></div>
+
+<!-- 推荐排行榜 -->
+<div id="sidebar_topdiggedposts" class="sidebar-block"></div><div id="sidebar_recentcomments" class="sidebar-block"></div>
+
+
+</div>
+                    <script>loadBlogSideColumn();</script>
+			</div>			
+		</div><!--end: sideBarMain -->
+	</div><!--end: sideBar 侧边栏容器 -->
+	<div class="clear"></div>
+	</div><!--end: main -->
+	<div class="clear"></div>
+	<div id="footer"><footer><footer-background><figure class="clouds"></figure><figure class="background"></figure><figure class="foreground"></figure></footer-background></footer><div class="footer-box"><div><span id="blogRunTimeSpan">This blog has running : 686 d 16 h 31 m 57 s</span><span class="my-face">ღゝ◡╹)ノ♡</span></div><div id="blogrollInfo"></div><div>
+		
+Copyright © 2023 ray963
+Powered by .NET 7.0 on Kubernetes
+
+
+
+	</div><div id="cnzzInfo"></div><div id="themeInfo">Theme version: <a href="https://github.com/BNDong/Cnblogs-Theme-SimpleMemory/tree/v1.3.3" target="_blank" style="color: #888;text-decoration: underline;">v1.3.3</a> / Loading theme version: <a href="https://github.com/BNDong/Cnblogs-Theme-SimpleMemory/tree/v1.3.3" target="_blank" style="color: #888;text-decoration: underline;">v1.3.3</a></div></div></div><!--end: footer -->
+</div><!--end: home 自定义的最大容器 -->
+
+
+
+    <div id="page_end_html">
+        <!--   网站统计  -->
+<div id="cnzzProtocol" style="display: none;">
+    <span class="id_cnzz_stat_icon" id="cnzz_stat_icon_1279442252"></span>
+    <script src="//v1.cnzz.com/z_stat.php?id=1279442252&amp;online=1&amp;show=line" type="text/javascript"></script>
+</div>
+
+<!--   播放器  -->
+<!-- require APlayer -->
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.css">
+<script src="//cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.js"></script>
+<!-- require MetingJS -->
+<script src="//cdn.jsdelivr.net/npm/meting@2/dist/Meting.min.js"></script>
+<meting-js auto="//y.qq.com/n/yqq/playlist/7787591166.html" fixed="true"></meting-js>
+<script type="text/javascript">
+/* 鼠标特效 */
+var a_idx = 0;
+jQuery(document).ready(function($) {
+    $("body").click(function(e) {
+        var a = new Array("❤开心❤","❤快乐❤","❤高兴❤","❤开心❤","❤快乐❤","❤开心❤","❤开心❤","❤开心❤","❤开心❤","❤开心❤","❤开心❤","❤开心❤");
+        var $i = $("<span></span>").text(a[a_idx]);
+        a_idx = (a_idx + 1) % a.length;
+        var x = e.pageX,
+        y = e.pageY;
+        $i.css({
+            "z-index": 999999999999999999999999999999999999999999999999999999999999999999999,
+            "top": y - 20,
+            "left": x,
+            "position": "absolute",
+            "font-weight": "bold",
+            "color": "rgb("+~~(255*Math.random())+","+~~(255*Math.random())+","+~~(255*Math.random())+")"
+        });
+        $("body").append($i);
+        $i.animate({
+            "top": y - 180,
+            "opacity": 0
+        },
+        1500,
+        function() {
+            $i.remove();
+        });
+    });
+});
+</script>
+<div class="Snow">
+    <div id="Snow"></div>
+</div>
+
+<script src="https://blog-static.cnblogs.com/files/Return-blog/xue.js"></script>
+ <script src="https://blog-static.cnblogs.com/files/yjlblog/cursor-effects.js"></script>
+ <div width="1366" height="662" style="position: fixed; left: 0px; top: 0px; z-index: 2147483647; pointer-events: none;"></div>
+<div class="Snow">
+    <div id="Snow"></div>
+</div>
+
+<script src="https://blog-static.cnblogs.com/files/Return-blog/xue.js"></script>
+
+
+    </div><canvas width="1865" height="947" style="position: fixed; left: 0px; top: 0px; z-index: 2147483647; pointer-events: none;"></canvas>
+
+    <input type="hidden" id="antiforgery_token" value="CfDJ8M-opqJn5c1MsCC_BxLIULmkn-_uJyZm5sTuO_2VWMtdoSr9sjLGTPyNoZsNO1hjFcw_tR84DRNu7RBgOzNV5Tsqz_wu52v6_IphcwD6jn330WcYeQI0HgAIy7vEYBUHMCY3ratEbQuQQK9ezslh9yQ">
+    <script async="" src="https://www.googletagmanager.com/gtag/js?id=UA-476124-1"></script>
+<script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    var kv = getGACustom();
+    if (kv) {
+        gtag('set', kv);
+    }
+    gtag('config', 'UA-476124-1');
+</script>
+<script defer="" src="https://hm.baidu.com/hm.js?866c9be12d4a814454792b1fd0fed295"></script>
+
+<script type="text/javascript">
+    window.cnblogsConfig = {
+        GhVersions    : 'v1.3.3', // 版本
+        blogUser      : "Ray963", // 用户名
+        blogAvatar    : "https://images.cnblogs.com/cnblogs_com/blogs/745175/galleries/2155155/o_220504153552_photo-1593085512500-5d55148d6f0d.jpg", // 用户头像
+        blogStartDate : "2021-6-29", // 入园时间，年-月-日。入园时间查看方法：鼠标停留园龄时间上，会显示入园时间
+    }
+</script><script type="text/javascript">
+    L2Dwidget.init({
+        "model": {
+             jsonPath: "https://unpkg.com/live2d-widget-model-hijiki/assets/hijiki.model.json",<!--这里改模型，前面后面都要改-->
+            "scale": 1
+        },
+        "display": {
+            "position": "right",<!--设置看板娘的上下左右位置-->
+            "width": 150,
+            "height": 190,
+            "hOffset": 0,
+            "vOffset": 0
+        },
+        "mobile": {
+            "show": true,
+            "scale": 0.5
+        },
+        "react": {
+            "opacityDefault": 0.7,<!--设置透明度-->
+            "opacityOnHover": 0.2
+        }
+    });
+</script><script type="text/javascript">getFollowStatus('350082ff-f067-4c14-f1c5-08d93abcd2cc');</script><canvas id="bgCanvas" width="1310" height="947" style="display: block; position: fixed; margin: 0px; padding: 0px; border: 0px; outline: 0px; left: 0px; top: 0px; width: 100%; height: 100%; z-index: -1;"></canvas><div id="sideToolbar" style="display: block; top: 384px; right: 0px;" class="sideToolbarFix"><span class="catalog-btn catalog-btn-shadow" style="display: block;"><i class="iconfont icon-mulu"></i></span><div class="sideCatalogBg" id="sideCatalog" style="display: none;"><div id="sideCatalog-sidebar"><div class="sideCatalog-sidebar-top"></div><div class="sideCatalog-sidebar-bottom"></div></div><div id="sideCatalog-catalog" class="mCustomScrollbar _mCS_1 mCS-autoHide" style="overflow: visible;"><div id="mCSB_1" class="mCustomScrollBox mCS-minimal-dark mCSB_vertical_horizontal mCSB_outside" style="max-height: 0px;" tabindex="0"><div id="mCSB_1_container" class="mCSB_container mCS_y_hidden mCS_no_scrollbar_y" style="position: relative; top: 0px; left: -230px; width: 230px;" dir="ltr"><ul class="nav" style="width:230px;zoom:1"><li h="1" g="1" class=""><a href="#1-linux操作系统概述" goto="tid-zP4h23" onclick="return false;">1. Linux操作系统概述</a><span class="sideCatalog-dot"></span></li><li h="1" g="2" class=""><a href="#2-linux操作系统选择与安装" goto="tid-cSnbRK" onclick="return false;">2. Linux操作系统选择与安装</a><span class="sideCatalog-dot"></span></li><li h="1" g="3" class=""><a href="#3-linux文件系统及文件的基础知识" goto="tid-wD8xhS" onclick="return false;">3. Linux文件系统及文件的基础知识</a><span class="sideCatalog-dot"></span></li><li h="2" g="3" class="h2Offset ceg3" style="display: none;"><a href="#31-文件系统概述" goto="tid-eMzZYp" onclick="return false;">3.1 文件系统概述</a></li><li h="2" g="3" class="h2Offset ceg3" style="display: none;"><a href="#32-linux文件系统及文件" goto="tid-EcbXzh" onclick="return false;">3.2 Linux文件系统及文件</a></li><li h="1" g="4" class=""><a href="#4-linux操作系统命令使用" goto="tid-WcKceX" onclick="return false;">4. Linux操作系统命令使用</a><span class="sideCatalog-dot"></span></li><li h="2" g="4" class="h2Offset ceg4 active" style="display: list-item;"><a href="#41-shell命令基础" goto="tid-CEMzf7" onclick="return false;">4.1 shell命令基础</a></li><li h="2" g="4" class="h2Offset ceg4" style="display: list-item;"><a href="#42-文件管理" goto="tid-eK7mbt" onclick="return false;">4.2 文件管理</a></li><li h="2" g="4" class="h2Offset ceg4" style="display: list-item;"><a href="#43-系统管理" goto="tid-rM5xT8" onclick="return false;">4.3 系统管理</a></li><li h="2" g="4" class="h2Offset ceg4" style="display: list-item;"><a href="#44-用户管理" goto="tid-3N6GCm" onclick="return false;">4.4 用户管理</a></li><li h="2" g="4" class="h2Offset ceg4" style="display: list-item;"><a href="#45-磁盘管理" goto="tid-zrshzc" onclick="return false;">4.5 磁盘管理</a></li><li h="2" g="4" class="h2Offset ceg4" style="display: list-item;"><a href="#46-网络配置管理" goto="tid-dtTMQE" onclick="return false;">4.6 网络配置管理</a></li><li h="1" g="5" class=""><a href="#5-linux应用程序的安装与卸载基础" goto="tid-J3TBia" onclick="return false;">5. Linux应用程序的安装与卸载基础</a><span class="sideCatalog-dot"></span></li><li h="1" g="6" class=""><a href="#6-linux系统vi编辑器的使用基础" goto="tid-KWCDMR" onclick="return false;">6. Linux系统VI编辑器的使用基础</a><span class="sideCatalog-dot"></span></li><li h="2" g="6" class="h2Offset ceg6" style="display: none;"><a href="#61-vi的基本介绍" goto="tid-wjp2Y5" onclick="return false;">6.1 VI的基本介绍</a></li><li h="2" g="6" class="h2Offset ceg6" style="display: none;"><a href="#62-vi的常用命令" goto="tid-G2B2Hk" onclick="return false;">6.2 VI的常用命令</a></li></ul></div></div><div id="mCSB_1_scrollbar_vertical" class="mCSB_scrollTools mCSB_1_scrollbar mCS-minimal-dark mCSB_scrollTools_vertical" style="display: none;"><div class="mCSB_draggerContainer"><div id="mCSB_1_dragger_vertical" class="mCSB_dragger" style="position: absolute; min-height: 50px; top: 0px; height: 0px;"><div class="mCSB_dragger_bar" style="line-height: 50px;"></div></div><div class="mCSB_draggerRail"></div></div></div><div id="mCSB_1_scrollbar_horizontal" class="mCSB_scrollTools mCSB_1_scrollbar mCS-minimal-dark mCSB_scrollTools_horizontal" style="display: block;"><div class="mCSB_draggerContainer"><div id="mCSB_1_dragger_horizontal" class="mCSB_dragger" style="position: absolute; min-width: 50px; display: block; width: 0px; left: 0px;"><div class="mCSB_dragger_bar"></div></div><div class="mCSB_draggerRail"></div></div></div></div></div><a href="javascript:void(0);" id="sideCatalogBtn" class="sideCatalogBtnDisable"></a></div></body></html>
