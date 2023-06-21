@@ -42,6 +42,6 @@
 
 **解决方法：**
 
-1. 编辑.config文件
-2. 修改CONFIG_SYSTEM_TRUSTED_KEYS，将其赋空值。
-3. 修改CONFIG_SYSTEM_REVOCATION_KEYS，将其赋空值。
+1. 编辑 `.config` 文件;
+2. 修改 `CONFIG_SYSTEM_TRUSTED_KEYS` ，将其赋空值;
+3. 修改 `CONFIG_SYSTEM_REVOCATION_KEYS` ，将其赋空值。
