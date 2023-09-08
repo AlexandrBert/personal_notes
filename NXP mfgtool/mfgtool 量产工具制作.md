@@ -47,7 +47,7 @@
 
 1. 将一级目录下的 `cfg.ini` 文件复制一份，并备份改名为 `cfg-Linux.ini` ；
 2. 将 `Profiles` 目录下的 Linux 文件夹复制一份，并命名为 `BOE-Linux` ；
-3. 确认烧写的版本为 eMMC 版本，烧写的芯片为 imx6ull，根据 `BOE-Linux` 目录下的官方 `ucl2.xml` 文件，找到需要的文件版本。使用时，为避免同系列种类和参数太多，可以将非目标设置的所有设置注释掉。
+3. 确认烧写的版本为 eMMC 版本，烧写的芯片为 imx6ull，根据 `BOE-Linux` 目录下的官方 `ucl2.xml` 文件，找到需要的文件版本。使用时，***为避免同系列种类和参数太多，可以将非目标设置的所有设置注释掉。***
 4. 确认要烧写的镜像版本：
     - `U-boot` 的路径 `firmware/u-boot-imx6ul%lite%%6uluboot%_emmc.imx` 对应芯片的版本为 `u-boot-imx6ull14x14evk_emmc.imx` ;
     - `kernel` 版本为 `zImage` ;
