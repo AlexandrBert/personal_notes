@@ -37,77 +37,60 @@
 1. 仓库初始化
 
     在文件夹右键使用 `git bash` 命令行，输入指令完成本地仓库的初始化，输入指令后会生成一个 `.git` 文件
-    ```c
+    ```shell
     $ git init
     ```
 
-2. 关联远程github仓库
-
-    ```c
-    $ git remote add <alias> <url> /* alias为仓库别名，url为仓库链接 */
+2. 远程github仓库操作
+    ```shell
+    $ git remote -v     /* 显示所有的仓库地址和仓库别名 */
+    $ git remote add <alias> <url>  /* 新增远程仓库 */
+    $ git remote rm <alias> <url>   /* 删除远程仓库 */
+    $ git remote rename <origin> <name>    /* 把远程仓库的origin改为name */
     ```
-3. 同步仓库
 
-    ```c
+3. 同步仓库
+    ```shell
     $ git pull add <alias> <baranch_name>   /* alias为仓库别名，baranch_name为分支名 */
     $ git pull                              /* 同步所有分支 */
     ```
 
 4. 将变更提交到本地仓库
-
-    ```c
+    ```shell
     $ git add 'filename'    /* 将filename文件提交到本地仓库 */
     $ git add .             /* 将所有更改都提交到本地仓库 */
     $ git add -A            /* 将所有更改都提交到本地仓库 */
     ```
 
 5. 将变更提交到本地仓库
-
-    ```c
+    ```shell
     $ git commit -m '注释或备注信息等' /* 提交注释 */
     ```
 
 6. 将本地仓库推送到远程仓库
-
-    ```c
+    ```shell
     $ git push /* 提交后远端仓库会和本地仓库合并，需要ssh-key的权限 */
     $ git push <远程仓库名> <本地分支名>:<远程分支名> /* 如果本地分支名与远程分支名相同，则可以省略冒号： ,需要ssh-key的权限*/
     ```
 
 7. 查看本地仓库状态
-
-    ```c
+    ```shell
     $ git status /* 可以查看到当前暂存区的修改的文件同步状态 */
     ```
 
 8. 对比本地仓库与remote仓库区别
-
-    ```c
+    ```shell
     $ git diff /* 可以查看到仓库与远程仓库的文件区别 */
     ```
 
 9. 查看git提交的日志
-
-    ```c
+    ```shell
     $ git log /* 可以查看到本地仓库的操作日志，上次存储、提交等的时间的注释等 */
     ```
 
 10. 克隆（下载）一个本地库
-
-    ```c
+    ```shell
     $ git clone <url> /* url为远程仓库地址 */
-    ```
-
-11. 查看现有远程仓库
-
-    ```c
-    $ git remote -v /*  */
-    ```
-
-12. 修改远程仓库别名
-
-    ```c
-    $ git remote rename <origin> <name> /* 把远程仓库的origin改为name */
     ```
 
 ## github 仓库设置
