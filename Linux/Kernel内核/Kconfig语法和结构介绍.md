@@ -1,5 +1,9 @@
 # Kconfig 语法和结构介绍
 
+Kconfig就是对应着内核的配置菜单。如果要想添加新的驱动到内核的源码中，可以修改Kconfig,这样就可以选择这个驱动，如果想使这个驱动被编译，要修改Makefile。
+
+Kconfig的语法在 [Kconfig-language](https://www.kernel.org/doc/Documentation/kbuild/kconfig-language.txt) 中做了详细的说明
+
 ## 内核中的 Kconfig 结构介绍
 
 1. 内核源码的顶层 linux-4.20.17/Kconfig 文件
