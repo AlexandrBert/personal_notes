@@ -1,4 +1,6 @@
 # buildroot
+## buildroot 简介
+buildroot 是一个通过交叉编译器生成嵌入式 Linux 系统的工具，其简单、高效并易于使用。
 
 ## 安装依赖
 
