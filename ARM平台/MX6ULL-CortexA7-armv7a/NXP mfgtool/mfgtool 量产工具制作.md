@@ -57,7 +57,7 @@
 5.  根据上述文件需要的变量，将一级目录下的 `cfg.ini` 文件修改为如下设置：
     ```ini
     [profiles]
-    chip = BOE
+    chip = BOE-Linux
 
     [platform]
     board = SabreSD
