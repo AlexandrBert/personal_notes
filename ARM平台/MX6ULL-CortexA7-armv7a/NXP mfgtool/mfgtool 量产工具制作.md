@@ -57,13 +57,14 @@
 5.  根据上述文件需要的变量，将一级目录下的 `cfg.ini` 文件修改为如下设置：
     ```ini
     [profiles]
-    chip = BOE-Linux
+    chip = BOE
 
     [platform]
     board = SabreSD
 
     [LIST]
     # 选择操作列表下的参数
+    #name = SDCard
     name = eMMC
 
     [variable]
@@ -77,13 +78,20 @@
     # 设置 MFG 工具加载的烧写套件版本
     6uluboot=14x14evk
     6uldtb=14x14-evk
+    #6uluboot=boe
+    #6uldtb=boe
+    kernel=zImage
+    #kernel=zImage-4.9.11
     ldo=
     plus=
     lite=l
     initramfs=fsl-image-mfgtool-initramfs-imx_mfgtools.cpio.gz.u-boot
+    #initramfs=fsl-image5.10.27-mfgtool-initramfs-imx_mfgtools.cpio.gz.u-boot
     seek = 1
     sxnor=qspi2
     7dnor=qspi1
     6ulnor=qspi1
     nor_part=0
+    rootfs=rootfs.tar.bz2
+    #rootfs=rootfs2021.tar.bz2
     ```
