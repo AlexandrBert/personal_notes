@@ -56,34 +56,34 @@
 
 5.  根据上述文件需要的变量，将一级目录下的 `cfg.ini` 文件修改为如下设置：
     ```ini
-        [profiles]
-        chip = BOE-Linux
+    [profiles]
+    chip = BOE-Linux
 
-        [platform]
-        board = SabreSD
+    [platform]
+    board = SabreSD
 
-        [LIST]
-        # 选择操作列表下的参数
-        name = eMMC
+    [LIST]
+    # 选择操作列表下的参数
+    name = eMMC
 
-        [variable]
-        board = sabresd
-        # 设置要创建分区的路径变量 /dev/mmcblk%mmc% 
-        mmc = 1
-        sxuboot=sabresd
-        sxdtb=sdb
-        7duboot=sabresd
-        7ddtb=sdb
-        # 设置 MFG 工具加载的烧写套件版本
-        6uluboot=14x14evk
-        6uldtb=14x14-evk
-        ldo=
-        plus=
-        lite=l
-        initramfs=fsl-image-mfgtool-initramfs-imx_mfgtools.cpio.gz.u-boot
-        seek = 1
-        sxnor=qspi2
-        7dnor=qspi1
-        6ulnor=qspi1
-        nor_part=0
+    [variable]
+    board = sabresd
+    # 设置要创建分区的路径变量 /dev/mmcblk%mmc% 
+    mmc = 1
+    sxuboot=sabresd
+    sxdtb=sdb
+    7duboot=sabresd
+    7ddtb=sdb
+    # 设置 MFG 工具加载的烧写套件版本
+    6uluboot=14x14evk
+    6uldtb=14x14-evk
+    ldo=
+    plus=
+    lite=l
+    initramfs=fsl-image-mfgtool-initramfs-imx_mfgtools.cpio.gz.u-boot
+    seek = 1
+    sxnor=qspi2
+    7dnor=qspi1
+    6ulnor=qspi1
+    nor_part=0
     ```
