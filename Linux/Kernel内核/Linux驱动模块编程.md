@@ -58,20 +58,30 @@ module_exit(myModule_exit);
 
 static int __init hello_init(void)
 {
-    printk(KERN_ALERT "Hello, world!\n");  /* KERN_ALERT 表示内核警告级别 */
+    printk(KERN_EMERG "[KERN_EMERG] Hello, world!\n");      /* KERN_EMERG 表示内核紧急情况，系统无法使用； */
+    // printk(KERN_ALERT "[KERN_ALERT] Hello, world!\n");      /* KERN_ALERT 表示内核警告级别 */
+    // printk(KERN_CRIT "[KERN_CRIT] Hello, world!\n");        /* KERN_CRIT 表示内核临界状态，需要注意 */
+    // printk(KERN_ERR "[KERN_ERR] Hello, world!\n");          /* KERN_ERR 表示内核错误信息 */
+    // printk(KERN_WARNING "[KERN_WARNING] Hello, world!\n");  /* KERN_EMERG 表示内核警告信息 */
+    // printk(KERN_NOTICE "[KERN_NOTICE] Hello, world!\n");    /* KERN_EMERG 表示内核普通但重要的信息 */
+    // printk(KERN_INFO "[KERN_INFO] Hello, world!\n");        /* KERN_EMERG 表示内核一般信息 */
+    // printk(KERN_DEBUG "[KERN_DEBUG] Hello, world!\n");      /* KERN_EMERG 表示内核调试信息 */
     return 0;
 }
 
 static void __exit hello_exit(void)
 {
-    printk(KERN_ALERT "Goodbye, world!\n");  /* KERN_ALERT 表示内核警告级别 */
+    printk(KERN_EMERG "Goodbye, world!\n");  /* KERN_EMERG 表示内核警告级别 */
 }
 
 module_init(hello_init);
 module_exit(hello_exit);
 
 MODULE_LICENSE("GPL");
-MODULE_AUTHOR("author");
+MODULE_AUTHOR("fengkang");
+MODULE_DESCRIPTION("hello world module");
+MODULE_ALIAS("hello_module");
+
 ```
 
 ### 编写 Makefile 文件
@@ -79,7 +89,7 @@ MODULE_AUTHOR("author");
 ifneq ($(KERNELRELEASE),)
 obj-m := hello.o
 else
-KDIR=/opt/kernel/ebf_linux_kernel-ebf_4.1.15_imx
+KDIR=/opt/kernel/ebf_linux_kernel
 CROSS_COMPILE=/opt/toolchain/gcc-linaro-7.5.0-2019.12-x86_64_arm-linux-gnueabihf/bin/arm-linux-gnueabihf-
 all:
         make -C $(KDIR) M=$(PWD) modules ARCH=arm CROSS_COMPILE=$(CROSS_COMPILE)
@@ -94,3 +104,118 @@ endif：
 1. 在虚拟机或编译环境中新建一个文件夹 hello，将 hello.c 和 Makefile 文件复制到该文件夹中；
 2. 将 Makefile 中的 KDIR 和 CROSS_COMPILE 路径修改为内核路径和交叉编译工具链路径；
 3. 执行 `make` 命令编译内核模块；
+4. 执行完成后会生成一个 hello.ko 的内核对象；
+
+### hello.ko 内核模块的加载
+1. 将 hello.ko 传输到开发板中（可以用sftp、ftp或者其他方式），可以传输到任意路径下；
+2. 先使用 lsmod 命令查看当前系统中已安装的所有模块：
+```bash
+root@npi:~# lsmod
+Module                  Size  Used by
+g_multi                16384  0
+...
+snd_timer              32768  1 snd_pcm
+```
+2. 使用模块安装指令 insmod 安装 hello.ko 模块：
+```bash
+root@npi:~# insmod hello.ko
+
+Message from syslogd@npi at Feb 14 18:44:57 ...
+ kernel:[ 1987.052642] [KERN_EMERG] Hello, world!
+```
+3. hello.ko 模块安装完成后，再次通过 lsmod 可以查看到 hello.ko 模块已经安装完成；
+```bash
+root@npi:~# lsmod
+Module                  Size  Used by
+hello                  16384  0
+g_multi                16384  0
+...
+snd_timer              32768  1 snd_pcm
+```
+
+### hello.ko 内核模块的卸载
+
+使用 rmmod 命令删除已经安装好的模块，卸载时是根据 Module 名卸载的，所以无需加 .ko 后缀，可以看到删除后就没有该模块了。
+
+```bash
+root@npi:~# rmmod hello
+root@npi:~#
+Message from syslogd@npi at Feb 14 18:48:43 ...
+ kernel:[ 2213.387172] Goodbye, world!
+root@npi:~# lsmod
+Module                  Size  Used by
+g_multi                16384  0
+...
+snd_timer              32768  1 snd_pcm
+
+```
+
+## 在内核中直接编译 helloworld 内核模块
+
+1. 找到内核源码目录中找到需要安装目录的，如安装在 `drivers/ebf_module/` 目录下，新建一个文件夹 `hello`；
+
+2. 在 `drivers/ebf_module/hello` 目录中新建一个 `Makefile` 文件，写入如下内容：
+```makefile
+ obj-$(CONFIG_HELLO) := hello.o
+```
+
+3. 修改 `drivers/ebf_module/` 目录中的 `Makefile` 文件，添加相关内容，例如：
+```makefile
+#core
+obj-y += dht11/ 
+obj-y += ds18b20/ 
+obj-y += infrared/
+#下面一句为新增
+obj-y += hello/
+```
+
+4.  修改 `drivers/ebf_module/` 目录中的 `Kconfig` 文件，并添加 `hello` 的模块选项，例如在 `drivers/ebf_module/Kconfig` ：
+```Kconfig
+menu "Embedfire Modules"
+
+menuconfig EBF_MODULE
+	bool "Embedfire Modules"
+
+if EBF_MODULE
+
+config EBF_DHT11
+	tristate "dht11"
+
+config HELLO
+	tristate "hello"
+
+endif # EBF_MODULE
+
+endmenu
+```
+
+5. 完成以上步骤后，在内核源码主目录中，使用 menuconfig 时，就可以找到目录下多了一个新的选项，选中该选项重新编译内核即可：
+```c
+arch/arm/configs/npi_v7_defconfig - Linux/arm 4.19.35 Kernel Configuration
+ > Device Drivers > Embedfire Modules > Embedfire Modules ──────────────────────
+  ┌─────────────────────────── Embedfire Modules ────────────────────────────┐
+  │  Arrow keys navigate the menu.  <Enter> selects submenus ---> (or empty  │
+  │  submenus ----).  Highlighted letters are hotkeys.  Pressing <Y>         │
+  │  includes, <N> excludes, <M> modularizes features.  Press <Esc><Esc> to  │
+  │  exit, <?> for Help, </> for Search.  Legend: [*] built-in  [ ] excluded │
+  │ ┌──────────────────────────────────────────────────────────────────────┐ │
+  │ │    --- Embedfire Modules                                             │ │
+  │ │    <M>   dht11                                                       │ │
+  │ │    <M>   ds18b20                                                     │ │
+  │ │    <M>   infrared                                                    │ │
+  │ │    <M>   hello_module(NEW)                                           │ │
+  │ │                                                                      │ │
+  │ │                                                                      │ │
+  │ │                                                                      │ │
+  │ │                                                                      │ │
+  │ │                                                                      │ │
+  │ │                                                                      │ │
+  │ │                                                                      │ │
+  │ │                                                                      │ │
+  │ │                                                                      │ │
+  │ │                                                                      │ │
+  │ └──────────────────────────────────────────────────────────────────────┘ │
+  ├──────────────────────────────────────────────────────────────────────────┤
+  │         <Select>    < Exit >    < Help >    < Save >    < Load >         │
+  └──────────────────────────────────────────────────────────────────────────┘
+```
