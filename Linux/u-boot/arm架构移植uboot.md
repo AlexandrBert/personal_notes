@@ -37,3 +37,12 @@
 
 ## uboot的烧写
 将生成的uboot镜像文件烧写到开发板
+
+### 烧写启动错误：Failed to load 'boot.scr'
+错误原因：为启动内核时环境变量设置错误。  
+解决办法：新增环境变量：
+```bash
+=>  setenv bootargs 'console=ttymxc0,115200 root=/dev/mmcblk1p2 rootwait rw'
+=>  setenv bootcmd 'fatload mmc 1:1 80800000 zImage;fatload mmc 1:1 83000000 imx6ull-14x14-evk.dtb;bootz 80800000 - 83000000'
+=>  saveenv
+```
