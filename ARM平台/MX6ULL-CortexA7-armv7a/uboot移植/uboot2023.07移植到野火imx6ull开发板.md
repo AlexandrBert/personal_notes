@@ -47,3 +47,11 @@ scripts/kconfig/conf  --syncconfig Kconfig
 1. 将生成的 `u-boot-dtb.imx` 复制到 `Profiles\BOE-Linux\OS Firmware\files` 目录下；
 2. 修改 `u-boot-dtb.imx` 的名称，根据 mfgtool 的配置文件格式修改。（默认格式，可以修改为 `u-boot-imx6ull14x14evk_emmc.imx` ）。
 3. 使用 mfgtool 程序将 uboot 烧写进系统。
+
+## 4. uboot 启动宏定义修改
+### 4.1 设置启动选项
+```bash
+=>  setenv bootargs 'console=ttymxc0,115200 root=/dev/mmcblk1p2 rootwait rw'
+=>  setenv bootcmd 'fatload mmc 1:1 80800000 zImage;fatload mmc 1:1 83000000 imx6ull-14x14-evk.dtb;bootz 80800000 - 83000000'
+=>  saveenv
+```
