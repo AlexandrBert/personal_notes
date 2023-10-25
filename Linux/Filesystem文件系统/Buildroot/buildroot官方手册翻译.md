@@ -274,10 +274,10 @@ Buildroot内部工具链选项可用于创建外部工具链构建内部工具�
 将在 `$(O)/images` 中生成 SDK tarball，名称类似于`arm-buildroot-linux-uclibcgnueabi_sdk-buildroot.tar.gz`。
 保存此tarball，因为它现在是您可以在其他Buildroot项目中作为外部工具链重用的工具链。
 在其他Buildroot项目中，在 `Toolchain` 菜单中：
-• 将 `Toolchain type` 设置为 `External toolchain`
-• 将 `Toolchain` 设置为 `Custom toolchain`
-• 将 `Toolchain origin` 为要 `Toolchain to be downloaded and installed`
-• 将 `Toolchain URL` 设置为 `file:///path/to/your/tarball.tar.gz`
+- 将 `Toolchain type` 设置为 `External toolchain`
+- 将 `Toolchain` 设置为 `Custom toolchain`
+- 将 `Toolchain origin` 为要 `Toolchain to be downloaded and installed`
+- 将 `Toolchain URL` 设置为 `file:///path/to/your/tarball.tar.gz`
 
 ##### 6.1.3.1 外部工具链包装器
 在使用外部工具链时，Buildroot会生成一个包装程序，该程序会根据配置透明地传递适当的选项给外部工具链程序。如果您需要调试此包装器以检查传递的确切参数，您可以将环境变量 `BR2_DEBUG_WRAPPER` 设置为以下之一：
@@ -1524,4 +1524,1046 @@ Buildroot本身是一个开源软件，根据GNU通用公共许可证第2版或�
 
 #### 13.2.1 软件包的补丁
 Buildroot还捆绑了补丁文件，这些补丁文件应用于各种软件包的源代码。这些补丁不受Buildroot许可证的覆盖。相反，它们受到应用补丁的软件的许可证的约束。当所述软件在多个许可证下可用时，Buildroot补丁仅在公开可访问的许可证下提供。详细技术信息请参见第19章。
+
+
+## Chapter 14、 Buildroot 之外的
+### 14.1 启动生成的镜像
+#### 14.1.1 NFS 引导
+要实现NFS引导,请在文件系统镜像菜单中启用tar根文件系统。
+
+构建完成后,只需运行以下命令来设置NFS根目录:
+
+    sudo tar -xavf /path/to/output_dir/rootfs.tar -C /path/to/nfs_root_dir 
+
+记住在/etc/exports中添加此路径。
+
+然后,您可以从目标设备执行NFS引导。
+
+#### 14.1.2 实时CD
+要构建实时CD镜像,请在文件系统镜像菜单中启用iso镜像选项。请注意,此选项仅在 x86 和 x86-64 体系结构上可用,如果您使用 Buildroot 构建内核。
+
+您可以使用IsoLinux、Grub或Grub 2作为引导程序构建实时CD镜像,但只有IsoLinux支持使此镜像既可以作为实时CD也可以作为实时U盘使用(通过Build hybrid image选项)。
+
+您可以使用QEMU测试您的实时CD镜像:
+
+    qemu-system-i386 -cdrom output/images/rootfs.iso9660
+
+或者如果它是混合ISO,可以将其用作硬盘镜像:
+
+    qemu-system-i386 -hda output/images/rootfs.iso9660
+
+它可以使用dd轻松刻录到U盘:
+
+    dd if=output/images/rootfs.iso9660 of=/dev/sdb
+
+
+### 14.2 chroot
+如果您要在生成的镜像中chroot,则应了解几点:
+- 您应该从tar根文件系统镜像设置新的根目录;
+- 选择的目标体系结构要兼容您的主机,或者您应使用一些qemu-*二进制文件并正确设置它们的binfmt属性,才能在主机上运行为目标构建的二进制文件;
+- Buildroot当前不提供为此目的正确构建和设置的host-qemu和binfmt。
+
+
+
+
+-------------
+-------------
+
+# III 进阶指导
+
+## Chapter 15、Buildroot 的工作原理
+如上所述,Buildroot本质上是一个包含Makefile的集合,它可以下载、配置和使用正确选项编译软件。它还包括各种软件包的补丁 - 主要是那些参与交叉编译工具链(gcc、binutils和uClibc)的软件包。
+
+每个软件包基本上对应一个Makefile,它使用.mk扩展名。Makefile被分成许多不同部分。
+
+- toolchain/目录包含所有与交叉编译工具链相关的软件的Makefile和相关文件:binutils、gcc、gdb、内核头文件和uClibc。
+- arch/目录包含Buildroot支持的所有处理器体系结构的定义。
+- package/目录包含Buildroot可以编译并添加到目标根文件系统的所有用户空间工具和库的Makefile和相关文件。每个包对应一个子目录。
+- linux/目录包含内核的Makefile和相关文件。
+- boot/目录包含Buildroot支持的引导程序的Makefile和相关文件。
+- system/目录包含系统集成支持,例如目标文件系统骨架和初始化系统选择。
+- fs/目录包含与生成目标根文件系统镜像相关的软件的Makefile和相关文件。
+
+每个目录至少包含两个文件:
+- something.mk是下载、配置、编译和安装包something的Makefile。
+- Config.in是配置工具描述文件的一部分。它描述与该包相关的选项。
+主Makefile执行以下步骤(在配置完成后):
+- 在输出目录(默认为output/,也可以使用O=指定其他值)中创建所有输出目录:staging、target、build等。
+- 生成工具链目标。对于内置工具链,这意味着生成交叉编译工具链。对于外部工具链,这意味着检查外部工具链的功能并将其导入到Buildroot环境中。
+- 生成TARGETS变量中列出的所有目标。这个变量由所有单个组件的Makefile填充。生成这些目标将触发用户空间包(库、程序)、内核和引导程序的编译,以及根文件系统镜像的生成,这取决于配置。
+
+
+## Chapter 16、 翻译:代码风格
+总体来说,这些代码风格规则旨在帮助您向Buildroot添加新文件或重构现有文件。
+
+如果您稍微修改一些现有文件,那么重要的是保持整个文件的一致性,所以您可以:
+- 遵循该文件中可能已过时的代码风格;
+- 或者完全重构它,以使其符合这些规则。
+
+### 16.1 Config.in文件
+Config.in文件包含Buildroot中几乎所有可配置项的条目。
+
+一个条目遵循以下模式:
+```
+config BR2_PACKAGE_LIBFOO
+    bool "libfoo"
+    depends on BR2_PACKAGE_LIBBAZ
+    select BR2_PACKAGE_LIBBAR
+    help
+        This is a comment that explains what libfoo is. The help text
+        should be wrapped.
+
+    http://foosoftware.org/libfoo/
+```
+- bool、depends on、select和help行使用一个制表符缩进。
+- 帮助文本本身使用一个制表符和两个空格缩进。
+- 帮助文本应该换行适应72列,其中制表符计为8个字符,所以文本本身为62个字符。
+
+Config.in文件是Buildroot中使用的配置工具Kconfig的输入。有关Kconfig语言的更多详细信息,请参阅http://kernel.org/doc/Documentation/kbuild/kconfig-language.txt。
+
+### 16.2 .mk文件
+- 标题(Header):文件从标题开始。它包含模块名称,最好使用小写,括在由80个井号组成的分隔符之间。标题后必须有一个空行:
+```
+################################################################################
+#
+# libfoo
+#
+################################################################################
+```
+
+- 分配:使用前后跟一个空格的=:
+```
+LIBFOO_VERSION = 1.0
+LIBFOO_CONF_OPTS += --without-python-support
+```
+不要对齐=符号。
+
+- 缩进:只使用制表符: 
+```
+define LIBFOO_REMOVE_DOC
+    $(RM) -r $(TARGET_DIR)/usr/share/libfoo/doc \
+        $(TARGET_DIR)/usr/share/man/man3/libfoo*
+endef
+```
+注意:define块中的命令应始终使用制表符开始,以便make将其识别为命令。
+- 可选依赖:
+  - 优先使用多行语法。  
+    YES:
+    ```
+    ifeq ($(BR2_PACKAGE_PYTHON3),y)
+    LIBFOO_CONF_OPTS += --with-python-support
+    LIBFOO_DEPENDENCIES += python3
+    else
+    LIBFOO_CONF_OPTS += --without-python-support
+    endif
+    ```
+    NO:
+    ```
+    LIBFOO_CONF_OPTS += --with$(if $(BR2_PACKAGE_PYTHON3),,out)-python-support
+    LIBFOO_DEPENDENCIES += $(if $(BR2_PACKAGE_PYTHON3),python3,)
+    ```
+  - 将配置选项和依赖关系保持在一起。
+
+- 可选钩子(HOOK):将钩子定义和赋值保持在一个if块中。  
+    YES:
+    ```
+    ifneq ($(BR2_LIBFOO_INSTALL_DATA),y)
+    define LIBFOO_REMOVE_DATA
+        $(RM) -r $(TARGET_DIR)/usr/share/libfoo/data
+    endef
+    LIBFOO_POST_INSTALL_TARGET_HOOKS += LIBFOO_REMOVE_DATA
+    endif
+    ```
+
+    NO:
+    ```
+    define LIBFOO_REMOVE_DATA
+        $(RM) -r $(TARGET_DIR)/usr/share/libfoo/data
+    endef
+
+    ifneq ($(BR2_LIBFOO_INSTALL_DATA),y)
+    LIBFOO_POST_INSTALL_TARGET_HOOKS += LIBFOO_REMOVE_DATA
+    endif
+    ```
+
+
+### 16.3 genimage.cfg文件
+genimage.cfg文件包含genimage实用程序用于创建最终.img文件的输出镜像布局。
+```
+image efi-part.vfat {
+    vfat {
+        file EFI {
+            image = "efi-part/EFI"
+        }
+        file Image {
+            image = "Image"
+        }
+    }
+
+    size = 32M
+}
+
+image sdimage.img {
+    hdimage {
+    }
+
+    partition u-boot {
+        image = "efi-part.vfat"
+        offset = 8K
+    }
+
+    partition root {
+        image = "rootfs.ext2"
+        size = 512M
+    }
+}
+```
+
+
+- 每个部分(如hdimage、vfat等)、分区必须使用一个制表符缩进。
+- 每个文件或其他子节点必须使用两个制表符缩进。
+- 每个节点(部分、分区、文件、子节点)名称必须在同一行使用一个左花括号,而右花括号必须在新行且后跟一个新行,除最后一个节点外。选项(如option size =)也一样。
+- 每个选项(如image、offset、size)等号赋值必须与其前后各有一个空格。
+- 文件名至少应以genimage前缀开头并使用.cfg扩展名以便识别。 
+- 允许的offset和size选项单位有:G、M、K(不用k)。如果无法用上述单位精确表示字节数,则使用0x十六进制前缀,或者直接使用字节数。在注释中分别使用GB、MB、KB(不用kb)替换G、M、K。
+- 对于ChatMindAi分区,partition-type-uuid值必须是U(代表EFI系统分区,genimage扩展为c12a7328-f81f-11d2-ba4b-00a0c93ec93b)、F(FAT分区,扩展为ebd0a0a2-b9e5-4433-87c0-68b6b72699c7)或L(根文件系统或其他文件系统,扩展为0fc63daf-8483-4772-8e79-3d69d8477de4)。尽管L是genimage的默认值,但我们优先在genimage.cfg文件中明确指定它。最后,这些缩写应不使用双引号,例如partition-type-uuid = U。如果指定了明确的GUID,应使用小写字母。
+
+genimage.cfg文件是Buildroot用于生成最终镜像文件的genimage工具的输入。有关genimage语言的更多详细信息,请参考https://github.com/pengutronix/genimage/blob/master/README.rst。
+
+
+### 16.4 文档
+文档使用asciidoc格式。
+
+有关asciidoc语法的更多详细信息,请参阅https://asciidoc-py.github.io/userguide.html。
+
+### 16.5 支持脚本 
+support/和utils/目录中的一些脚本使用Python编写,应遵循Python代码的PEP8风格指南。
+
+
+## Chapter 17、 为特定板卡添加支持
+Buildroot 包含了对几个公开可用硬件板卡的基本配置,这样这些板卡的用户就可以轻松构建一个知道可以工作的系统。您也可以向 Buildroot 添加其他板卡的支持。
+
+要做到这一点,您需要创建一个普通的 Buildroot 配置,可以为该硬件构建一个基本系统:内部工具链、内核、引导加载程序、文件系统和一个简单的仅包含 BusyBox 的用户空间。不应选择任何特定软件包:配置应尽可能简单,仅构建一个工作的基于 BusyBox 的基本系统用于目标平台。当然,您可以为内部项目使用更复杂的配置,但 Buildroot 项目仅会集成基本的板卡配置。因为软件包选择高度依赖于应用。
+
+一旦您有一个知道可以工作的配置,运行 make savedefconfig。这将在 Buildroot 源代码树的根目录生成一个最小的 defconfig 文件。将这个文件移动到 configs/ 目录下,并重命名为 `<板卡名称>_defconfig`。 
+
+如果配置较为复杂,可以手动重新格式化它,并用注释将其分成几个部分,典型的部分包括:架构、工具链选项(通常只是 Linux 头文件版本)、固件、引导加载程序、内核和文件系统。
+
+应始终使用固定的版本或提交哈希来设置不同组件,而不是“最新”版本。例如,设置 BR2_LINUX_KERNEL_CUSTOM_VERSION=y 并将 BR2_LINUX_KERNEL_CUSTOM_VERSION_VALUE 设置为您测试过的内核版本。
+
+建议尽可能使用 Linux 内核和引导加载程序的上游版本,并尽可能使用内核和引导加载程序的默认配置。如果它们不适用于您的板卡,或者没有默认配置,我们鼓励您向对应上游项目提交修复。
+
+不过,在此期间,您可能希望存储特定于目标平台的内核或引导加载程序配置或补丁。为此,请创建目录 board/<制造商> 和子目录 board/<制造商>/<板卡名称>。然后可以在这些目录中存储您的补丁和配置,并从主 Buildroot 配置中引用它们。请参阅第 9 章了解更多细节。
+
+在提交新板卡补丁之前,建议使用最新版本的 gitlab-CI Docker 容器进行测试构建。操作如下:
+
+    $ make <板卡名称>_defconfig 
+    $ make
+
+默认情况下,Buildroot 开发人员使用 gitlab.com 注册表上官方托管的镜像,对大多数使用场景来说应该很方便。如果仍然想构建自己的 Docker 镜像,可以从官方镜像作为 Dockerfile 的 FROM 指令:
+
+    FROM registry.gitlab.com/buildroot.org/buildroot/base:YYYYMMDD.HHMM
+    RUN ...
+    COPY ...
+
+当前版本 YYYYMMDD.HHMM 可以在 Buildroot 源代码树顶部的 .gitlab-ci.yml 文件中找到;所有过去版本都在上述注册表中列出。
+
+
+## Chapter 18、 添加Buildroot新软件包
+本节介绍如何将新软件包(用户空间库或应用程序)集成到Buildroot中。它还展示了如何集成现有软件包,这对修复问题或调整其配置很重要。
+
+添加新软件包时,务必在各种条件下进行测试(见第18.25.3节),并检查代码风格(见第18.25.2节)。
+
+### 18.1 软件包目录
+首先,在软件包目录下为您的软件创建一个目录,例如libfoo。
+
+一些软件包已经根据主题在子目录中进行分组:x11r7、qt5和gstreamer。如果您的软件包适合这些类别中的一个,那么请在这些目录下创建软件包目录。但是,不鼓励创建新的子目录。
+
+### 18.2 配置文件
+要使软件包在配置工具中显示,需要在软件包目录下创建Config文件。有两种类型:Config.in和Config.in.host。
+
+#### 18.2.1 Config.in文件
+对于目标上的软件包,请创建名为Config.in的文件。这个文件将包含与我们的libfoo软件相关的选项描述,这些选项将在配置工具中使用和显示。它基本应包含:
+
+```
+config BR2_PACKAGE_LIBFOO
+    bool "libfoo"  
+    help
+        This is a comment that explains what libfoo is. The help text
+        should be wrapped.
+
+        http://foosoftware.org/libfoo/
+```
+bool行,help行和其他元数据信息 about 配置选项必须与一个制表符对齐。帮助文本本身应该与一个制表符和两个空格对齐,行应换行以适应72列,其中制表符计为8个字符,所以文本本身为62个字符。帮助文本必须在空行后面提到项目的上游URL。
+
+作为Buildroot的一项约定,属性顺序如下:
+1. 选项类型:bool、string等带有提示的 
+2. 如果需要,默认值
+3. 任何依赖目标的depends on形式的依赖
+4. 任何依赖工具链的depends on形式的依赖 
+5. 任何依赖其他软件包的depends on形式的依赖
+6. 任何select形式的依赖
+7. help关键词和帮助文本
+
+您可以在if BR2_PACKAGE_LIBFOO...endif语句中添加其他子选项来配置软件中的特定内容。您可以查看其他软件包的示例。Config.in文件语法与内核Kconfig文件相同。此语法的文档可在http://kernel.org/doc/Documentation/kbuild/kconfig-language.txt找到。
+
+最后,您必须将新的libfoo/Config.in添加到package/Config.in(如果决定将软件包放入现有类别中的一个,则放在相应子目录)。包含的文件按类别字母排序,不应包含任何除软件包名称外的内容。
+
+    source "package/libfoo/Config.in"
+
+#### 18.2.2 Config.in.host文件
+一些软件包也需要为主机系统构建。这里有两种选择:
+- 主机软件包仅需要满足一个或多个目标软件包的构建时依赖。在这种情况下,请将host-foo添加到目标软件包的BAR_DEPENDENCIES变量中。不应创建Config.in.host文件。
+- 主机软件包应该允许用户从配置菜单明确选择。在这种情况下,为该主机软件包创建Config.in.host文件:
+```
+config BR2_PACKAGE_HOST_FOO
+    bool "host foo"
+    help
+        This is a comment that explains what foo for the host is.
+
+    http://foosoftware.org/foo/
+```
+Config.in文件同样适用的编码风格和选项。
+
+最后,您必须将新的libfoo/Config.in.host添加到package/Config.in.host。包含的文件按字母顺序排序,不应包含除软件包名称外的任何内容。
+
+    source "package/foo/Config.in.host"
+
+主机软件包随后将从主机实用程序菜单中可用。
+
+
+#### 18.2.3选择depends on或select翻译:
+您软件包的Config.in文件也必须确保依赖项被启用。通常,Buildroot使用以下规则:
+- 对库依赖使用select类型的依赖。这些依赖通常不是显而易见的,因此使用kconfig系统确保依赖项被选择是有意义的。例如,libgtk2软件包使用select BR2_PACKAGE_LIBGLIB2来确保启用这个库。select关键字使用反向语义表达依赖。
+- 当用户真的需要了解依赖时,使用depends on类型的依赖。通常,Buildroot会对目标架构、MMU支持和工具链选项(参见第18.2.4节)这样的依赖使用这种依赖类型,或者对“大”东西如X.org系统的依赖使用它。depends on关键字使用正向语义表达依赖。
+
+注意:kconfig语言当前的问题是,这两种依赖语义内在上没有链接。因此,可能会选择一个软件包,但其中一个依赖/需求没有满足。
+
+下面一个例子说明了select和depends on的使用。注意,这两种依赖类型只对相同类型的依赖是传递的。
+```
+config BR2_PACKAGE_RRDTOOL
+    bool "rrdtool"
+    depends on BR2_USE_WCHAR
+    select BR2_PACKAGE_FREETYPE
+    select BR2_PACKAGE_LIBART
+    select BR2_PACKAGE_LIBPNG
+    select BR2_PACKAGE_ZLIB
+    help
+        RRDtool is the OpenSource industry standard, high performance
+        data logging and graphing system for time series data.
+
+        http://oss.oetiker.ch/rrdtool/
+comment "rrdtool needs a toolchain w/ wchar"
+    depends on !BR2_USE_WCHAR
+```
+
+请注意,这两种依赖类型仅对相同类型的依赖是传递性的。
+
+这意味着在下面的例子中:
+```
+config BR2_PACKAGE_A
+    bool "Package A"
+
+config BR2_PACKAGE_B
+    bool "Package B"
+    depends on BR2_PACKAGE_A
+
+config BR2_PACKAGE_C
+    bool "Package C"
+    depends on BR2_PACKAGE_B
+
+config BR2_PACKAGE_D
+    bool "Package D"
+    select BR2_PACKAGE_B
+
+config BR2_PACKAGE_E
+    bool "Package E"
+    select BR2_PACKAGE_D
+```
+
+- 选择软件包C仅在软件包B被选择的情况下可见,软件包B的选择又只在软件包A被选择时可见。
+- 选择软件包E将选择软件包D,软件包D将选择软件包B,但它不会检查软件包B的依赖,所以不会选择软件包A。
+- 由于软件包B被选择但软件包A没有被选择,这违反了软件包B对软件包A的依赖。因此,在这样的情况下,依赖关系必须显式添加传递性:
+```
+config BR2_PACKAGE_D
+    bool "Package D"
+    depends on BR2_PACKAGE_A
+    select BR2_PACKAGE_B
+
+config BR2_PACKAGE_E
+    bool "Package E"
+    depends on BR2_PACKAGE_A
+    select BR2_PACKAGE_D
+```
+
+总体来说,对于库依赖,应优先考虑select类型依赖。
+
+请注意,这样的依赖可以确保依赖选项也被启用,但不一定保证依赖项在您的软件包之前被构建。为此,依赖也需要在软件包的.mk文件中表达。
+
+有关格式的其他细节,请参考代码风格。
+
+#### 18.2.4 目标依赖和交叉编译工具链的选项
+许多软件包依赖于工具链的某些选项:C库的选择,C++支持,线程支持,RPC支持,宽字符支持或动态库支持。一些软件包只能在某些目标体系结构上构建,或者如果处理器中有MMU支持。
+
+这些依赖关系必须通过Config.in文件中的适当depends on语句来表达。此外,对于工具链选项的依赖,如果该选项未启用,则应显示一个注释,以便用户了解为什么该软件包不可用。对目标体系结构或MMU支持的依赖不应在注释中显式显示:由于用户可能无法自由选择其他目标,显式显示这些依赖关系没有太大意义。
+
+注释只应在工具链选项依赖满足时才可见。这意味着软件包的所有其他依赖(包括对目标体系结构和MMU支持的依赖)都必须在注释定义中重复一次。为了保持清晰,这些非工具链选项的depends on语句应与工具链选项的depends on语句分开。如果在同一文件(通常是主软件包)中存在对配置选项的依赖,最好使用全局if...endif结构,而不是在注释和其他配置选项上重复depends on语句。
+
+软件包foo的依赖注释的一般格式是:
+    
+    foo needs a toolchain w/ featA, featB, featC
+
+例如:
+
+    mpd needs a toolchain w/ C++, threads, wchar
+
+或者:
+
+    crda needs a toolchain w/ threads
+
+注意：注释文本故意保持简洁,以便它可以适应80字符终端。
+
+本节后面将列出不同的目标和工具链选项,对应的配置符号以及注释文本中的依赖说明。
+- 目标体系结构
+  - 依赖符号:BR2_powerpc,BR2_mips等(见arch/Config.in)
+  - 注释字符串:不添加注释
+
+- MMU支持
+  - 依赖符号:BR2_USE_MMU 
+  - 注释字符串:不添加注释
+
+- Gcc _sync* 内置函数用于原子操作。它有1字节,2字节,4字节和8字节版本。由于不同体系结构支持不同大小的原子操作,所以每个大小都有一个依赖符号:
+  - 依赖符号:BR2_TOOLCHAIN_HAS_SYNC_1 对于1字节, BR2_TOOLCHAIN_HAS_SYNC_2 对于2字节, BR2_TOOLCH对于4字节, BR2_TOOLCHAIN_HAS_SYNC_8 对于8字节。 
+  - 注释字符串:无需添加注释
+- Gcc _atomic* 内置函数用于原子操作。
+  - 依赖符号:BR2_TOOLCHAIN_HAS_ATOMIC。
+  - 注释字符串:无需添加注释
+- 内核头文件
+  - 依赖符号:BR2_TOOLCHAIN_HEADERS_AT_LEAST_X_Y, (用适当的版本替换X_Y,参见toolchain/C)
+  - 注释字符串:头文件版本>= X.Y 和/或 <= X.Y(用适当的版本替换X.Y)
+- GCC版本
+  - 依赖符号:BR2_TOOLCHAIN_GCC_AT_LEAST_X_Y,(用适当的版本替换X_Y,参见toolchain/Config.in)
+  - 注释字符串:gcc版本>= X.Y 和/或 <= X.Y(用适当的版本替换X.Y)  
+- 宿主GCC版本
+  - 依赖符号:BR2_HOST_GCC_AT_LEAST_X_Y,(用适当的版本替换X_Y,参见Config.in)
+  - 注释字符串:无需添加注释
+  - 注意,通常不是包本身需要最小宿主GCC版本,而是它依赖的宿主包。
+- C库
+  - 依赖符号:BR2_TOOLCHAIN_USES_GLIBC, BR2_TOOLCHAIN_USES_MUSL, BR2_TOOLCHAIN_USES_UCLIB
+  - 注释字符串:对于C库,使用不同的注释文本,如:需要glibc工具链,或者需要带C++的glibc工具链。
+- C++支持 
+  - 依赖符号:BR2_INSTALL_LIBSTDCPP
+  - 注释字符串:C++
+- D支持
+  - 依赖符号:BR2_TOOLCHAIN_HAS_DLANG  
+  - 注释字符串:Dlang
+- Fortran支持
+  - 依赖符号:BR2_TOOLCHAIN_HAS_FORTRAN
+  - 注释字符串:Fortran
+- 线程支持 
+  - 依赖符号:BR2_TOOLCHAIN_HAS_THREADS
+  - 注释字符串:线程(除非也需要BR2_TOOLCHAIN_HAS_THREADS_NPTL,这种情况下仅指定NPTL就足够了)
+- NPTL线程支持
+    - 依赖符号:BR2_TOOLCHAIN_HAS_THREADS_NPTL
+    - 注释字符串:NPTL
+- RPC支持 
+  - 依赖符号:BR2_TOOLCHAIN_HAS_NATIVE_RPC
+  - 注释字符串:RPC
+- wchar支持
+  - 依赖符号:BR2_USE_WCHAR
+  - 注释字符串:wchar
+- 动态库
+  - 依赖符号:!BR2_STATIC_LIBS
+  - 注释字符串:动态库
+
+
+#### 18.2.5 对Linux内核的依赖
+某些包需要Buildroot构建Linux内核,通常是内核模块或固件。Config.in文件中应添加注释来表达这个依赖,与工具链选项依赖类似。格式如下:
+
+    foo needs a Linux kernel to be built
+
+如果同时依赖工具链选项和Linux内核,格式如下: 
+
+    foo needs a toolchain w/ featA, featB, featC and a Linux kernel to be built
+
+
+#### 18.2.6 对udev/dev管理的依赖
+如果一个包需要udev设备管理,它应依赖符号BR2_PACKAGE_HAS_UDEV,并添加以下注释:
+
+    foo needs udev /dev management
+
+如果同时依赖工具链选项和udev设备管理,格式如下:
+
+    foo needs udev /dev management and a toolchain w/ featA, featB, featC
+
+
+#### 18.2.7 对虚拟包提供的功能依赖
+某些功能可以由多个包提供,如openGL库。
+
+有关虚拟包的更多信息,请参阅第18.12节。
+
+
+### 18.3 .mk文件
+最后,这是最难的部分。创建名为libfoo.mk的文件。它描述了如何下载、配置、构建、安装该包等。
+
+根据包类型,需要用不同的方式编写.mk文件,使用不同的基础设施:
+- 普通包的Makefile(不使用autotools或CMake):基于类似autotools包使用的基础设施,但开发者需要做更多工作。它指定了配置、编译和安装过程。这种基础设施必须用于不使用autotools作为构建系统的所有包。未来可能会为其他构建系统编写其他专业基础设施。我们通过教程和参考文档进行介绍。
+- 基于autotools的Makefile(autoconf, automake等):我们提供了专门的基础设施,因为autotools是很常见的构建系统。这种基础设施必须用于依赖于autotools构建系统的新包。我们通过教程和参考文档进行介绍。
+- 基于CMake的Makefile:我们提供了专门的基础设施,因为CMake正在成为越来越常见的构建系统,并且有标准化的行为。这种基础设施必须用于依赖于CMake的新包。我们通过教程和参考文档进行介绍。  
+- Python模块的Makefile:我们有专门的基础设施用于使用distutils, flit, pep517或setuptools机制的Python模块。我们通过教程和参考文档进行介绍。
+- Lua模块的Makefile:我们有专门的基础设施用于通过LuaRocks网站提供的Lua模块。我们通过教程和参考文档进行介绍。
+
+关于格式细节,请参阅写作规则。
+
+### 18.4 .hash文件 
+如果可能,您必须添加第三个文件libfoo.hash,包含libfoo包下载文件的哈希值。不添加.hash文件的唯一原因是下载方式使哈希检查不可能。
+
+如果一个包有版本选择,那么哈希文件可以存储在名为版本号的子目录中,例如package/libfoo/1.2.3/libfoo.hash。这在不同版本具有不同许可条款但存储在同一个文件中的情况下尤其重要。否则,哈希文件应保留在包目录中。
+
+该文件中的哈希值用于验证下载文件和许可证文件的完整性。
+
+该文件的格式为每个需要检查哈希值的文件一行,每行包含以下三个字段,用两个空格分隔:
+- 哈希类型,选择以下一种:
+  - md5
+  - sha1 
+  - sha224
+  - sha256 
+  - sha384
+  - sha512
+- 文件的哈希值:
+  - 对于md5,32个十六进制字符
+  - 对于sha1,40个十六进制字符
+  - 对于sha224,56个十六进制字符
+  - 对于sha256,64个十六进制字符
+  - 对于sha384,96个十六进制字符
+  - 对于sha512,128个十六进制字符
+- 文件的名称:
+  - 对于源代码压缩包:文件名不包含任何目录组件的基名
+  - 对于许可证文件:它在FOO_LICENSE_FILES中出现的路径
+
+以#开头的行被视为注释,将被忽略。空行也将被忽略。
+
+一个文件可以有多个哈希值,每个哈希值单独占一行。在这种情况下,所有哈希值都必须匹配。
+
+注意:理想情况下,此文件中的哈希值应与上游发布的哈希值匹配,例如在他们的网站或电子邮件公告中。如果上游提供了多个哈希类型(例如sha1和sha512),最好在.hash文件中添加所有这些哈希值。如果上游没有提供任何哈希值,或者只提供了md5哈希值,那么自己计算至少一个强哈希值(优先选择sha256,但不是md5),并在哈希值上面添加一个注释行说明。
+
+注意:许可证文件的哈希值用于检测版本提升时许可证的变化。哈希值在make legal-info目标运行期间进行检查。对于具有多个版本(如Qt5)的包,请在该包的子目录<packageversion>中创建哈希文件(另请参阅第19.2节)。
+
+下面的例子定义了上游为主要的libfoo-1.2.3.tar.bz2源码包提供的sha1和sha256哈希值,上游提供的二进制blob的md5值和本地计算的sha256哈希值,下载补丁的sha256哈希值,以及没有哈希值的归档文件:
+```
+# Hashes from: http://www.foosoftware.org/download/libfoo-1.2.3.tar.bz2.{sha1,sha256}:
+sha1 486fb55c3efa71148fe07895fd713ea3a5ae343a libfoo-1.2.3.tar.bz2
+sha256 efc8103cc3bcb06bda6a781532d12701eb081ad83e8f90004b39ab81b65d4369 libfoo-1.2.3.tar.bz2
+
+# md5 from: http://www.foosoftware.org/download/libfoo-1.2.3.tar.bz2.md5, sha256 locally computed:
+md5 2d608f3c318c6b7557d551a5a09314f03452f1a1 libfoo-data.bin
+sha256 01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b libfoo-data.bin
+
+# Locally computed:
+sha256 ff52101fb90bbfc3fe9475e425688c660f46216d7e751c4bbdb1dc85cdccacb9 libfoo-fix-blabla.patch
+
+# Hash for license files:
+sha256 a45a845012742796534f7e91fe623262ccfb99460a2bd04015bd28d66fba95b8 COPYING
+sha256 01b1f9f2c8ee648a7a596a1abe8aa4ed7899b1c9e5551bda06da6e422b04aa55 doc/COPYING.LGPL
+```
+
+如果存在.hash文件,并且它包含一个或多个下载文件的哈希值,则Buildroot计算的哈希值(下载后)必须与.hash文件中存储的哈希值匹配。如果一个或多个哈希值不匹配,Buildroot将视为错误,删除下载文件并中止。
+
+如果.hash文件存在,但它不包含下载文件的哈希值,Buildroot也会视为错误并中止。但是,下载文件会留在下载目录中,因为这通常表示.hash文件有误但下载文件可能是正确的。
+
+目前对从http/ftp服务器,Git仓库和使用scp复制的文件进行哈希值检查。对其他版本控制系统(如Subversion,CVS等)不进行检查,因为Buildroot目前在从这样的版本控制系统获取源代码时无法生成可重复的tar包。
+
+只有对保证稳定的文件添加.hash文件中的哈希值。例如,由Github自动生成的补丁不保证稳定,因此其哈希值可能随时间变化。这样的补丁不应下载,而应本地添加到包文件夹中。
+
+如果缺少.hash文件,则不进行任何检查。
+
+### 18.5 SNNfoo启动脚本
+提供系统守护进程的包通常需要在引导时以某种方式启动。Buildroot提供了对几种init系统的支持,部分被视为一级(参见第6.3节),而其他也可用但没有同样的集成级别。理想情况下,所有提供系统守护进程的包应提供BusyBox/SysV init的启动脚本和systemd单元文件。
+
+为保持一致,启动脚本必须遵循参考示例package/busybox/S01syslogd中的样式和结构。下面给出了带注释的样例。systemd单元文件没有特定的编码风格,但如果一个包带有自己的单元文件,且与Buildroot兼容,则优先考虑该单元文件,而不是Buildroot专用的单元文件。
+
+启动脚本的名称由SNN和守护进程名称组成。NN是启动顺序号,需要谨慎选择。例如,需要网络才能启动的程序不应该早于S40network启动。脚本按字母顺序启动,所以S01syslogd比S01watchdogd先启动,S02sysctl随后启动。
+
+```
+01: #!/bin/sh
+02:
+03: DAEMON="syslogd"
+04: PIDFILE="/var/run/$DAEMON.pid"
+05:
+06: SYSLOGD_ARGS=""
+07:
+08: # shellcheck source=/dev/null
+09: [ -r "/etc/default/$DAEMON" ] && . "/etc/default/$DAEMON"
+10:
+11: # BusyBox' syslogd does not create a pidfile, so pass "-n" in the command line
+12: # and use "-m" to instruct start-stop-daemon to create one.
+13: start() {
+14:     printf 'Starting %s: ' "$DAEMON"
+15:     # shellcheck disable=SC2086 # we need the word splitting
+16:     start-stop-daemon -b -m -S -q -p "$PIDFILE" -x "/sbin/$DAEMON" \
+17:         -- -n $SYSLOGD_ARGS
+18:     status=$?
+19:     if [ "$status" -eq 0 ]; then
+20:         echo "OK"
+21:     else
+22:         echo "FAIL"
+23:     fi
+24:     return "$status"
+25: }
+26:
+27: stop() {
+28:     printf 'Stopping %s: ' "$DAEMON"
+29:     start-stop-daemon -K -q -p "$PIDFILE"
+30:     status=$?
+31:     if [ "$status" -eq 0 ]; then
+32:         rm -f "$PIDFILE"
+33:         echo "OK"
+34:     else
+35:         echo "FAIL"
+36:     fi
+37:     return "$status"
+38: }
+39:
+40: restart() {
+41:     stop
+42:     sleep 1
+43:     start
+44:     }
+45:
+46: case "$1" in
+47:     start|stop|restart)
+48:         "$1";;
+49:     reload)
+50:         # Restart, since there is no true "reload" feature.
+51:         restart;;
+52:     *)
+53:     echo "Usage: $0 {start|stop|restart|reload}"
+54:     exit 1
+55: esac
+```
+
+注意:支持以某种方式重新加载配置(SIGHUP)的程序应提供类似stop()的reload()函数。start-stop-daemon支持-K -s HUP实现此功能。建议始终将-x "/sbin/$DAEMON"附加到所有start-stop-daemon命令,以确保信号设置到与$DAEMON匹配的PID。
+
+启动脚本和单元文件都可以从/etc/default/foo中获取命令行参数,通常如果该文件不存在,除非守护进程需要某些站点特定的命令行参数才能启动,否则它不应阻止守护进程的启动。对于启动脚本,可以在FOO_ARGS="-s -o -m -e -args"中定义默认值,用户可以从/etc/default/foo覆盖此值。
+
+
+### 18.6 针对具体构建系统的基础设施
+我们所说的具有特定构建系统的包,是指所有构建系统不是标准的autotools或CMake的包。这通常包括基于手写Makefile或shell脚本的构建系统的包。
+#### 18.6.1 普通包教程
+```
+01: ################################################################################
+02: #
+03: # libfoo
+04: #
+05: ################################################################################
+06:
+07: LIBFOO_VERSION = 1.0
+08: LIBFOO_SOURCE = libfoo-$(LIBFOO_VERSION).tar.gz
+09: LIBFOO_SITE = http://www.foosoftware.org/download
+10: LIBFOO_LICENSE = GPL-3.0+
+11: LIBFOO_LICENSE_FILES = COPYING
+12: LIBFOO_INSTALL_STAGING = YES
+13: LIBFOO_CONFIG_SCRIPTS = libfoo-config
+14: LIBFOO_DEPENDENCIES = host-libaaa libbbb
+15:
+16: define LIBFOO_BUILD_CMDS
+17:     $(MAKE) $(TARGET_CONFIGURE_OPTS) -C $(@D) all
+18: endef
+19:
+20: define LIBFOO_INSTALL_STAGING_CMDS
+21:     $(INSTALL) -D -m 0755 $(@D)/libfoo.a $(STAGING_DIR)/usr/lib/libfoo.a
+22:     $(INSTALL) -D -m 0644 $(@D)/foo.h $(STAGING_DIR)/usr/include/foo.h
+23:     $(INSTALL) -D -m 0755 $(@D)/libfoo.so* $(STAGING_DIR)/usr/lib
+24: endef
+25:
+26: define LIBFOO_INSTALL_TARGET_CMDS
+27:     $(INSTALL) -D -m 0755 $(@D)/libfoo.so* $(TARGET_DIR)/usr/lib
+28:     $(INSTALL) -d -m 0755 $(TARGET_DIR)/etc/foo.d
+29: endef
+30:
+31: define LIBFOO_USERS
+32:     foo -1 libfoo -1 * - - - LibFoo daemon
+33: endef
+34:
+35: define LIBFOO_DEVICES
+36:     /dev/foo c 666 0 0 42 0 - - -
+37: endef
+38:
+39: define LIBFOO_PERMISSIONS
+40:     /bin/foo f 4755 foo libfoo - - - - -
+41: endef
+42:
+43: $(eval $(generic-package))
+```
+7-11行定义了元数据信息:包版本(LIBFOO_VERSION)、包含该包的压缩包名称(LIBFOO_SOURCE)(推荐使用xz压缩包)、可以从中下载压缩包的互联网位置(LIBFOO_SITE)、许可证(LIBFOO_LICENSE)、包含许可证文本的文件(LIBFOO_LICENSE_FILES)。所有变量都必须以相同的前缀开头,这里是LIBFOO_。这个前缀总是包名称的大写版本(下面会解释包名称定义在哪里)。
+
+12行指定这个包要在staging空间安装一些内容。这对库包来说经常需要,因为它们必须在staging空间安装头文件和其他开发文件。这将确保执行在LIBFOO_INSTALL_STAGING_CMDS变量中列出的命令。
+
+13行指定需要修复在LIBFOO_INSTALL阶段安装的一些libfoo-config文件。这些*-config文件是位于$(STAGING_DIR)/usr/bin目录的可执行shell脚本,被其他第三方包执行以获取这个特定包的位置和链接选项。
+
+问题是,默认这些*-config文件给出错误的宿主系统链接选项,不适用于交叉编译。
+
+例如:-I/usr/include而不是-I$(STAGING_DIR)/usr/include或者:-L/usr/lib而不是-L$(STAGING_DIR)/usr/lib。
+
+所以使用一些sed魔法修复这些脚本,使它们给出正确的选项。LIBFOO_CONFIG_SCRIPTS的参数是需要修复的shell脚本文件的名称,所有名称相对于$(STAGING_DIR)/usr/bin。如果需要可以给出多个名称。
+
+此外,列在LIBFOO_CONFIG_SCRIPTS中的脚本从$(TARGET_DIR)/usr/bin删除,因为目标上不需要它们。
+
+------------------------------------
+**示例18.1** 配置脚本:divine包
+
+divine包安装shell脚本$(STAGING_DIR)/usr/bin/divine-config。
+所以它的修复应该是:
+
+    DIVINE_CONFIG_SCRIPTS = divine-config
+
+-----------------------------------
+**示例18.2** 配置脚本:imagemagick包:
+imagemagick包安装以下脚本:$(STAGING_DIR)/usr/bin/{Magick,Magick++,MagickCore,MagickWand,Wand}-config
+所以它的修复应该是:
+
+    IMAGEMAGICK_CONFIG_SCRIPTS = \
+    Magick-config Magick++-config \
+    MagickCore-config MagickWand-config Wand-config
+
+----------------------------------
+
+14行指定这个包依赖的包,使用小写包名表示,可以是目标包(没有host-前缀)或者宿主包(有host-前缀)。Buildroot将确保这些包在当前包配置前构建和安装。
+
+16-29行定义了包在不同阶段的配置,编译和安装操作。LIBFOO_BUILD_CMDS告诉如何构建包。
+
+LIBFOO_INSTALL_STAGING_CTELLS如何在staging空间安装。LIBFOO_INSTALL_TARGET_CMDS告诉如何在目标空间安装。
+
+所有这些步骤都依赖于 $(@D) 变量,包含源码解压目录。
+
+31-33行定义这个包使用的用户(如运行守护进程)。
+
+35-37行定义设备节点文件。
+
+39-41行定义特定文件权限。
+
+最后,43行调用generic-package函数,根据前面定义的变量生成所有必需的Makefile代码使包正常工作。
+
+#### 18.6.2 普通包参考
+有两种通用目标。generic-package宏用于交叉编译目标包。host-generic-package宏用于本地编译宿主包。可以在单个.mk文件中调用它们两次:一次创建目标包规则,一次创建宿主包规则:
+
+    $(eval $(generic-package))
+    $(eval $(host-generic-package))
+
+这在目标包编译需要安装一些宿主工具时可能很有用。如果包名是libfoo,那么目标包名也是libfoo,而宿主包名是host-libfoo。这些名称应在其他包的DEPENDENCIES变量中使用,如果它们依赖于libfoo或host-libfoo。
+
+对generic-package和/或host-generic-package的调用必须放在.mk文件最后,在所有变量定义之后。如果有的话,host-generic-package调用必须放在generic-package调用之后。
+
+对于目标包,generic-package使用以包名称大写开头的LIBFOO_*变量。host-generic-package使用HOST_LIBFOO_*变量。对于一些变量,如果没有HOST_LIBFOO_前缀的变量,则包基础设施会使用LIBFOO_前缀的对应变量。这是对可能在目标和宿主包中具有相同值的变量进行的。下面有详细说明。
+
+在.mk文件中可以设置的变量列表(假设包名为libfoo)包括:
+- LIBFOO_VERSION,必需,必须包含包版本。如果没有HOST_LIBFOO_VERSION,则假定与LIBFOO_VERSION相同。它也可以是版本控制系统直接获取的包的修订号或标记。例如:
+    - 发布压缩包的版本:LIBFOO_VERSION = 0.1.2
+    - git树的sha1:LIBFOO_VERSION = cb9d6aa9429e838f0e54faa3d455bcbab5eef057
+    - git树的标签:LIBFOO_VERSION = v0.1.2  
+        注意:使用分支名作为FOO_VERSION不受支持,因为它无法像人们期望的那样工作:
+        1. 由于本地缓存,Buildroot不会重新获取仓库,所以期望能跟随远程仓库的人会很惊讶;
+        2. 因为两个构建永远不能完全同时进行,远程仓库的分支任何时候都可能有新提交,两个使用相同Buildroot树和配置的用户可能获取不同源代码,从而导致构建不可重复,人们会很惊讶。
+
+- LIBFOO_SOURCE可以包含包的压缩包名称,Buildroot将从LIBFOO_SITE下载这个压缩包。如果没有指定HOST_LIBFOO_SOURCE,则默认为LIBFOO_SOURCE。如果都没有指定,则假定为libfoo-$(LIBFOO_VERSION).tar.gz。例如:LIBFOO_SOURCE = foobar-$(LIBFOO_VERSION).tar.bz2
+
+- LIBFOO_PATCH可以包含空格分隔的补丁文件名列表,Buildroot将下载并应用于源代码。如果包含://,则Buildroot将假定它是完整URL,从该位置下载补丁。否则,Buildroot将假定应从LIBFOO_SITE下载补丁。如果没有指定HOST_LIBFOO_PATCH,则默认为LIBFOO_PATCH。最后,LIBFOO_PATCH列出的补丁在Buildroot包目录内补丁先应用。
+
+- LIBFOO_SITE提供包位置,可以是URL或本地文件系统路径。支持HTTP、FTP和SCP URL类型获取包压缩包。在这些情况下不包括尾随斜杠:Buildroot会在目录和文件名之间添加适当的斜杠。支持Git、Subversion、Mercurial和Bazaar URL类型直接从源代码管理系统获取包。有一个辅助函数可以更轻松从GitHub下载源码压缩包(参见18.25.4节了解详情)。文件系统路径可以指定压缩包或包含源代码的目录。有关获取方式的更多详细信息,请参阅下面的LIBFOO_SITE_METHOD。  
+注意SCP URL应为scp://[user@]host:filepath格式,filepath相对于用户主目录,所以可能需要在前面加斜杠指定绝对路径,如scp://[user@]host:/absolutepath。SFTP URL也一样。
+如果没有指定HOST_LIBFOO_SITE,则默认为LIBFOO_SITE。例如:
+
+    LIBFOO_SITE=http://www.libfoosoftware.org/libfoo  
+    LIBFOO_SITE=http://svn.xiph.org/trunk/Tremor  
+    LIBFOO_SITE=/opt/software/libfoo.tar.gz  
+    LIBFOO_SITE=$(TOPDIR)/../src/libfoo  
+
+- LIBFOO_DL_OPTS包含传递给下载器的额外选项列表。用于需要服务器端检查用户登录和密码的文档下载,或使用代理。所有LIBFOO_SITE_METHOD支持的下载方法都支持;有效选项取决于下载方法(参考相关下载工具手册)。
+
+- LIBFOO_EXTRA_DOWNLOADS包含额外需要下载的文件的空格分隔列表。如果包含://,Buildroot将假定它是完整URL,使用该URL下载文件。否则,Buildroot将假定文件位于LIBFOO_SITE。Buildroot不会对这些额外文件做任何操作,由包配方决定如何使用它们$(LIBFOO_DL_DIR)。
+
+- LIBFOO_SITE_METHOD确定获取或复制源代码的方法。在许多情况下,Buildroot会从LIBFOO_SITE内容猜测方法,通常无需设置LIBFOO_SITE_METHOD。如果没有指定HOST_LIBFOO_SITE_METHOD,则默认为LIBFOO_SITE_METHOD的值。  
+LIBFOO_SITE_METHOD可能的值包括:
+    - wget用于正常的FTP/HTTP压缩包下载。LIBFOO_SITE开始于http://或ftp://默认为此值。
+    - scp用于SSH scp下载压缩包。LIBFOO_SITE开始于scp://默认为此值。
+    - sftp用于SSH sftp下载压缩包。LIBFOO_SITE开始于sftp://默认为此值。
+    - svn从Subversion仓库检出源代码。LIBFOO_SITE开始于svn://默认为此值。http:// Subversion仓库URL必须指定LIBFOO_SITE_METHOD=svn。
+    - cvs从CVS仓库获取源代码,匿名pserver模式默认。
+    - git从Git仓库获取源代码。LIBFOO_SITE开始于git://默认为此值。
+    - hg从Mercurial仓库获取源代码,必须指定LIBFOO_SITE_METHOD=hg。
+    - bzr从Bazaar仓库获取源代码。LIBFOO_SITE开始于bzr://默认为此值。
+    - file本地压缩包,LIBFOO_SITE指定本地文件名。
+    - local本地源代码目录,LIBFOO_SITE指定目录路径。Buildroot将目录内容复制到包构建目录。
+
+- LIBFOO_GIT_SUBMODULES可以设置为YES,以创建包含仓库中的git子模块的归档文件。这只适用于使用git下载的包(即LIBFOO_SITE_METHOD=git)。注意,我们尽量不使用包含捆绑库的git子模块,在这种情况下,我们更倾向于从它们自己的包中使用这些库。
+
+- LIBFOO_GIT_LFS应设置为YES,如果Git仓库使用Git LFS存储大文件。这只适用于使用git下载的包(即LIBFOO_SITE_METHOD=git)。
+
+- LIBFOO_STRIP_COMPONENTS是tar从文件名中提取时必须剥离的前导组件(目录)数。大多数包的压缩包有一个前导组件名为"<pkg-name>-<pkg-version>",因此Buildroot传递--strip-components=1给tar删除它。对于非标准包没有此组件或有多个前导组件需要删除,请设置此变量的值传递给tar。默认:1。
+
+- LIBFOO_EXCLUDES是在提取归档时排除模式的空格分隔列表。该列表中的每个项都作为tar的--exclude选项传递。默认为空。
+
+- LIBFOO_DEPENDENCIES列出当前目标包编译需要的依赖项(以包名表示)。这些依赖项保证在当前包配置开始前编译和安装。但是,这些依赖项的配置修改不会强制重新编译当前包。同样,HOST_LIBFOO_DEPENDENCIES列出当前宿主包的依赖项。
+
+- LIBFOO_EXTRACT_DEPENDENCIES列出当前目标包提取需要的依赖项。这些依赖项保证在当前包提取步骤开始前编译和安装。这只在包基础设施内部使用,包通常不应直接使用。
+
+- LIBFOO_PATCH_DEPENDENCIES列出当前包打补丁需要的依赖项。这些依赖项保证在当前包打补丁前提取和打补丁(但不一定构建)。同样,HOST_LIBFOO_PATCH_DEPENDENCIES列出当前宿主包的依赖项。这很少使用;通常你真正需要的是LIBFOO_DEPENDENCIES。
+
+- LIBFOO_PROVIDES列出libfoo实现的所有虚拟包。参见18.12节。
+
+- LIBFOO_INSTALL_STAGING可以设置为YES或NO(默认)。如果设置为YES,则执行LIBFOO_INSTALL_STA变量中的命令在staging目录安装包。
+
+- LIBFOO_INSTALL_TARGET可以设置为YES(默认)或NO。如果设置为YES,则执行LIBFOO_INSTALL_TARGE变量中的命令在目标目录安装包。
+
+- LIBFOO_INSTALL_IMAGES可以设置为YES或NO(默认)。如果设置为YES,则执行LIBFOO_INSTALL_IMAG变量中的命令在镜像目录安装包。
+
+- LIBFOO_CONFIG_SCRIPTS列出需要特殊修复以支持交叉编译的$(STAGING_DIR)/usr/bin中的文件名称。可以使用空格分隔多个文件名称,所有名称相对于$(STAGING_DIR)/usr/bin。LIBFOO_CONFIG_SCRIPTS列出的文件也从$(TARGET_DIR)/usr/bin删除,因为目标上不需要它们。
+
+- LIBFOO_DEVICES可选地列出Buildroot使用静态设备表创建的设备文件。使用makedevs语法。可以参考第25章找到此语法的一些文档。
+
+- LIBFOO_PERMISSIONS可选地列出构建过程结束时需要做的权限更改。使用makedevs语法。可以参考第25章找到此语法的一些文档。
+
+- LIBFOO_USERS可选地列出为这个包创建的用户,如果它安装了一个程序需要作为特定用户运行(例如作为守护进程或cron作业)。语法在精神上类似makedevs,描述在第26章。
+
+- LIBFOO_LICENSE定义包的许可证(或许可证)。此名称将出现在make legal-info产生的清单文件中。如果许可证出现在SPDX许可证列表中,请使用SPDX短标识符使清单文件统一。否则,用精确和简洁的方式描述许可证,避免模糊名称如BSD实际上是一组许可证。此变量是可选的。如果未定义,未知将出现在此包的许可证字段中。  
+此变量的预期格式必须遵循以下规则:
+    - 如果包的不同部分根据不同的许可证发布,请使用逗号分隔许可证(例如LIBFOO_LICENSE=GPL-2.0+,LGPL-2.1+)。如果清楚区分哪个组件根据哪个许可证许可,请在括号中注释许可证(例如LIBFOO_LICENSE=GPL-2.0+(programs),LGPL-2.1+(libraries))。
+    - 如果一些许可证取决于子选项是否启用,请使用逗号将有条件许可证附加(例如:FOO_LICENSE+=,GPL-2.0+(programs));基础设施将内部删除前面的空格。 
+    - 如果包是双重许可的,请使用或关键字分隔许可证(例如LIBFOO_LICENSE=AFL-2.1或GPL-2.0+)。
+
+- LIBFOO_LICENSE_FILES是包含包发布许可证的压缩包中的文件列表,空格分隔。make legal-info将所有这些文件复制到legal-info目录。参见第13章了解更多信息。此变量是可选的。如果未定义,将产生警告提示您,未保存将出现在此包的许可文件字段中。
+
+- LIBFOO_ACTUAL_SOURCE_TARBALL仅适用于LIBFOO_SITE/LIBFOO_SOURCE对指向实际不包含源代码而包含二进制代码的归档的包。这是非常少见的情况,仅知道适用于预编译的外部工具链,但理论上也可能适用于其他包。在这种情况下,通常有单独的压缩包包含实际源代码。设置LIBFOO_ACTUAL_SOURCE_TARBALL为实际源代码归档的名称,Buildroot将下载并在运行make legal-info收集相关法律材料时使用它。注意此文件不会在常规构建中下载,也不会通过make source下载。
+
+- LIBFOO_ACTUAL_SOURCE_SITE提供实际源码压缩包的位置。默认值为LIBFOO_SITE,所以如果二进制和源码归档位于同一目录,则无需设置此变量。如果未设置LIBFOO_ACTUAL_SOURCE_T,则没有设置LIBFOO_ACTUAL_SOURCE_SITE的意义。
+
+- LIBFOO_REDISTRIBUTE可以设置为YES(默认)或NO,表示是否允许重新分发包源代码。对非开源包设置为NO:Buildroot将不会保存此包的源代码收集legal-info时。
+
+- LIBFOO_IGNORE_CVES是空格分隔的CVE列表,告诉Buildroot CVE跟踪工具哪些CVE应该忽略此包。通常用于CVE通过包补丁修复,或因某种原因不影响Buildroot包时使用。必须始终用Makefile注释前面添加CVE。
+例如:
+    ```
+    # 0001-fix-cve-2020-12345.patch
+    LIBFOO_IGNORE_CVES += CVE-2020-12345
+    # only when built with libbaz, which Buildroot doesn't support
+    LIBFOO_IGNORE_CVES += CVE-2020-54321
+    ```
+
+- LIBFOO_CPE_ID_*变量集允许包定义其CPE标识符。可用变量包括:
+
+- LIBFOO_CPE_ID_PREFIX,指定CPE标识符的前缀,即前三个字段。未定义时默认值为cpe:2.3:a。
+
+- LIBFOO_CPE_ID_VENDOR,指定CPE标识符的供应商部分。未定义时默认值为<pkgname>_project。
+
+- LIBFOO_CPE_ID_PRODUCT,指定CPE标识符的产品部分。未定义时默认值为<pkgname>。
+
+- LIBFOO_CPE_ID_VERSION,指定CPE标识符的版本部分。未定义时默认值为$(LIBFOO_VERSION)。
+
+- LIBFOO_CPE_ID_UPDATE指定CPE标识符的更新部分。未定义时默认值为*。  
+如果定义了这些变量中的任何一个,则通用包基础设施将假定包提供有效的CPE信息。在这种情况下,通用包基础设施将定义LIBFOO_CPE_ID。  
+对于宿主包,如果未定义其LIBFOO_CPE_ID_*变量,它将继承对应目标包的这些变量值。
+
+定义这些变量的推荐方式是使用以下语法:  
+```
+LIBFOO_VERSION = 2.32
+```
+
+现在,定义应在构建过程不同阶段执行什么的变量:
+
+- LIBFOO_EXTRACT_CMDS列出提取包时需要执行的操作。通常不需要,因为tar包自动由Buildroot处理。但是,如果包使用非标准归档格式(如ZIP或RAR文件),或者tar包组织方式非标准,此变量允许覆盖包基础设施的默认行为。
+- LIBFOO_CONFIGURE_CMDS列出编译前需要执行的配置操作。
+- LIBFOO_BUILD_CMDS列出编译时需要执行的操作。
+- HOST_LIBFOO_INSTALL_CMDS列出安装宿主包时需要执行的操作。包必须将文件安装到$(HOST_DIR)目录。
+- LIBFOO_INSTALL_TARGET_CMDS列出安装目标包到目标目录时需要执行的操作。只需安装运行包所需的文件。
+- LIBFOO_INSTALL_STAGING_CMDS列出安装目标包到staging目录时需要执行的操作。所有开发文件都应安装。
+- LIBFOO_INSTALL_IMAGES_CMDS列出安装包到镜像目录时需要执行的操作。只能放置不属于TARGET_DIR但必需引导板的二进制镜像。
+- LIBFOO_INSTALL_INIT_XXX列出安装init脚本的操作,用于不同的init系统。
+- LIBFOO_HELP_CMDS列出打印帮助信息的操作,包含在make help输出中。
+- LIBFOO_LINUX_CONFIG_FIXUPS列出构建和使用此包所需的内核配置选项。
+
+推荐定义这些变量的方式是:
+```
+define LIBFOO_CONFIGURE_CMDS
+    action 1
+    action 2
+    action 3
+endef
+```
+
+在操作定义中,可以使用以下变量:
+- $(LIBFOO_PKGDIR)包含libfoo.mk和Config.in文件所在的目录路径。用于安装打包在Buildroot中的文件,如运行时配置文件、启动画面等。
+- $(@D),包含解压缩包源代码的目录。 
+- $(LIBFOO_DL_DIR)包含Buildroot为libfoo下载的所有文件存储的目录路径。
+- $(TARGET_CC)、$(TARGET_LD)等获取交叉编译工具
+- $(TARGET_CROSS)获取交叉编译工具链前缀
+- 当然还有$(HOST_DIR)、$(STAGING_DIR)和$(TARGET_DIR)变量正确安装包。除非使用按包目录支持,否则它们指向全局主机、staging和目标目录;使用按包目录支持时,它们指向当前包的主机、staging和目标目录。从包角度没有区别:它应简单使用HOST_DIR、STAGING_DIR和TARGET_DIR。第8.12节有更多按包目录支持细节。
+
+最后,也可以使用钩子。第18.23节有更多信息。
+
+
+### 18.7 autotools基包基础设施
+#### 18.7.1 autotools包教程
+首先,看看如何为基于autotools的包编写.mk文件,以一个例子:
+```
+01: ################################################################################
+02: #
+03: # libfoo
+04: #
+05: ################################################################################
+06:
+07: LIBFOO_VERSION = 1.0
+08: LIBFOO_SOURCE = libfoo-$(LIBFOO_VERSION).tar.gz
+09: LIBFOO_SITE = http://www.foosoftware.org/download
+10: LIBFOO_INSTALL_STAGING = YES
+11: LIBFOO_INSTALL_TARGET = NO
+12: LIBFOO_CONF_OPTS = --disable-shared
+13: LIBFOO_DEPENDENCIES = libglib2 host-pkgconf
+14:
+15: $(eval $(autotools-package))
+```
+第7行声明了包的版本号。
+
+第8-9行声明了压缩包名称(推荐使用xz压缩包)和Web上的压缩包位置。Buildroot将自动从这个位置下载压缩包。
+
+第10行告诉Buildroot将包安装到staging目录。位于output/staging/的staging目录是安装所有包(包括开发文件等)的目录。默认情况下,包不会安装到staging目录,因为通常只需要库安装到staging目录:它们的开发文件需要用于编译依赖它们的其他库或应用程序。默认情况下,启用staging安装时,使用make install命令安装包。
+
+第11行告诉Buildroot不将包安装到目标目录。这个目录将成为运行在目标上的根文件系统。对于纯静态库来说,无需将它们安装到目标目录,因为它们在运行时不会使用。默认情况下启用目标安装;几乎不需要设置此变量为NO。默认情况下,使用make install命令安装包。
+
+第12行告诉Buildroot传递自定义配置选项,在配置和构建包前传递给./configure脚本。
+
+第13行声明依赖关系,以便它们在包构建过程开始前构建。
+
+最后,第15行调用autotools-package宏,生成实际允许构建包的Makefile规则。
+
+
+#### 18.7.2 autotools包基础设施参考
+autotools包基础设施的主要宏是autotools-package。它类似于通用包宏。也可以使用主机autotools包宏实现主机和目标包。
+
+就像通用基础设施一样,autotools基础设施通过在调用autotools-package宏之前定义一些变量来工作。
+首先,通用基础设施中存在的所有包元数据信息变量也存在于autotools基础设施中:LIBFOO_VERSION、LIBFOO_SOURCE、LIBFOO_PATCH、LIBFOO_SITE、LIBFOO_SUBDIR、LIBFOO_DEPENDENCIES、LIBFOO_INSTALL_STAGING、LIBFOO_INSTALL_TARGET。
+
+autotools基础设施也可以定义一些特定变量。许多变量只在特定情况下有用,所以典型包只会使用其中一些:
+- LIBFOO_SUBDIR可以包含包内包含配置脚本的子目录的名称。如果主配置脚本不在tarball提取的树的根目录中,则这很有用。如果未指定HOST_LIBFOO_SUBDIR,则默认为LIBFOO_SUBDIR。
+- LIBFOO_CONF_ENV用于指定传递给配置脚本的额外环境变量。默认为空。
+- LIBFOO_CONF_OPTS用于指定传递给配置脚本的额外配置选项。默认为空。
+- LIBFOO_MAKE用于指定替代的make命令。当在配置中启用并行构建(使用BR2_JLEVEL)但对于给定的包应禁用此功能时,这通常很有用。默认设置为$(MAKE)。如果包不支持并行构建,则应设置为LIBFOO_MAKE=$(MAKE1)。
+- LIBFOO_MAKE_ENV用于指定传递给构建步骤中的make的额外环境变量。这些变量在make命令之前传递。默认为空。
+- LIBFOO_MAKE_OPTS用于指定传递给构建步骤中的make的额外变量。这些变量在make命令之后传递。默认为空。
+- LIBFOO_AUTORECONF指示是否应重新配置包(即是否应通过重新运行autoconf、automake、libtool等重新生成配置脚本和Makefile.in文件)。有效值为YES和NO。默认值为NO。
+- LIBFOO_AUTORECONF_ENV用于指定传递给autoreconf程序的额外环境变量。这些变量在autoreconf命令的环境中传递。默认为空。
+- LIBFOO_AUTORECONF_OPTS用于指定传递给autoreconf程序的额外选项。仅在LIBFOO_AUTORECONF=YES时有效。默认为空。
+- LIBFOO_AUTOPOINT指示是否应自动设置包(即是否需要复制I18N基础设施)。仅在LIBFOO_AUTORECONF=YES时有效。有效值为YES和NO。默认值为NO。
+- LIBFOO_LIBTOOL_PATCH指示是否应应用修复libtool交叉编译问题的Buildroot补丁。有效值为YES和NO。默认值为YES
+- LIBFOO_INSTALL_STAGING_OPTS包含用于将包安装到staging目录的make选项。默认值为DESTDIR=$(STAGING_DIR) install,对大多数autotools包正确。仍可覆盖。
+- LIBFOO_INSTALL_TARGET_OPTS包含用于将包安装到目标目录的make选项。默认值为DESTDIR=$(TARGET_DIR) install。对大多数autotools包正确,但仍可在需要时覆盖。
+
+使用autotools基础设施,已经定义了构建和安装包所需的所有步骤,它们通常可以很好地支持基于autotools的大多数包。但是,在需要时,仍然可以自定义任何特定步骤:
+- 添加后操作钩子(提取、修补、配置、构建或安装后)。详见18.23节。 
+- 覆盖其中一个步骤。例如,即使使用autotools基础设施,如果包的.mk文件定义了自己的LIBFOO_CONFIGURE_CMDS变量,也会使用它而不是默认的autotools配置步骤。但是,只应在特定情况下使用此方法。一般情况下不要使用。
+
+### 18.8 CMake基包基础设施
+#### 18.8.1 cmake-package教程
+首先看一个CMake包的.mk文件示例:
+```
+01: ################################################################################
+02: #
+03: # libfoo
+04: #
+05: ################################################################################
+06:
+07: LIBFOO_VERSION = 1.0
+08: LIBFOO_SOURCE = libfoo-$(LIBFOO_VERSION).tar.gz
+09: LIBFOO_SITE = http://www.foosoftware.org/download
+10: LIBFOO_INSTALL_STAGING = YES
+11: LIBFOO_INSTALL_TARGET = NO
+12: LIBFOO_CONF_OPTS = -DBUILD_DEMOS=ON
+13: LIBFOO_DEPENDENCIES = libglib2 host-pkgconf
+14:
+15: $(eval $(cmake-package))
+```
+第7行声明了包的版本号。
+
+第8-9行声明了压缩包名称(推荐使用xz压缩包)和Web上的压缩包位置。Buildroot将自动从这个位置下载压缩包。
+
+第10行告诉Buildroot将包安装到staging目录。位于output/staging/的staging目录是安装所有包(包括开发文件等)的目录。默认情况下,包不会安装到staging目录,因为通常只需要库安装到staging目录:它们的开发文件需要用于编译依赖它们的其他库或应用程序。默认情况下,启用staging安装时,使用make install命令安装包。
+
+第11行告诉Buildroot不将包安装到目标目录。这个目录将成为运行在目标上的根文件系统。对于纯静态库来说,无需将它们安装到目标目录,因为它们在运行时不会使用。默认情况下启用目标安装;几乎不需要设置此变量为NO。默认情况下,使用make install命令安装包。
+
+第12行告诉Buildroot在配置包时传递自定义选项给CMake。
+
+第13行声明依赖关系,以便它们在包构建过程开始前构建。
+
+最后,第15行调用cmake-package宏,生成实际允许构建包的Makefile规则。
+
+#### 18.8.2 CMake包基础设施参考
+CMake包基础设施的主要宏是cmake-package。它类似于通用包宏generic-package。
+
+也可以使用主机CMake包宏host-cmake-package实现主机和目标包的能力。
+
+就像通用基础设施一样,CMake基础设施通过在调用cmake-package宏之前定义一些变量来工作。
+
+首先,通用基础设施中存在的所有包元数据信息变量也存在于CMake基础设施中:
+LIBFOO_VERSION、LIBFOO_SOURCE、LIBFOO_PATCH、LIBFOO_SITE、LIBFOO_SUBDIR、LIBFOO_DEPENDENCIES、
+LIBFOO_INSTALL_STAGING、LIBFOO_INSTALL_TARGET。
+
+CMake基础设施也可以定义一些特定变量。许多变量只在特定情况下有用,所以典型包只会使用其中一些。
+- LIBFOO_SUBDIR可以包含主CMakeLists.txt文件的子目录名称。
+- LIBFOO_CONF_ENV指定传递给CMake的额外环境变量。
+- LIBFOO_CONF_OPTS指定传递给CMake的额外配置选项。  
+cmake-package基础设施会设置一些常用的CMake选项,所以通常无需在包的*.mk文件中设置,除非要覆盖它们。
+    - CMAKE_BUILD_TYPE由BR2_ENABLE_RUNTIME_DEBUG驱动;
+    - CMAKE_INSTALL_PREFIX; 
+    - BUILD_SHARED_LIBS由BR2_STATIC_LIBS驱动;
+    - BUILD_DOC、BUILD_DOCS被禁用;
+    - BUILD_EXAMPLE、BUILD_EXAMPLES被禁用;
+    - BUILD_TEST、BUILD_TESTS、BUILD_TESTING被禁用。
+- LIBFOO_SUPPORTS_IN_SOURCE_BUILD=NO应当设置为包无法在源目录内构建但需要单独的构建目录。
+- LIBFOO_MAKE用于指定替代的make命令。默认为$(MAKE)。如果不支持并行构建,应设置为LIBFOO_MAKE=$(MAKE1)。
+- LIBFOO_MAKE_ENV指定传递给make的额外环境变量。这些变量在make命令之前传递。默认为空。
+- LIBFOO_MAKE_OPTS指定传递给make的额外变量。这些变量在make命令之后传递。默认为空。
+- LIBFOO_INSTALL_OPTS包含安装到主机目录的make选项。默认为install,对大多数CMake包正确。
+- LIBFOO_INSTALL_STAGING_OPTS包含安装到staging目录的make选项。默认为DESTDIR=$(STAGING_DIR) install/fast,对大多数CMake包正确。但都可以覆盖。
+- LIBFOO_INSTALL_TARGET_OPTS包含安装到目标目录的make选项。默认为DESTDIR=$(TARGET_DIR) install/fast。对大多数CMake包正确,但仍可在需要时覆盖。
+
+使用CMake基础设施,已经定义了构建和安装包所需的所有步骤,它们通常可以很好地支持基于CMake的大多数包。但是,在需要时,仍然可以自定义任何特定步骤:
+- 添加后操作钩子(提取、修补、配置、构建或安装后)。详见18.23节。
+- 覆盖其中一个步骤。例如,即使使用CMake基础设施,如果包的.mk文件定义了自己的LIBFOO_CONFIGURE_CMDS变量,也会使用它而不是默认的CMake配置步骤。但是,只应在特定情况下使用此方法。一般情况下不要使用。
+
+
+### 18.9 Python包基础设施
+此基础设施适用于使用标准Python setuptools或pep517机制作为构建系统的Python包,通常通过使用setup.py脚本或pyproject.toml文件识别。
+#### 18.9.1 python-package教程
+首先看一个Python包的.mk文件示例:
+```
+01: ################################################################################
+02: #
+03: # python-foo
+04: #
+05: ################################################################################
+06:
+07: PYTHON_FOO_VERSION = 1.0
+08: PYTHON_FOO_SOURCE = python-foo-$(PYTHON_FOO_VERSION).tar.xz
+09: PYTHON_FOO_SITE = http://www.foosoftware.org/download
+10: PYTHON_FOO_LICENSE = BSD-3-Clause
+11: PYTHON_FOO_LICENSE_FILES = LICENSE
+12: PYTHON_FOO_ENV = SOME_VAR=1
+13: PYTHON_FOO_DEPENDENCIES = libmad
+14: PYTHON_FOO_SETUP_TYPE = distutils
+15:
+16: $(eval $(python-package))
+```
+第7行声明了包的版本号。
+
+第8-9行声明了压缩包名称(推荐使用xz压缩包)和Web上的压缩包位置。Buildroot将自动从这个位置下载压缩包。
+
+第10-11行提供了包的许可详情(第10行是许可证,第11行是包含许可文本的文件)。
+
+第12行告诉Buildroot在配置包时将自定义选项传递给Python setup.py脚本。
+
+第13行声明依赖关系,以便它们在包构建过程开始前构建。
+
+第14行声明了使用的具体Python构建系统。在此例中使用的是Python的distutils构建系统。
+
+支持的四种构建系统有distutils、flit、pep517和setuptools。
+
+最后,第16行调用python-package宏,生成实际允许构建包的Makefile规则。
 
