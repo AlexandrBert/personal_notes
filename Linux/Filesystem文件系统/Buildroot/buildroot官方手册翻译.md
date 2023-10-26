@@ -1200,7 +1200,7 @@ Toolchain --->
 
 建议保存此defconfig文件的位置是 `configs/<boardname>_defconfig` 。如果遵循这个建议，配置会出现在 make list-defconfigs 输出中，并可以通过运行 `make <boardname>_defconfig` 再次设置。
 
-或者，也可以将文件复制到任何其他位置，并使用 `make defconfig BR2_DEFCONFIG=<配置文件路径>` 重新构建。
+或者，也可以将文件复制到任何其他位置，并使用 `make defconfig BR2_DEFCONFIG=<path-to-defconfig>` 重新构建。
 
 ### 9.4 保存其他组件的配置 
 如果修改了BusyBox、Linux内核、Barebox、U-Boot和uClibc的配置，也应保存这些组件的配置文件。对于这些每个组件，Buildroot都有一个配置选项用于指向输入配置文件，例如
