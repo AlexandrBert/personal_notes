@@ -646,14 +646,14 @@ Buildroot生成的工具链默认位于 `output/host/` 。使用它的最简单�
 
 另外，如果您只想准备SDK而不生成tarball（例如，因为您将只移动主机目录，或者将自己生成tarball），Buildroot 还允许您只使用 `make prepare-sdk` 来准备SDK，而不实际生成tarball。
 
-为了方便起见，通过选择选项 BR2_PACKAGE_HOST_ENVIRONMENT_SETUP ，您可以在 output/host/ 中安装一个 environment-setup 脚本，因此在您的SDK中也会有这个脚本。您可以使用.  your/sdk/path/environment-setup 来源化此脚本，以导出一些环境变量，帮助使用Buildroot SDK进行交叉编译项目：PATH将包含SDK二进制文件，标准的 autotools 变量将被定义为适当的值，并且 CONFIGURE_FLAGS 将包含基本的 ./configure 选项，用于交叉编译 autotools 项目。它还提供了一些有用的命令。但请注意，一旦此脚本被源化，环境只会为交叉编译设置，不再适用于本地编译。
+为了方便起见，通过选择选项 BR2_PACKAGE_HOST_ENVIRONMENT_SETUP ，您可以在 output/host/ 中安装一个 environment-setup 脚本，因此在您的SDK中也会有这个脚本。您可以使用 .  your/sdk/path/environment-setup 来源化此脚本，以导出一些环境变量，帮助使用Buildroot SDK进行交叉编译项目：PATH将包含SDK二进制文件，标准的 autotools 变量将被定义为适当的值，并且 CONFIGURE_FLAGS 将包含基本的 ./configure 选项，用于交叉编译 autotools 项目。它还提供了一些有用的命令。但请注意，一旦此脚本被源化，环境只会为交叉编译设置，不再适用于本地编译。
 
 #### 8.13.2 在Buildroot中使用gdb
-Buildroot允许进行交叉调试，其中调试器在构建机上运行，并与目标上的gdbserver通信以控制程序的执行。 要实现这一点：
-- 如果您使用的是内部工具链（由Buildroot构建），您必须启用BR2_PACKAGE_HOST_GDB、BR2_PACKAGE_GDB和BR2_PACKAGE_GDB_SERVER。这确保同时构建交叉gdb和gdbserver，并将gdbserver安装到目标上。
-- 如果您使用的是外部工具链，您应该启用BR2_TOOLCHAIN_EXTERNAL_GDB_SERVER_COPY，它将外部工具链中包含的gdbserver复制到目标上。如果您的外部工具链没有交叉gdb或gdbserver，也可以让Buildroot构建它们，方法是启用与内部工具链后端相同的选项。
+Buildroot允许进行交叉调试，其中调试器在构建机上运行，并与目标上的 gdbserver 通信以控制程序的执行。 要实现这一点：
+- 如果您使用的是内部工具链（由 Buildroot 构建），您必须启用 BR2_PACKAGE_HOST_GDB、BR2_PACKAGE_GDB 和 BR2_PACKAGE_GDB_SERVER 。这确保同时构建交叉 gdb 和 gdbserver ，并将 gdbserver 安装到目标上。
+- 如果您使用的是外部工具链，您应该启用 BR2_TOOLCHAIN_EXTERNAL_GDB_SERVER_COPY ，它将外部工具链中包含的 gdbserver 复制到目标上。如果您的外部工具链没有交叉 gdb 或 gdbserver ，也可以让Buildroot 构建它们，方法是启用与内部工具链后端相同的选项。
 
-现在，要开始调试名为foo的程序，您应该在目标上运行以下命令：
+现在，要开始调试名为 foo 的程序，您应该在目标上运行以下命令：
 
     gdbserver :2345 foo
 这将导致gdbserver在TCP5上监听来自交叉gdb的连接。
@@ -661,11 +661,11 @@ Buildroot允许进行交叉调试，其中调试器在构建机上运行，并�
 然后，在主机上，您应该使用以下命令行启动交叉gdb：
 
     <buildroot>/output/host/bin/<tuple>-gdb -ix <buildroot>/output/staging/usr/share/buildroot/
-    gdbinit foo
+        gdbinit foo
 
-当然，foo必须在当前目录中可用，并带有调试符号。通常，您从构建foo的目录中启动此命令（是从output/target/中启动，因为该目录中的二进制文件已被剥离）。
+当然，foo必须在当前目录中可用，并带有调试符号。通常，您从构建 foo 的目录中启动此命令（是从 output/target/ 中启动，因为该目录中的二进制文件已被剥离）。
 
-`/output/staging/usr/share/buildroot/gdbinit` 文件将告诉交叉gdb如何找到目标的库。 最后，要从交叉gdb连接到目标：
+`/output/staging/usr/share/buildroot/gdbinit` 文件将告诉交叉 gdb 如何找到目标的库。 最后，要从交叉 gdb 连接到目标：
 
     (gdb) target remote <target ip address>:2345
 
@@ -673,13 +673,14 @@ Buildroot允许进行交叉调试，其中调试器在构建机上运行，并�
 ccache是编译器缓存。它存储每个编译过程产生的对象文件，并能够通过使用预存对象文件跳过相同源文件(使用相同编译器和相同参数)的后续编译。对于从零开始几次进行几乎相同的构建，它可以很好地加速构建过程。
 Buildroot集成了ccache支持。只需在构建选项中启用编译器缓存即可。这将自动构建ccache并在每个主机和目标编译中使用它。
 
-缓存位于BR2_CCACHE_DIR配置选项定义的目录中，默认为 `$HOME/.buildroot-ccache` 。这个默认位置位于Buildroot输出目录外，所以不同的Buildroot构建可以共享它。如果想清除缓存，只需删除这个目录。
-可以通过运行make ccache-stats获取缓存统计信息(其大小、命中数、未命中数等)。
+缓存位于 BR2_CCACHE_DIR 配置选项定义的目录中，默认为 `$HOME/.buildroot-ccache` 。这个默认位置位于Buildroot输出目录外，所以不同的 Buildroot 构建可以共享它。如果想清除缓存，只需删除这个目录。
+可以通过运行 `make ccache-stats` 获取缓存统计信息(其大小、命中数、未命中数等)。
 
-make目标ccache-options和CCACHE_OPTIONS变量提供对ccache更通用的访问。例如:
+make目标 ccache-options 和 CCACHE_OPTIONS 变量提供对 ccache 更通用的访问。例如:
 
     # set cache limit size
     make CCACHE_OPTIONS="--max-size=5G" ccache-options
+
     # zero statistics counters
     make CCACHE_OPTIONS="--zero-stats" ccache-options
 
@@ -689,13 +690,13 @@ ccache对源文件和编译器选项生成哈希值。如果编译器选项不�
 
 相对路径的缺点是对象文件中的路径也变成相对路径。例如，调试器在未cd到输出目录前无法找到文件。
 
-有关在不同目录下编译的详细信息，请参阅ccache手册中的“Compiling in different directories”部分。
+有关在不同目录下编译的详细信息，请参阅ccache手册中的 “Compiling in different directories” 部分。
 
-在Buildroot使用BR2_CCACHE=y选项启用ccache时:
-- ccache在Buildroot自身构建中使用
-- ccache在Buildroot外构建时(如直接调用交叉编译器或使用SDK)不使用
+在Buildroot使用 `BR2_CCACHE=y` 选项启用ccache时:
+- ccache 在 Buildroot 自身构建中使用
+- ccache 在 Buildroot 外构建时(如直接调用交叉编译器或使用SDK)不使用
 
-可以通过BR2_USE_CCACHE环境变量覆盖此行为:设置为1时启用ccache(Buildroot构建默认)，未设置或设置不同值时禁用ccache。
+可以通过 BR2_USE_CCACHE 环境变量覆盖此行为:设置为1时启用 ccache(Buildroot构建默认)，未设置或设置不同值时禁用ccache。
 
 #### 8.13.4 下载包位置  
 Buildroot下载的各种tar包都存储在BR2_DL_DIR中，默认为dl目录。如果要保存一个已知与相关tar包兼容的完整Buildroot版本，可以复制这个目录。这样就可以使用完全相同版本重新生成工具链和目标文件系统。
@@ -725,7 +726,7 @@ Buildroot下载的各种tar包都存储在BR2_DL_DIR中，默认为dl目录。�
 |install-staging |目标包:在交叉编译目录安装(如果需要)|
 |install-target |目标包:在目标目录安装(如果需要)  |
 |install |目标包:运行前两个安装命令|
-|host |包:在主机目录安装|
+|-|主机包:在主机目录安装|
 
 此外还有一些其他有用的make目标:
 |命令/目标 |说明|
@@ -757,8 +758,8 @@ Buildroot正常操作是下载一个 tarball ，解压它，配置、编译和�
 如果需要其他位置，也可以通过 `BR2_PACKAGE_OVERRIDE_FILE` 配置选项指定。
 在这个覆盖文件中，Buildroot期望找到如下格式的行:
 
-    <pkg1>_OVERRIDE_SRCDIR = /pkg1源代码路径
-    <pkg2>_OVERRIDE_SRCDIR = /pkg2源代码路径
+    <pkg1>_OVERRIDE_SRCDIR = /path/to/pkg1/sources
+    <pkg2>_OVERRIDE_SRCDIR = /path/to/pkg2/sources
 
 例如:
 
@@ -778,7 +779,7 @@ Buildroot正常操作是下载一个 tarball ，解压它，配置、编译和�
     make busybox-rebuild all
 output/images中的根文件系统镜像就包含了更新后的BusyBox。
 
-大项目源代码树通常包含数百上千个不需要构建但会减慢rsync复制速度的文件。可以选择定义<pkg>_OVERRIDE_SRCDIR_RSYNC_EXCLUSIONS跳过从源代码树同步某些文件。例如在webkitgtk包上工作时:
+大项目源代码树通常包含数百上千个不需要构建但会减慢rsync复制速度的文件。可以选择定义 <pkg>_OVERRIDE_SRCDIR_RSYNC_EXCLUSIONS 跳过从源代码树同步某些文件。例如在 webkitgtk 包上工作时:
 
     WEBKITGTK_OVERRIDE_SRCDIR = /home/bob/WebKit
     WEBKITGTK_OVERRIDE_SRCDIR_RSYNC_EXCLUSIONS = \
@@ -812,9 +813,9 @@ output/images中的根文件系统镜像就包含了更新后的BusyBox。
 本章描述如何在Buildroot中进行这样的项目专用定制，以及如何存储定制内容以便在运行make clean后以可重复方式构建相同镜像。遵循推荐策略，甚至可以使用同一个Buildroot树构建多个不同项目!
 
 ### 9.1 推荐目录结构
-定制Buildroot项目时，需要存储一些项目专用文件。这些文件可以放任何位置，但Buildroot开发者推荐以下目录结构:
+定制 Buildroot 项目时，需要存储一些项目专用文件。这些文件可以放任何位置，但 Buildroot 开发者推荐以下目录结构:
 
-可以选择这个结构是否放在Buildroot树内，还是使用br2-external树放外部。两种方式都可以，取决于个人选择。
+可以选择这个结构是否放在 Buildroot 树内，还是使用 br2-external 树放外部。两种方式都可以，取决于个人选择。
 ```
 +-- board/
 | +-- <company>/
@@ -852,7 +853,7 @@ output/images中的根文件系统镜像就包含了更新后的BusyBox。
 ```
 上面显示的文件细节将在本章后面给出。
 
-注意:如果选择将这个结构放在Buildroot树外但使用br2-external树， <company> 和可能的 <boardname> 组件可能是多余的，可以省略。
+注意:如果选择将这个结构放在 Buildroot 树外但使用 br2-external 树， <company> 和可能的 <boardname> 组件可能是多余的，可以省略。
 
 #### 9.1.1 实现分层定制
 对于有几个相关项目但部分需要相同定制的用户来说，使用分层定制方法是很常见的，如本节所述。
@@ -933,23 +934,23 @@ br2-external 树必须包含至少以下三个文件，下章将对它们进行�
 该文件描述 br2-external 树:为该 br2-external 树指定名称和描述。
 
 该文件采用基于行的格式，每行由关键字开头，后跟冒号和一个或多个空格，再跟该关键字的值。目前只识别两个关键字:
-- name，强制，为该 br2-external 树指定名称。名称只能使用ASCII字符集中的[A-Za-z0-9_]字符;其它任何字符都禁止使用。Buildroot会设置 `BR2_EXTERNAL_$(NAME)_PATH` 变量，指定 br2-external 树的绝对路径，这样您就可以使用它来引用您的br2-external树。这个变量既在Kconfig中可用，用于源代码Kconfig文件(见下文)，也在Makefile中可用，用于包含其他Makefile或引用br2-external树中的其他文件(如数据文件)。  
+- name，强制，为该 br2-external 树指定名称。名称只能使用ASCII字符集中的[A-Za-z0-9_]字符;其它任何字符都禁止使用。Buildroot会设置 `BR2_EXTERNAL_$(NAME)_PATH` 变量，指定 br2-external 树的绝对路径，这样您就可以使用它来引用您的br2-external树。这个变量既在 Kconfig 中可用，用于源代码 Kconfig 文件(见下文)，也在 Makefile 中可用，用于包含其他 Makefile 或引用 br2-external 树中的其他文件(如数据文件)。  
 注意:由于可以同时使用多个br2-external树，Buildroot会使用这个名称为每个树生成变量。这个名称用来标识您的br2-external树，所以请尽量取一个真正描述您br2-external树的名称，以使其相对唯一，避免与其他br2-external树的名称冲突，特别是如果您计划与第三方共享br2-external树，或者使用来自第三方的br2-external树。
 
-- desc，可选，为该br2-external树提供简短描述。应限于单行，格式较为自由(见下文)，用于显示br2-external树相关信息(如配置列表上方或菜单配置中的提示);因此，描述应相对简短(40字符左右就可以了)。描述存储在BR2_EXTERNAL_$(NAME)_DESC变量中。
+- desc，可选，为该br2-external树提供简短描述。应限于单行，格式较为自由(见下文)，用于显示br2-external树相关信息(如配置列表上方或菜单配置中的提示);因此，描述应相对简短(40字符左右就可以了)。描述存储在 BR2_EXTERNAL_$(NAME)_DESC 变量中。
 
 例如名称及对应的BR2_EXTERNAL_$(NAME)_PATH变量:
 - FOO → BR2_EXTERNAL_FOO_PATH
 - BAR_42 → BR2_EXTERNAL_BAR_42_PATH
 
-以下示例假设名称设置为BAR_42。
+以下示例假设名称设置为 BAR_42 。
 
-注:BR2_EXTERNAL_$(NAME)_PATH和BR2_EXTERNAL_$(NAME)_DESC变量既在Kconfig文件也在Makefile中可用。它们也会导出到环境中，因此在后构建、后镜像和伪根脚本中也可用。
+注: BR2_EXTERNAL_$(NAME)_PATH 和 BR2_EXTERNAL_$(NAME)_DESC 变量既在 Kconfig 文件也在Makefile 中可用。它们也会导出到环境中，因此在后构建、后镜像和伪根脚本中也可用。
 
 ##### 9.2.1.2 Config.in 和 external.mk 文件
-这两个文件(各自可以为空)可以用于定义软件包recipes(即类似Buildroot内置软件包的foo/Config.in和foo/foo.mk)或其他自定义配置选项或make逻辑。
+这两个文件(各自可以为空)可以用于定义软件包 recipes (即类似Buildroot内置软件包的 foo/Config.in 和 foo/foo.mk )或其他自定义配置选项或 make 逻辑。
 
-Buildroot会自动包含每个br2-external树中的Config.in，使其出现在顶层配置菜单中，并包含每个br2-external树中的external.mk，将其与其他make逻辑一起包含。
+Buildroot 会自动包含每个 br2-external 树中的 Config.in ，使其出现在顶层配置菜单中，并包含每个 br2-external 树中的 external.mk，将其与其他make逻辑一起包含。
 
 主要用途是存储软件包recipes。推荐的做法是编写类似以下格式的Config.in文件:
 
@@ -962,15 +963,15 @@ Buildroot会自动包含每个br2-external树中的Config.in，使其出现在�
 
 然后在 `$(BR2_EXTERNAL_BAR_42_PATH)/package/package1` 和 `$(BR2_EXTERNAL_BAR_42_PATH)/package/package2` 创建正常的 Buildroot 软件包 recipes ，如第18章所解释。或者，您也可以将软件包分组到名为 <boardname> 的子目录中，相应调整上述路径。
 
-您也可以在Config.in中定义自定义配置选项，在external.mk中定义自定义make逻辑。
+您也可以在 Config.in 中定义自定义配置选项，在 external.mk 中定义自定义make逻辑。
 
 ##### 9.2.1.3 configs/目录 
-可以在br2-external树的configs子目录中存储Buildroot defconfig文件。Buildroot会自动在make list-defconfigs输出中显示它们，并允许通过正常的make <名称>_defconfig命令加载它们。它们会出现在make list-defconfigs输出下方带有br2-external树名称的“External configs”标签下。
+可以在 br2-external 树的 configs 子目录中存储 Buildroot defconfig 文件。Buildroot会自动在 make list-defconfigs 输出中显示它们，并允许通过正常的 `make <name>_defconfig` 命令加载它们。它们会出现在 make list-defconfigs 输出下方带有 br2-external 树名称的 “External configs” 标签下。
 
-注意:如果一个defconfig文件存在于多个br2-external树中，则使用最后一个br2-external树中的文件。因此可以覆盖Buildroot或其他br2-external树打包的defconfig文件。
+注意:如果一个 defconfig 文件存在于多个 br2-external 树中，则使用最后一个 br2-external 树中的文件。因此可以覆盖 Buildroot 或其他 br2-external 树打包的 defconfig 文件。
 
 ##### 9.2.1.4 provides/目录
-对于一些软件包，Buildroot会提供在API兼容的软件包之间选择两个(或更多)实现版本的选择。例如，可以选择libjpeg或者jpeg-turbo;可以选择openssl或者libressl;可以选择预配置的工具链......
+对于一些软件包，Buildroot会提供在API兼容的软件包之间选择两个(或更多)实现版本的选择。例如，可以选择 libjpeg 或者 jpeg-turbo ;可以选择 openssl 或者 libressl ;可以选择预配置的工具链......
 br2-external可以扩展这些选择，通过提供一组定义这些替代方案的文件:
 - provides/toolchains.in定义预配置的工具链，它们将在工具链选择中列出;
 - provides/jpeg.in定义libjpeg替代实现;
@@ -979,17 +980,17 @@ br2-external可以扩展这些选择，通过提供一组定义这些替代方�
 - provides/init.in定义init系统替代实现，可以用于选择默认的init系统骨架。
 
 ##### 9.2.1.5 自由形式内容
-可以在这里存储所有板级特定的配置文件，如内核配置、根文件系统覆盖层或者Buildroot允许设置位置的任何其他配置文件(通过使用BR2_EXTERNAL_$(NAME)_PATH变量)。例如，可以如下设置全局补丁目录、根文件系统覆盖层和内核配置文件的路径(例如通过运行make menuconfig并填写这些选项):
+可以在这里存储所有板级特定的配置文件，如内核配置、根文件系统覆盖层或者Buildroot允许设置位置的任何其他配置文件(通过使用 BR2_EXTERNAL_$(NAME)_PATH 变量)。例如，可以如下设置全局补丁目录、根文件系统覆盖层和内核配置文件的路径(例如通过运行make menuconfig并填写这些选项):
 
     BR2_GLOBAL_PATCH_DIR=$(BR2_EXTERNAL_BAR_42_PATH)/patches/
     BR2_ROOTFS_OVERLAY=$(BR2_EXTERNAL_BAR_42_PATH)/board/<boardname>/overlay/  
     BR2_LINUX_KERNEL_CUSTOM_CONFIG_FILE=$(BR2_EXTERNAL_BAR_42_PATH)/board/<boardname>/kernel.config
 
 ##### 9.2.1.6 额外的Linux内核扩展
-可以通过将它们存储在br2-external树根目录下的linux/目录中来添加额外的Linux内核扩展(参见第18.22.2节)。
+可以通过将它们存储在 br2-external 树根目录下的 linux/ 目录中来添加额外的Linux内核扩展(参见第18.22.2节)。
 
 ##### 9.2.1.7 示例布局
-下面是一个使用所有br2-external功能的示例布局(仅为了说明br2-external树，对于相关文件显示了假设内容;这些内容完全是为了说明目的而虚构的):
+下面是一个使用所有 br2-external 功能的示例布局(仅为了说明 br2-external 树，对于相关文件显示了假设内容;这些内容完全是为了说明目的而虚构的):
 ```
 /path/to/br2-ext-tree/
 |- external.desc
@@ -1190,14 +1191,14 @@ Toolchain --->
         (X) my custom toolchain
 ```
 
-注意toolchain/toolchain-external-mine/Config.in.options中的工具链选项不会出现在工具链菜单中。它们必须从br2-external的顶层Config.in明确包含，这样它们才会出现在外部选项菜单中。
+注意 toolchain/toolchain-external-mine/Config.in.options 中的工具链选项不会出现在工具链菜单中。它们必须从br2-external的顶层Config.in明确包含，这样它们才会出现在外部选项菜单中。
 
 ### 9.3 保存Buildroot配置
 可以使用make savedefconfig命令保存Buildroot配置。
 
-这会通过删除默认值的配置选项来简化Buildroot配置。结果会保存到名为defconfig的文件中。如果想保存到其他位置，可以在Buildroot配置本身更改BR2_DEFCONFIG选项，或者使用make savedefconfig BR2_DEFCONFIG=<配置文件路径>命令。
+这会通过删除默认值的配置选项来简化Buildroot配置。结果会保存到名为defconfig的文件中。如果想保存到其他位置，可以在Buildroot配置本身更改BR2_DEFCONFIG选项，或者使用 make savedefconfig BR2_DEFCONFIG=<path-to-defconfig> 命令。
 
-建议保存此defconfig文件的位置是configs/<板名>_defconfig。如果遵循这个建议，配置会出现在make list-defconfigs输出中，并可以通过运行make <板名>_defconfig再次设置。
+建议保存此defconfig文件的位置是configs/<boardname>_defconfig。如果遵循这个建议，配置会出现在 make list-defconfigs 输出中，并可以通过运行make <boardname>_defconfig再次设置。
 
 或者，也可以将文件复制到任何其他位置，并使用make defconfig BR2_DEFCONFIG=<配置文件路径>重新构建。
 
@@ -1208,12 +1209,12 @@ Toolchain --->
 
 要保存它们的配置，请将这些配置选项设置为要保存配置文件的路径，然后使用下面描述的辅助目标实际保存配置。
 
-如第9.1节所述，建议的路径存储这些配置文件的位置是board/<company>/<板名>/foo.config。
+如第9.1节所述，建议的路径存储这些配置文件的位置是board/<company>/<boardname>/foo.config。
 
 在更改BR2_LINUX_KERNEL_CUSTOM_CONFIG_FILE等选项前，请确保已经创建了配置文件。否则，Buildroot会试图访问尚不存在的配置文件并失败。可以通过运行make linux-menuconfig等创建配置文件。
 
 Buildroot提供了一些辅助目标来简化配置文件保存:
-- make linux-update-defconfig会将Linux配置保存到BR2_LINUX_KERNEL_CUSTOM_CONFIG_FILE指定的路径。它会简化配置文件并删除默认值。但是，这只适用于2.6.33及更高版本的内核。对于早期内核，请使用make linux-update-config。
+- make linux-update-defconfig会将Linux配置保存到 BR2_LINUX_KERNEL_CUSTOM_CONFIG_FILE 指定的路径。它会简化配置文件并删除默认值。但是，这只适用于2.6.33及更高版本的内核。对于早期内核，请使用make linux-update-config。
 - make busybox-update-config会将Busybox配置保存到BR2_PACKAGE_BUSYBOX_CONFIG指定的路径。
 - make uclibc-update-config会将uClibc配置保存到BR2_UCLIBC_CONFIG指定的路径。
 - make barebox-update-defconfig会将Barebox配置保存到BR2_TARGET_BAREBOX_CUSTOM_CONFIG_FILE指定的路径。
@@ -1221,7 +1222,7 @@ Buildroot提供了一些辅助目标来简化配置文件保存:
 - 对于at91bootstrap3，没有辅助目标，需要手动将配置文件复制到BR2_TARGET_AT91BOOTSTRAP3_CUSTOM_CONFIG路径。
 
 ### 9.5 自定义生成的目标文件系统
-除了通过make *config更改配置外，还有一些其他方法可以自定义结果目标文件系统。
+除了通过 make *config 更改配置外，还有一些其他方法可以自定义结果目标文件系统。
 
 两个推荐的方法可以共存:根文件系统覆盖层和后构建脚本。
 
