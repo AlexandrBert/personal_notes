@@ -469,7 +469,7 @@ Buildroot不支持在不从头开始全面重建的情况下删除包。这是�
 ### 8.5 外部树构建
 默认情况下， Buildroot 构建的所有内容都存储在源码树下的 output 目录中。
 
-Buildroot 还支持类似 Linux 内核的外部树构建语法。使用时，在 make 命令行添加O=<目录>:
+Buildroot 还支持类似 Linux 内核的外部树构建语法。使用时，在 make 命令行添加 O=<目录> :
 
     $ make O=/tmp/build menuconfig
 或者:
@@ -550,7 +550,7 @@ Buildroot的职责之一是了解包之间的依赖关系，并确保它们按�
 如果系统非常大，依赖关系图可能过于复杂难以阅读。所以可以生成给定包的依赖关系图:
 
     make <pkg>-graph-depends 
-生成的图位于 output/graph/<pkg>-graph-depends.pdf 。
+生成的图位于 `output/graph/<pkg>-graph-depends.pdf` 。
 
 注意依赖关系图使用Graphviz项目的dot工具生成，您必须在系统中安装此工具才能使用此功能。在大多数发行版中它作为graphviz软件包提供。
 
@@ -638,7 +638,7 @@ Buildroot一直能够在软件包的基础上使用并行构建：Buildroot使�
 
 Buildroot生成的工具链默认位于 `output/host/` 。使用它的最简单方法是将 `output/host/bin/` 添加到您的PATH环境变量中，然后使用 ARCH-linux-gcc、ARCH-linux-objdump、ARCH-linux-ld等命令。
 
-另外，Buildroot 还可以通过运行 make sdk 命令将所有选定软件包的工具链和开发文件作为SDK导出。这将生成一个 tarball ，其中包含主机目录 output/host/ 的内容，命名为 <TARGET-TUPLE>_sdk-buildroot.tar.gz（可以通过设置环境变量 BR2_SDK_PREFIX 进行覆盖），位于 output/images/ 目录中。
+另外，Buildroot 还可以通过运行 make sdk 命令将所有选定软件包的工具链和开发文件作为SDK导出。这将生成一个 tarball ，其中包含主机目录 output/host/ 的内容，命名为 `<TARGET-TUPLE>_sdk-buildroot.tar.gz`（可以通过设置环境变量 BR2_SDK_PREFIX 进行覆盖），位于 output/images/ 目录中。
 
 然后，可以将此tarball分发给应用程序开发人员，当他们想要开发尚未打包为 Buildroot 软件包的应用程序时使用。
 
@@ -707,7 +707,7 @@ Buildroot下载的各种tar包都存储在BR2_DL_DIR中，默认为dl目录。�
 下载位置也可以通过BR2_DL_DIR选项在.config文件中设置。与.config文件中的大多数选项不同，.config文件中的这个值会被BR2_DL_DIR环境变量覆盖。
 
 #### 8.13.5 包特定的make目标
-运行 make <package> 构建和安装该特定包及其依赖。
+运行 `make <package>` 构建和安装该特定包及其依赖。
 
 对于依赖Buildroot基础架构的包，有许多可以单独如下调用的特殊make目标:
 
@@ -768,7 +768,7 @@ Buildroot正常操作是下载一个 tarball ，解压它，配置、编译和�
 
 当Buildroot找到某个包定义了 `<pkg>_OVERRIDE_SRCDIR` ，它将不再尝试下载、解压和修补这个包，而是直接使用指定目录下的源代码。 `make clean` 也不会清理这个目录。这允许指向使用版本控制的自己的目录。Buildroot使用rsync将源代码从指定目录复制到 `output/build/<package>-custom/` 。
 
-最好与 `make <pkg>-rebuild` 和 `make <pkg>-reconfigure` 目标一起使用。make <pkg>-rebuild all将只同步修改的文件，然后重新构建这个包。
+最好与 `make <pkg>-rebuild` 和 `make <pkg>-reconfigure` 目标一起使用。 `make <pkg>-rebuild all` 将只同步修改的文件，然后重新构建这个包。
 
 这样开发者就可以在 `/home/bob/linux` 做修改，然后运行 `make linux-rebuild` 完成快速构建:
 
@@ -779,7 +779,7 @@ Buildroot正常操作是下载一个 tarball ，解压它，配置、编译和�
     make busybox-rebuild all
 output/images中的根文件系统镜像就包含了更新后的BusyBox。
 
-大项目源代码树通常包含数百上千个不需要构建但会减慢rsync复制速度的文件。可以选择定义 <pkg>_OVERRIDE_SRCDIR_RSYNC_EXCLUSIONS 跳过从源代码树同步某些文件。例如在 webkitgtk 包上工作时:
+大项目源代码树通常包含数百上千个不需要构建但会减慢rsync复制速度的文件。可以选择定义 `<pkg>_OVERRIDE_SRCDIR_RSYNC_EXCLUSIONS` 跳过从源代码树同步某些文件。例如在 webkitgtk 包上工作时:
 
     WEBKITGTK_OVERRIDE_SRCDIR = /home/bob/WebKit
     WEBKITGTK_OVERRIDE_SRCDIR_RSYNC_EXCLUSIONS = \
@@ -853,12 +853,12 @@ output/images中的根文件系统镜像就包含了更新后的BusyBox。
 ```
 上面显示的文件细节将在本章后面给出。
 
-注意:如果选择将这个结构放在 Buildroot 树外但使用 br2-external 树， <company> 和可能的 <boardname> 组件可能是多余的，可以省略。
+注意:如果选择将这个结构放在 Buildroot 树外但使用 br2-external 树， `<company>` 和可能的 `<boardname>` 组件可能是多余的，可以省略。
 
 #### 9.1.1 实现分层定制
 对于有几个相关项目但部分需要相同定制的用户来说，使用分层定制方法是很常见的，如本节所述。
 
-Buildroot提供的大多数定制方法，如后置脚本和根文件系统覆盖层，都可以接受空格分隔的多项列表。指定的多项总是从左到右顺序处理。通过创建一个定制项用于通用定制，另一个定制项用于真正项目专用定制，可以避免不必要的重复。每个层面通常用一个单独的目录表示，位于 board/<company>/ 下。根据项目不同，甚至可以引入更多层面。
+Buildroot提供的大多数定制方法，如后置脚本和根文件系统覆盖层，都可以接受空格分隔的多项列表。指定的多项总是从左到右顺序处理。通过创建一个定制项用于通用定制，另一个定制项用于真正项目专用定制，可以避免不必要的重复。每个层面通常用一个单独的目录表示，位于 `board/<company>/` 下。根据项目不同，甚至可以引入更多层面。
 
 例如有两个定制层common和fooboard的目录结构:
 ```
@@ -961,7 +961,7 @@ Buildroot 会自动包含每个 br2-external 树中的 Config.in ，使其出现
 
     include $(sort $(wildcard $(BR2_EXTERNAL_BAR_42_PATH)/package/*/*.mk))
 
-然后在 `$(BR2_EXTERNAL_BAR_42_PATH)/package/package1` 和 `$(BR2_EXTERNAL_BAR_42_PATH)/package/package2` 创建正常的 Buildroot 软件包 recipes ，如第18章所解释。或者，您也可以将软件包分组到名为 <boardname> 的子目录中，相应调整上述路径。
+然后在 `$(BR2_EXTERNAL_BAR_42_PATH)/package/package1` 和 `$(BR2_EXTERNAL_BAR_42_PATH)/package/package2` 创建正常的 Buildroot 软件包 recipes ，如第18章所解释。或者，您也可以将软件包分组到名为 `<boardname>` 的子目录中，相应调整上述路径。
 
 您也可以在 Config.in 中定义自定义配置选项，在 external.mk 中定义自定义make逻辑。
 
@@ -1196,20 +1196,20 @@ Toolchain --->
 ### 9.3 保存Buildroot配置
 可以使用make savedefconfig命令保存Buildroot配置。
 
-这会通过删除默认值的配置选项来简化Buildroot配置。结果会保存到名为defconfig的文件中。如果想保存到其他位置，可以在Buildroot配置本身更改BR2_DEFCONFIG选项，或者使用 make savedefconfig BR2_DEFCONFIG=<path-to-defconfig> 命令。
+这会通过删除默认值的配置选项来简化Buildroot配置。结果会保存到名为defconfig的文件中。如果想保存到其他位置，可以在Buildroot配置本身更改BR2_DEFCONFIG选项，或者使用 make savedefconfig `BR2_DEFCONFIG=<path-to-defconfig>` 命令。
 
-建议保存此defconfig文件的位置是configs/<boardname>_defconfig。如果遵循这个建议，配置会出现在 make list-defconfigs 输出中，并可以通过运行make <boardname>_defconfig再次设置。
+建议保存此defconfig文件的位置是 `configs/<boardname>_defconfig` 。如果遵循这个建议，配置会出现在 make list-defconfigs 输出中，并可以通过运行 `make <boardname>_defconfig` 再次设置。
 
-或者，也可以将文件复制到任何其他位置，并使用make defconfig BR2_DEFCONFIG=<配置文件路径>重新构建。
+或者，也可以将文件复制到任何其他位置，并使用 `make defconfig BR2_DEFCONFIG=<配置文件路径>` 重新构建。
 
 ### 9.4 保存其他组件的配置 
 如果修改了BusyBox、Linux内核、Barebox、U-Boot和uClibc的配置，也应保存这些组件的配置文件。对于这些每个组件，Buildroot都有一个配置选项用于指向输入配置文件，例如
 
-    BR2_LINUX_KERNEL_CUSTOM_CONFIG_FILE。
+    BR2_LINUX_KERNEL_CUSTOM_CONFIG_FILE
 
 要保存它们的配置，请将这些配置选项设置为要保存配置文件的路径，然后使用下面描述的辅助目标实际保存配置。
 
-如第9.1节所述，建议的路径存储这些配置文件的位置是board/<company>/<boardname>/foo.config。
+如第9.1节所述，建议的路径存储这些配置文件的位置是 `board/<company>/<boardname>/foo.config` 。
 
 在更改BR2_LINUX_KERNEL_CUSTOM_CONFIG_FILE等选项前，请确保已经创建了配置文件。否则，Buildroot会试图访问尚不存在的配置文件并失败。可以通过运行make linux-menuconfig等创建配置文件。
 
@@ -1230,12 +1230,12 @@ Buildroot提供了一些辅助目标来简化配置文件保存:
 - 文件系统覆盖层是在目标文件系统构建完成后直接复制到目标文件系统上的文件树。要启用此功能，请将配置选项BR2_ROOTFS_OVERLAY(在系统配置菜单中)设置为覆盖层的根目录。
 - 您甚至可以指定多个覆盖层，使用空格分隔。如果指定相对路径，它将相对于Buildroot树的根目录。版本控制系统的隐藏目录(如.git、.svn、.hg等)、名为.empty的文件以及以~结尾的文件都会从复制中排除。
 - 当启用BR2_ROOTFS_MERGED_USR时，则覆盖层不得包含/bin、/lib或/sbin目录，因为Buildroot会将它们创建为指向/usr下相关文件夹的符号链接。在这种情况下，如果覆盖层包含任何程序或库，它们应放在/usr/bin、/usr/sbin和/usr/lib下。
-- 如第9.1节所示，此覆盖层的推荐路径是board/<company>/<板名>/rootfs-overlay。
+- 如第9.1节所示，此覆盖层的推荐路径是 `board/<company>/<boardname>/rootfs-overlay` 。
 
 **后构建脚本(BR2_ROOTFS_POST_BUILD_SCRIPT)**
 - 后构建脚本是在Buildroot构建所有选定软件后，但在组装根文件系统映像前调用的shell脚本。要启用此功能，请在配置选项BR2_ROOTFS_POST_BUILD_SCRIPT(在系统配置菜单中)指定一组以空格分隔的后构建脚本。如果指定相对路径，它将相对于Buildroot树的根目录。
 - 使用后构建脚本，您可以从目标文件系统中删除或修改任何文件。然而，您应谨慎使用此功能。每当您发现某个软件包生成错误或不需要的文件时，最好修复该软件包，而不是使用一些后构建清理脚本来解决问题。
-- 如第9.1节所示，此脚本的推荐路径是board/<company>/<板名>/post_build.sh。
+- 如第9.1节所示，此脚本的推荐路径是 `board/<company>/<boardname>/post_build.sh` 。
 - 后构建脚本在Buildroot主树作为当前工作目录运行。目标文件系统的路径作为第一个参数传递给每个脚本。如果配置选项BR2_ROOTFS_POST_SCRIPT_ARGS不为空，这些参数也将传递给脚本。所有脚本都将接收相同的一组参数集，无法向每个脚本传递不同的参数集。
 此外，还可以使用以下环境变量:
     - BR2_CONFIG: Buildroot .config文件的路径
@@ -1272,14 +1272,14 @@ Buildroot提供了一些辅助目标来简化配置文件保存:
 相反，Buildroot提供了所谓的权限表支持。要使用此功能，请将配置选项BR2_ROOTFS_DEVICE_TABLE设置为权限表的空格分隔列表，权限表是遵循makedev语法的常规文本文件。
 
 如果使用静态设备表(即不使用devtmpfs、mdev或(e)udev)，则可以使用相同语法在所谓的设备表中添加设备节点。要使用此功能，请将配置选项BR2_ROOTFS_STATIC_DEVICE_TABLE设置为设备表的空格分隔列表。
-如第9.1节所示，这类文件的推荐位置是board/<company>/<板名>/。
+如第9.1节所示，这类文件的推荐位置是 `board/<company>/<boardname>/` 。
 
 需要注意的是，如果特定权限或设备节点与特定应用相关，则应在软件包的.mk文件中设置FOO_PERMISSIONS和FOO_DEVICES变量(参见第18.6.2节)。
 
 ### 9.6 添加自定义用户帐户
 有时需要在目标系统中添加特定用户。为满足此要求，Buildroot提供了所谓的用户表支持。要使用此功能，请将配置选项BR2_ROOTFS_USERS_TABLES设置为用户表的空格分隔列表，用户表是遵循makeusers语法的常规文本文件。
 
-如第9.1节所示，这类文件的推荐位置是board/<company>/<板名>/。
+如第9.1节所示，这类文件的推荐位置是 `board/<company>/<boardname>/` 。
 
 需要注意的是，如果自定义用户与特定应用相关，则应在软件包的.mk文件中设置FOO_USERS变量(参见第18.6.2节)。
 
@@ -1301,13 +1301,13 @@ Buildroot提供了一些辅助目标来简化配置文件保存:
 
 BR2_GLOBAL_PATCH_DIR配置选项可以用于指定一个或多个包含软件包补丁的目录的空格分隔列表。
 
-对于特定版本<packageversion>的特定软件包<packagename>，从BR2_GLOBAL_PATCH_DIR应用补丁如下:
-1. 对于BR2_GLOBAL_PATCH_DIR中的每个目录- <global-patch-dir>-如果存在<package-patch-dir>将确定如下:
-   - 如果存在<global-patch-dir>/<packagename>/<packageversion>/
-   - 否则，如果存在<global-patch-dir>/<packagename>
-2. 然后从<package-patch-dir>应用补丁:
+对于特定版本 `<packageversion>` 的特定软件包 `<packagename>` ，从BR2_GLOBAL_PATCH_DIR应用补丁如下:
+1. 对于BR2_GLOBAL_PATCH_DIR中的每个目录- `<global-patch-dir>`-如果存在 `<package-patch-dir>` 将确定如下:
+   - 如果存在 `<global-patch-dir>/<packagename>/<packageversion>/`
+   - 否则，如果存在 `<global-patch-dir>/<packagename>`
+2. 然后从 `<package-patch-dir>` 应用补丁:
    - 如果软件包目录中存在series文件，则根据series文件应用补丁;
-   - 否则，应用名称匹配*.patch的补丁文件，按字母顺序。所以为了确保正确顺序，建议命名补丁文件为:<number>-<description>.patch。
+   - 否则，应用名称匹配*.patch的补丁文件，按字母顺序。所以为了确保正确顺序，建议命名补丁文件为: `<number>-<description>.patch` 。
 
 有关软件包如何应用补丁的详细信息，请参阅第19.2节。
 
@@ -1320,18 +1320,18 @@ BR2_LINUX_KERNEL_PATCH是指定内核补丁的例外情况。BR2_LINUX_KERNEL_PA
 
 Buildroot如何一般添加软件包在第18章中有详细说明，这里不再重复。但是，您的项目可能需要一些专有软件包无法上游。本节将解释如何将此类项目特定软件包保存在项目特定目录中。
 
-如第9.1节所示，项目特定软件包的推荐位置是package/<company>/。如果使用br2-external树功能(参见第9.2节)，则推荐位置是将它们放在br2-external树下名为package/的子目录中。
+如第9.1节所示，项目特定软件包的推荐位置是 `package/<company>/` 。如果使用br2-external树功能(参见第9.2节)，则推荐位置是将它们放在br2-external树下名为package/的子目录中。
 
 但是，Buildroot不知道此位置的软件包，除非进行额外步骤。如第18章所述，Buildroot软件包基本上由两个文件组成:.mk文件(描述如何构建软件包)和Config.in文件(描述此软件包的配置选项)。
 
-Buildroot会自动包含软件包目录第一级子目录下的.mk文件(使用pattern package/*/*.mk)。如果要包含更深子目录下的.mk文件(如package/<company>/package1/)，则只需在第一级子目录下添加一个.mk文件来包含这些额外的.mk文件。因此，创建文件package/<company>/<company>.mk，内容如下(假设下package/<company>/只有一个额外级别):
+Buildroot会自动包含软件包目录第一级子目录下的.mk文件(使用pattern package/*/*.mk)。如果要包含更深子目录下的.mk文件(如 `package/<company>/package1/` )，则只需在第一级子目录下添加一个.mk文件来包含这些额外的.mk文件。因此，创建文件 `package/<company>/<company>.mk` ，内容如下(假设下 `package/<company>/`只有一个额外级别):
 
     include $(sort $(wildcard package/<company>/*/*.mk))
-对于Config.in文件，创建文件package/<company>/Config.in包含所有软件包的Config.in文件。由于kconfig源命令不支持通配符，必须提供详尽列表。例如:
+对于Config.in文件，创建文件 `package/<company>/Config.in` 包含所有软件包的Config.in文件。由于kconfig源命令不支持通配符，必须提供详尽列表。例如:
 
     source "package/<company>/package1/Config.in"
     source "package/<company>/package2/Config.in"
-从package/Config.in包含此新文件package/<company>/Config.in，最好放在company特定菜单中以便于与未来Buildroot版本合并。
+从package/Config.in包含此新文件 `package/<company>/Config.in` ，最好放在company特定菜单中以便于与未来Buildroot版本合并。
 
 如果使用br2-external树，请参考第9.2节填写这些文件。
 
@@ -1339,8 +1339,8 @@ Buildroot会自动包含软件包目录第一级子目录下的.mk文件(使用p
 本章前面描述了不同的项目特定自定义方法。本节将总结所有内容，提供按步骤指导存储项目特定自定义内容:
 1. make menuconfig 配置工具链、软件包和内核。
 2. make linux-menuconfig 更新内核配置，其他配置如busybox、uclibc等也类似。 
-3. mkdir -p board/<制造商>/<板名>
-4. 将以下选项设置为board/<制造商>/<板名>/<软件包>.config(如果相关):
+3. `mkdir -p board/<manufacturer>/<boardname>`
+4. 将以下选项设置为 `board/<manufacturer>/<boardname>/<package>.config` (如果相关):
    - BR2_LINUX_KERNEL_CUSTOM_CONFIG_FILE
    - BR2_PACKAGE_BUSYBOX_CONFIG
    - BR2_UCLIBC_CONFIG
@@ -1351,18 +1351,18 @@ Buildroot会自动包含软件包目录第一级子目录下的.mk文件(使用p
    - make linux-update-defconfig
    - make busybox-update-config
    - make uclibc-update-config
-   - cp <输出>/build/at91bootstrap3-*/.config board/<制造商>/<板名>/at91bootstrap3.config
+   - `cp <output>/build/at91bootstrap3-*/.config board/<manufacturer>/<boardname>/at91bootstrap3.config`
    - make barebox-update-defconfig
    - make uboot-update-defconfig
-6. 创建board/<制造商>/<板名>/rootfs-overlay/添加需要的附加文件，设置BR2_ROOTFS_OVERLAY。
-7. 创建post-build脚本board/<制造商>/<板名>/post_build.sh，设置BR2_ROOTFS_POST_BUILD_SCRIPT。  
-8. 如果需要设置设备节点或权限，创建board/<制造商>/<板名>/device_table.txt并添加到BR2_ROOTFS_DEVICE_TABLE。
-9. 如果需要创建用户，创建board/<制造商>/<板名>/users_table.txt并添加到BR2_ROOTFS_USERS_TABLES。
-10. 设置BR2_GLOBAL_PATCH_DIR添加补丁。
-11. 内核也有BR2_LINUX_KERNEL_PATCH从URL获取补丁。
-12. 如果需要添加专有软件包，创建package/<制造商>放置软件包。
-13. make savedefconfig保存配置。
-14. cp defconfig configs/<板名>_defconfig。
+6. 创建 `board/<manufacturer>/<boardname>/rootfs-overlay/` 添加需要的附加文件，设置 `BR2_ROOTFS_OVERLAY` 。
+7. 创建post-build脚本 `board/<manufacturer>/<boardname>/post_build.sh` ，设置 BR2_ROOTFS_POST_BUILD_SCRIPT。  
+8. 如果需要设置设备节点或权限，创建 `board/<manufacturer>/<boardname>/device_table.txt` 并添加到BR2_ROOTFS_DEVICE_TABLE。
+9. 如果需要创建用户，创建 `board/<manufacturer>/<boardname>/users_table.txt` 并添加到 BR2_ROOTFS_USERS_TABLES。
+10. 设置 BR2_GLOBAL_PATCH_DIR 添加补丁。
+11. 内核也有 BR2_LINUX_KERNEL_PATCH 从URL获取补丁。
+12. 如果需要添加专有软件包，创建 `package/<manufacturer>` 放置软件包。
+13. make savedefconfig 保存配置。
+14. `cp defconfig configs/<boardname>_defconfig` 。
 
 
 ## Chapter 10、 集成主题
@@ -1394,8 +1394,8 @@ SELinux有三种操作模式:
 
 #### 10.2.2 调整SELinux策略
 SELinux refpolicy包含可以在构建时启用或禁用的模块。每个模块提供一组SELinux规则。在Buildroot中，默认禁用非基本模块，提供以下几种方式启用此类模块:
-- 软件包可以使用<软件包名称>_SELINUX_MODULES变量在refpolicy中启用模块列表。
-- 软件包可以通过将模块(.fc、.if和.te文件)放在package/<软件包名称>/selinux/下提供额外的SELinux模块。
+- 软件包可以使用 `<packagename>_SELINUX_MODULES` 变量在refpolicy中启用模块列表。
+- 软件包可以通过将模块(.fc、.if和.te文件)放在 `package/<packagename>/selinux/` 下提供额外的SELinux模块。
 - 可以通过BR2_REFPOLICY_EXTRA_MODULES_DIRS配置选项指定的目录添加额外SELinux模块。
 - 如果在BR2_REFPOLICY_EXTRA_MODULES_DEPENDENCIES配置选项中列出，也可以在refpolicy中启用额外模块。
 
@@ -1466,7 +1466,7 @@ Buildroot列表上经常讨论的一个主题是“包管理”。总结来说�
 
 通常认为这很容易实现:只需追踪软件包安装了什么，取消选择时删除。但是其实比这复杂得多:
 
- - 问题不仅涉及目标/目录，还涉及主机/<元组>/sysroot中的系统根目录以及主机/目录本身。所有这些目录下由各种软件包安装的文件都必须进行跟踪。
+- 问题不仅涉及 `target/` 目录，还涉及 `host/<tuple>/sysroot` 中的系统根目录以及 `hsot/` 目录本身。所有这些目录下由各种软件包安装的文件都必须进行跟踪。
 - 当软件包从配置中取消选择时，仅删除它安装的文件是不足够的。还必须删除所有反向依赖(即依赖它的软件包)，并重新构建这些软件包。例如，软件包A可选地依赖OpenSSL库。两者都被选择，Buildroot被构建。软件包A使用OpenSSL构建带加密支持。之后取消选择OpenSSL，但软件包A保留(由于OpenSSL是可选依赖，这是可能的)。如果仅删除OpenSSL文件，则软件包A安装的文件会损坏:它使用一个不再存在于目标上的库。这在技术上是可行的，但会给Buildroot增加很多复杂性，这与我们努力保持的简单性背道而驰。
 - 除了上述问题，可选依赖本身可能Buildroot不知道。例如，软件包A版本1.0从未使用OpenSSL，但版本2.0如果可用会自动使用OpenSSL。如果Buildroot的.mk文件没有更新考虑这一点，则软件包A不会成为OpenSSL的反向依赖，OpenSSL删除时也不会删除和重新构建软件包A。当然，.mk文件应修复此可选依赖，但在此期间可能出现不可重复的行为。
 - 也要允许menuconfig中的更改应用于输出目录，而无需从头重新构建 everything。但是，这很难可靠实现:子选项更改会如何处理，是否需要检测并从头重新构建软件包以及其潜在的反向依赖关系等。目前，Buildroot所做的是清晰简单的，其行为非常可靠且支持用户也很容易。如果menuconfig中的配置更改在下次make后应用，那么它必须在所有情况下都正确有效工作，而不是有一些奇怪的边缘案例。风险是收到类似“我启用了A、B和C软件包，然后make，然后禁用C启用D然后make，然后重新启用C启用E然后构建失败”的错误报告。或者更糟的是“我做了一些配置，然后构建，然后做一些更改，构建，再做一些更改，构建，再做一些更改，构建，现在失败了，但我不记得做了哪些更改和顺序”。这将无法支持。
@@ -1509,7 +1509,7 @@ Buildroot生成的所有产品(工具链、根文件系统、内核、引导加�
 
 - 摘要文件（README文件），总结了生成的材料，并包含了Buildroot无法产生的材料的警告。
 - buildroot.config：这是Buildroot的配置文件，通常使用make menuconfig生成，并且在重建构建时是必需的。
-- 所有软件包的源代码；这些源代码分别保存在目标软件包的sources/子目录和主机软件包的host-sources/子目录中。未保存设置<PKG>_REDISTRIBUTE = NO的软件包的源代码。还保存了应用的补丁，以及一个名为series的文件，列出了补丁的应用顺序。补丁的许可与修改的文件相同。注意：Buildroot还会对基于autotools的软件包的Libtool脚本应用额外的补丁。这些补丁可以在Buildroot源代码的support/libtool目录中找到，由于技术限制，不会与软件包源代码一起保存。您可能需要手动收集它们。
+- 所有软件包的源代码；这些源代码分别保存在目标软件包的sources/子目录和主机软件包的host-sources/子目录中。未保存设置 `<PKG>_REDISTRIBUTE = NO` 的软件包的源代码。还保存了应用的补丁，以及一个名为series的文件，列出了补丁的应用顺序。补丁的许可与修改的文件相同。注意：Buildroot还会对基于autotools的软件包的Libtool脚本应用额外的补丁。这些补丁可以在Buildroot源代码的support/libtool目录中找到，由于技术限制，不会与软件包源代码一起保存。您可能需要手动收集它们。
 - 清单文件（主机和目标软件包各一个），列出了已配置的软件包、它们的版本、许可证和相关信息。Buildroot中可能没有定义某些信息；这些项目标记为“未知”。
 - 所有软件包的许可证文本，分别保存在目标软件包的licenses/子目录和主机软件包的host-licenses/子目录中。如果Buildroot中未定义许可证文件，则不会生成该文件，并在README中指示警告。
 
@@ -1751,19 +1751,19 @@ Buildroot 包含了对几个公开可用硬件板卡的基本配置，这样这�
 
 要做到这一点，您需要创建一个普通的 Buildroot 配置，可以为该硬件构建一个基本系统:内部工具链、内核、引导加载程序、文件系统和一个简单的仅包含 BusyBox 的用户空间。不应选择任何特定软件包:配置应尽可能简单，仅构建一个工作的基于 BusyBox 的基本系统用于目标平台。当然，您可以为内部项目使用更复杂的配置，但 Buildroot 项目仅会集成基本的板卡配置。因为软件包选择高度依赖于应用。
 
-一旦您有一个知道可以工作的配置，运行 make savedefconfig。这将在 Buildroot 源代码树的根目录生成一个最小的 defconfig 文件。将这个文件移动到 configs/ 目录下，并重命名为 `<板卡名称>_defconfig`。 
+一旦您有一个知道可以工作的配置，运行 make savedefconfig。这将在 Buildroot 源代码树的根目录生成一个最小的 defconfig 文件。将这个文件移动到 configs/ 目录下，并重命名为 `<boardname>_defconfig`。 
 
 如果配置较为复杂，可以手动重新格式化它，并用注释将其分成几个部分，典型的部分包括:架构、工具链选项(通常只是 Linux 头文件版本)、固件、引导加载程序、内核和文件系统。
 
-应始终使用固定的版本或提交哈希来设置不同组件，而不是“最新”版本。例如，设置 BR2_LINUX_KERNEL_CUSTOM_VERSION=y 并将 BR2_LINUX_KERNEL_CUSTOM_VERSION_VALUE 设置为您测试过的内核版本。
+应始终使用固定的版本或提交哈希来设置不同组件，而不是“最新”版本。例如，设置 `BR2_LINUX_KERNEL_CUSTOM_VERSION=y` 并将 `BR2_LINUX_KERNEL_CUSTOM_VERSION_VALUE` 设置为您测试过的内核版本。
 
 建议尽可能使用 Linux 内核和引导加载程序的上游版本，并尽可能使用内核和引导加载程序的默认配置。如果它们不适用于您的板卡，或者没有默认配置，我们鼓励您向对应上游项目提交修复。
 
-不过，在此期间，您可能希望存储特定于目标平台的内核或引导加载程序配置或补丁。为此，请创建目录 board/<制造商> 和子目录 board/<制造商>/<板卡名称>。然后可以在这些目录中存储您的补丁和配置，并从主 Buildroot 配置中引用它们。请参阅第 9 章了解更多细节。
+不过，在此期间，您可能希望存储特定于目标平台的内核或引导加载程序配置或补丁。为此，请创建目录 `board/<manufacturer>` 和子目录 `board/<manufacturer>/<boardname>` 。然后可以在这些目录中存储您的补丁和配置，并从主 Buildroot 配置中引用它们。请参阅第 9 章了解更多细节。
 
 在提交新板卡补丁之前，建议使用最新版本的 gitlab-CI Docker 容器进行测试构建。操作如下:
 
-    $ make <板卡名称>_defconfig 
+    $ make <boardname>_defconfig 
     $ make
 
 默认情况下，Buildroot 开发人员使用 gitlab.com 注册表上官方托管的镜像，对大多数使用场景来说应该很方便。如果仍然想构建自己的 Docker 镜像，可以从官方镜像作为 Dockerfile 的 FROM 指令:
@@ -2053,7 +2053,7 @@ config BR2_PACKAGE_E
 
 注意:理想情况下，此文件中的哈希值应与上游发布的哈希值匹配，例如在他们的网站或电子邮件公告中。如果上游提供了多个哈希类型(例如sha1和sha512)，最好在.hash文件中添加所有这些哈希值。如果上游没有提供任何哈希值，或者只提供了md5哈希值，那么自己计算至少一个强哈希值(优先选择sha256，但不是md5)，并在哈希值上面添加一个注释行说明。
 
-注意:许可证文件的哈希值用于检测版本提升时许可证的变化。哈希值在make legal-info目标运行期间进行检查。对于具有多个版本(如Qt5)的包，请在该包的子目录<packageversion>中创建哈希文件(另请参阅第19.2节)。
+注意:许可证文件的哈希值用于检测版本提升时许可证的变化。哈希值在make legal-info目标运行期间进行检查。对于具有多个版本(如Qt5)的包，请在该包的子目录 `<packageversion>` 中创建哈希文件(另请参阅第19.2节)。
 
 下面的例子定义了上游为主要的libfoo-1.2.3.tar.bz2源码包提供的sha1和sha256哈希值，上游提供的二进制blob的md5值和本地计算的sha256哈希值，下载补丁的sha256哈希值，以及没有哈希值的归档文件:
 ```
@@ -2305,7 +2305,7 @@ LIBFOO_SITE_METHOD可能的值包括:
 
 - LIBFOO_GIT_LFS应设置为YES，如果Git仓库使用Git LFS存储大文件。这只适用于使用git下载的包(即LIBFOO_SITE_METHOD=git)。
 
-- LIBFOO_STRIP_COMPONENTS是tar从文件名中提取时必须剥离的前导组件(目录)数。大多数包的压缩包有一个前导组件名为"<pkg-name>-<pkg-version>"，因此Buildroot传递--strip-components=1给tar删除它。对于非标准包没有此组件或有多个前导组件需要删除，请设置此变量的值传递给tar。默认:1。
+- LIBFOO_STRIP_COMPONENTS是tar从文件名中提取时必须剥离的前导组件(目录)数。大多数包的压缩包有一个前导组件名为"`<pkg-name>-<pkg-version>`"，因此 Buildroot 传递 --strip-components=1给tar 删除它。对于非标准包没有此组件或有多个前导组件需要删除，请设置此变量的值传递给tar。默认:1。
 
 - LIBFOO_EXCLUDES是在提取归档时排除模式的空格分隔列表。该列表中的每个项都作为tar的--exclude选项传递。默认为空。
 
@@ -2358,9 +2358,9 @@ LIBFOO_SITE_METHOD可能的值包括:
 
 - LIBFOO_CPE_ID_PREFIX，指定CPE标识符的前缀，即前三个字段。未定义时默认值为cpe:2.3:a。
 
-- LIBFOO_CPE_ID_VENDOR，指定CPE标识符的供应商部分。未定义时默认值为<pkgname>_project。
+- LIBFOO_CPE_ID_VENDOR，指定CPE标识符的供应商部分。未定义时默认值为 `<pkgname>_project` 。
 
-- LIBFOO_CPE_ID_PRODUCT，指定CPE标识符的产品部分。未定义时默认值为<pkgname>。
+- LIBFOO_CPE_ID_PRODUCT，指定CPE标识符的产品部分。未定义时默认值为 `<pkgname>` 。
 
 - LIBFOO_CPE_ID_VERSION，指定CPE标识符的版本部分。未定义时默认值为$(LIBFOO_VERSION)。
 
@@ -2574,7 +2574,7 @@ cmake-package基础设施会设置一些常用的CMake选项，所以通常无�
 最后，第16行调用python-package宏，生成实际允许构建包的Makefile规则。
 
 #### 18.9.2 Python软件包参考
-作为政策，仅提供Python模块的软件包在Buildroot中应该全部以python-<something>命名。其他使用Python构建系统但不是Python模块的软件包可以自由选择名称（Buildroot中的现有示例有scons和supervisor）。
+作为政策，仅提供Python模块的软件包在Buildroot中应该全部以 `python-<something>` 命名。其他使用Python构建系统但不是Python模块的软件包可以自由选择名称（Buildroot中的现有示例有scons和supervisor）。
 
 Python软件包基础设施的主要宏是python-package。它类似于generic-package宏。
 
@@ -2749,7 +2749,7 @@ LuaRocks包基础架构的主要宏是luarocks-package：与generic-package类�
 - 必须手动更新package/Config.in文件以包含生成的Config.in文件。作为提示，scancpan脚本按字母顺序打印所需的源“…”语句。
 
 #### 18.11.2 perl-package参考
-作为一项政策，提供Perl/CPAN模块的包在Buildroot中都应该以perl-<something>的形式命名。
+作为一项政策，提供Perl/CPAN模块的包在Buildroot中都应该以 `perl-<something>` 的形式命名。
 
 该基础架构处理各种Perl构建系统：ExtUtils-MakeMaker（EUMM）、Module-Build（MB）和Module-Build-Tiny。当一个包提供Makefile.PL和Build.PL时，默认情况下会优先选择Build.PL。
 
@@ -3055,7 +3055,7 @@ FOO_VERSION、FOO_SOURCE、FOO_PATCH、FOO_SITE、FOO_SUBDIR、FOO_DEPENDENCIES�
 - FOO_CXXFLAGS，用于指定添加到软件包特定的交叉编译.conf 文件 cpp_args 属性的编译器参数。默认值为 TARGET_CXXFLAGS。
 - FOO_LDFLAGS，用于指定添加到软件包特定的交叉编译.conf 文件 c_link_args 和 cpp_link_args 属性的编译器参数。默认值为 TARGET_LDFLAGS。
 - FOO_MESON_EXTRA_BINARIES，用于指定要添加到 meson 交叉编译.conf 配置文件的 [binaries] 部分的以空格分隔的程序列表。格式为 program-name=’/path/to/program’，等号周围没有空格，并且程序的路径放在单引号之间。默认为空。请注意，Buildroot 已经为 c、cpp、ar、strip 和 pkgconfig 设置了正确的值。
-- FOO_MESON_EXTRA_PROPERTIES，用于指定要添加到 meson 交叉编译.conf 配置文件的 [properties] 部分的以空格分隔的属性列表。格式为 property-name=<value>，等号周围没有空格，并且字符串值要放在单引号之间。默认为空。请注意，Buildroot 已经为 needs_exe_wrapper、c_args、c_link_args、cpp_args、cpp_link_args、sys_root 和 pkg_config_libdir 设置了值。
+- FOO_MESON_EXTRA_PROPERTIES，用于指定要添加到 meson 交叉编译.conf 配置文件的 [properties] 部分的以空格分隔的属性列表。格式为 `property-name=<value>` ，等号周围没有空格，并且字符串值要放在单引号之间。默认为空。请注意，Buildroot 已经为 needs_exe_wrapper、c_args、c_link_args、cpp_args、cpp_link_args、sys_root 和 pkg_config_libdir 设置了值。
 - FOO_NINJA_ENV，用于指定要传递给 ninja 的附加环境变量，ninja 是 meson 的伴随工具，负责构建操作。默认为空。
 - FOO_NINJA_OPTS，用于指定要构建的目标的以空格分隔的列表。默认为空，表示构建默认目标。
 
@@ -3152,7 +3152,7 @@ Go 软件包基础架构的主要宏是 golang-package，它类似于 generic-pa
 
 还可以根据软件包的需求选择性地定义一些特定于 Go 基础架构的附加变量。其中许多仅在特定情况下有用，因此典型的软件包只会使用其中的几个，或者根本不使用。
 
-- 软件包必须在 FOO_GOMOD 变量中指定其 Go 模块名称。如果未指定，默认为 URL-域名/URL 的第一部分/URL 的第二部分，例如，对于指定 FOO_SITE = $(call github，bar，foo，$(FOO_VERSION)) 的软件包，FOO_GOMOD 将取值为 github.com/bar/foo。
+- 软件包必须在 FOO_GOMOD 变量中指定其 Go 模块名称。如果未指定，默认为 URL-域名/URL 的第一部分/URL 的第二部分，例如，对于指定 `FOO_SITE = $(call github，bar，foo，$(FOO_VERSION))` 的软件包，FOO_GOMOD 将取值为 github.com/bar/foo。
 如果软件包源代码树中不存在 go.mod 文件，Go 软件包基础架构将自动生成一个最小化的 go.mod 文件。
 - FOO_LDFLAGS 和 FOO_TAGS 分别用于将 LDFLAGS 或 TAGS 传递给 go build 命令。
 - FOO_BUILD_TARGETS 可用于传递应该构建的目标列表。如果未指定 FOO_BUILD_TARGETS，则默认为..我们有两种情况：
@@ -3338,12 +3338,12 @@ $(eval $(generic-package))
 - FOO_SOURCES，必需，定义文档源文件。
 - FOO_RESOURCES，可选，可以包含一个以空格分隔的路径列表，指向一个或多个包含所谓资源(如CSS或图像)的目录。默认为空。
 - FOO_DEPENDENCIES，可选，必须在构建此文档前构建的软件包列表(很可能是宿主软件包)。
-- FOO_TOC_DEPTH，FOO_TOC_DEPTH_<FMT>，可选，此文档的目录深度，可以单独为指定格式<FMT>覆盖(参见上面渲染格式的列表，但用大写并用下划线替换连字符;见下例)。默认:1。
+- `FOO_TOC_DEPTH，FOO_TOC_DEPTH_<FMT>` ，可选，此文档的目录深度，可以单独为指定格式 `<FMT>` 覆盖(参见上面渲染格式的列表，但用大写并用下划线替换连字符;见下例)。默认:1。
 
 还有一些附加钩子(有关钩子的通用信息请参见第18.23节)，文档可以设置以定义在各个步骤执行额外操作:
 - FOO_POST_RSYNC_HOOKS 在Buildroot拷贝源文件后运行额外命令。例如可以用来使用从树中提取的信息生成文档的一部分。Buildroot就是用这个钩子生成附录中的表格。
 - FOO_CHECK_DEPENDENCIES_HOOKS 检查生成文档所需组件的额外测试。在AsciiDoc中，可以调用过滤器，即将解析AsciiDoc块并适当渲染的程序(如ditaa或aafigure)。
-- FOO_CHECK_DEPENDENCIES_<FMT>_HOOKS 为指定格式<FMT>运行额外测试(参见上面渲染格式列表)。
+- `FOO_CHECK_DEPENDENCIES_<FMT>_HOOKS` 为指定格式 `<FMT>` 运行额外测试(参见上面渲染格式列表)。
 
 Buildroot设置以下变量可以在上述定义中使用:
 - $(FOO_DOCDIR)，类似于$(FOO_PKGDIR)，包含foo.mk的目录路径。可以用来引用文档源，也可以在钩子中使用，尤其是post-rsync钩子，如果文档的一部分需要生成。
@@ -3445,7 +3445,7 @@ Buildroot 提供了一个辅助基础设施来构建目标机器在 Linux 内核
 
 11-25 行定义在 Linux 工具构建过程不同步骤所应执行的内容，类似通用软件包。实际仅在选择 foo 工具时使用。仅支持的命令是 _BUILD_CMDS、_INSTALL_STAGING_CMDS 和 _INSTALL_TARGET_CMDS。
 
-注意不要调用 $(eval $(generic-package)) 或任何其他软件包基础设施!Linux 工具本身不是软件包，它们是 linux-tools 软件包的一部分。
+注意不要调用 `$(eval $(generic-package))` 或任何其他软件包基础设施!Linux 工具本身不是软件包，它们是 linux-tools 软件包的一部分。
 
 
 #### 18.22.2 linux-kernel-extensions
@@ -3482,7 +3482,7 @@ Buildroot 提供了一个辅助基础设施来构建目标机器在 Linux 内核
 
 7行将 Linux 扩展 foo 添加到可用扩展列表。
 
-9-11行定义扩展应如何修改 Linux 内核树;这与 Linux 扩展具体相关，可以使用 foo 软件包定义的变量，如 $(FOO_DIR) 或 $(FOO_VERSION) 以及所有 Linux 变量，如 $(LINUX_VERSION) 或 $(LINUX_VERSION_PROBED)、$(KERNEL_ARCH)。查看这些内核变量的定义。
+9-11行定义扩展应如何修改 Linux 内核树;这与 Linux 扩展具体相关，可以使用 foo 软件包定义的变量，如 `$(FOO_DIR)` 或 `$(FOO_VERSION)` 以及所有 Linux 变量，如 `$(LINUX_VERSION)` 或 `$(LINUX_VERSION_PROBED)`、`$(KERNEL_ARCH)`。查看这些内核变量的定义。
 
 
 ### 18.23 各个构建步骤中可用的钩子
@@ -3541,7 +3541,7 @@ glibc C库内置了完整的gettext实现，支持翻译。因此，本地语言
 
 因此，为了确保正确处理本地语言支持，Buildroot中的可以使用NLS支持的软件包应该:
 1. 当BR2_SYSTEM_ENABLE_NLS=y时，确保启用NLS支持。这对autotools软件包自动生效，所以其他基础设施的软件包需要单独做。
-2. 将$(TARGET_NLS_DEPENDENCIES)添加到软件包<pkg>_DEPENDENCIES变量。这一添加应无条件进行:这个变量的值由核心自动调整为相关软件包列表。如果NLS关闭，这个变量为空;如果开启，包含host-gettext提供编译翻译文件的工具。此外，如果使用uClibc或musl，也包含gettext获取完整实现。 
+2. 将$(TARGET_NLS_DEPENDENCIES)添加到软件包 `<pkg>_DEPENDENCIES` 变量。这一添加应无条件进行:这个变量的值由核心自动调整为相关软件包列表。如果NLS关闭，这个变量为空;如果开启，包含host-gettext提供编译翻译文件的工具。此外，如果使用uClibc或musl，也包含gettext获取完整实现。 
 3. 如果需要，可以将$(TARGET_NLS_LIBS)添加到链接器标志，以便与libintl链接。autotools软件包通常自动检测应与libintl链接。但是其他构建系统或autotools问题软件包可能需要此操作。应无条件添加$(TARGET_NLS_LIBS)，核心会使其为空或定义为-lintl。
 
 不应向Config.in文件添加任何更改支持NLS。
@@ -3672,7 +3672,7 @@ FOO_VERSION = 1.0
 FOO_SITE = $(call gitlab，<user>，<package>，v$(FOO_VERSION))
 ```
 
-默认情况下，它将使用.tar.gz tarball，但Gitlab也提供.tar.bz2 tarball，所以通过添加<pkg>_SOURCE变量，可以使用这个.tar.bz2 tarball:
+默认情况下，它将使用.tar.gz tarball，但Gitlab也提供.tar.bz2 tarball，所以通过添加 `<pkg>_SOURCE` 变量，可以使用这个.tar.bz2 tarball:
 ```
 # Use a tag or a full commit ID
 FOO_VERSION = 1.0
@@ -3680,7 +3680,7 @@ FOO_SITE = $(call gitlab，<user>，<package>，v$(FOO_VERSION))
 FOO_SOURCE = foo-$(FOO_VERSION).tar.bz2
 ```
 
-如果上游开发者在https://gitlab.com/<project>/releases/上传了特定的tarball，不要使用这个宏，而应直接使用tarball链接。
+如果上游开发者在 `https://gitlab.com/<project>/releases/` 上传了特定的tarball，不要使用这个宏，而应直接使用tarball链接。
 
 
 ### 18.26 结论
@@ -3696,22 +3696,22 @@ Buildroot提供了一套自动化机制来在构建过程中处理这些修补�
 
 ### 19.1 提供补丁
 #### 19.1.1 下载的补丁
-如果需要应用可以下载的补丁，则需要将它添加到<软件包名>_PATCH变量中。如果条目包含“://”，Buildroot将假设它是一个完整的URL，并从这个位置下载补丁。否则，Buildroot将假设补丁应该从<软件包名>_SITE下载。它可以是一个单独的补丁，也可以是一个包含补丁系列的tar包。 
+如果需要应用可以下载的补丁，则需要将它添加到 `<packagename>_PATCH` 变量中。如果条目包含“://”，Buildroot将假设它是一个完整的URL，并从这个位置下载补丁。否则，Buildroot将假设补丁应该从 `<packagename>_SITE` 下载。它可以是一个单独的补丁，也可以是一个包含补丁系列的tar包。 
 
-与所有下载一样，应该添加哈希值到<软件包名>.hash文件中。
+与所有下载一样，应该添加哈希值到 `<packagename>.hash` 文件中。
 
 这种方法通常用于来自Debian的软件包。
 
 #### 19.1.2 Buildroot内置的补丁
 大多数补丁提供在Buildroot内，位于软件包目录中;这些补丁通常用于解决交叉编译、libc支持或其他问题。
 
-这些补丁文件应命名为<序号>-<描述>.patch。
+这些补丁文件应命名为 `<number>-<description>.patch` 。
 
 注意:
 - Buildroot内置的补丁文件名不应包含任何软件包版本信息。
-- 补丁文件名中的<序号>字段表示应用顺序，从1开始;建议用零填充到4位宽，如git format-patch所做。例如:0001-foobar-the-buz.patch 
-- 补丁邮件主题前缀不应编号。应使用git format-patch -N命令生成补丁，它会自动添加编号用于系列。例如，补丁主题行应为Subject: [PATCH] foobar the buz，而不是Subject: [PATCH n/m] foobar the buz。
-- 以前，补丁文件名必须以软件包名前缀，如<软件包名>-<序号>-<描述>.patch，但现在不再需要。现有软件包将随时间修正。不要在补丁文件名前添加软件包名前缀。
+- 补丁文件名中的 `<number>` 字段表示应用顺序，从1开始;建议用零填充到4位宽，如 git format-patch 所做。例如: 0001-foobar-the-buz.patch 
+- 补丁邮件主题前缀不应编号。应使用 `git format-patch -N` 命令生成补丁，它会自动添加编号用于系列。例如，补丁主题行应为 Subject: [PATCH] foobar the buz，而不是Subject: [PATCH n/m] foobar the buz。
+- 以前，补丁文件名必须以软件包名前缀，如 `<packagename>-<number>-<description>.patch` ，但现在不再需要。现有软件包将随时间修正。不要在补丁文件名前添加软件包名前缀。
 - 以前可以添加quilt系列文件，但现在不再推荐，将来会删除。不要使用系列文件。
 
 #### 19.1.3 全局补丁目录
@@ -3719,14 +3719,14 @@ Buildroot提供了一套自动化机制来在构建过程中处理这些修补�
 
 
 ### 19.2 补丁应用顺序
-1. 如果定义了<软件包名>_PRE_PATCH_HOOKS，则运行它;
-2. 清理构建目录，删除任何存在的*.rej文件; 
-3. 如果定义了<软件包名>_PATCH，则应用来自这些tar包的补丁;
-4. 如果软件包Buildroot目录或名为<软件包版本>的子目录中存在*.patch文件，则:
+1. 如果定义了 `<packagename>_PRE_PATCH_HOOKS` ，则运行它;
+2. 清理构建目录，删除任何存在的 `*.rej` 文件; 
+3. 如果定义了 `<packagename>_PATCH` ，则应用来自这些 tar 包的补丁;
+4. 如果软件包Buildroot目录或名为 `<packageversion>` 的子目录中存在 `*.patch` 文件，则:
    - 如果软件包目录中存在系列文件，则根据系列文件应用补丁;
-   - 否则，按字母顺序应用匹配*.patch的补丁文件。因此，为确保正确顺序，强烈建议按如下命名补丁文件:<序号>-<描述>.patch，其中<序号>表示应用顺序。
-5. 如果定义了BR2_GLOBAL_PATCH_DIR，则按指定顺序枚举目录。按前一步描述应用补丁。
-6. 如果定义了<软件包名>_POST_PATCH_HOOKS，则运行它。
+   - 否则，按字母顺序应用匹配*.patch的补丁文件。因此，为确保正确顺序，强烈建议按如下命名补丁文件: `<number>-<description>.patch` ，其中 `<number>` 表示应用顺序。
+5. 如果定义了 `BR2_GLOBAL_PATCH_DIR` ，则按指定顺序枚举目录。按前一步描述应用补丁。
+6. 如果定义了 `<packagename>_POST_PATCH_HOOKS` ，则运行它。
 
 如果第3或4步出错，则构建失败。
 
@@ -3907,17 +3907,19 @@ Buildroot的Patchwork网站可以用于拉取补丁进行测试。有关使用Bu
 
 为了给赞助创建补丁或将其上游化的人员致谢，您可以使用电子邮件子地址作为您的git身份（即用作提交作者和电子邮件From：字段以及您的Signed-off-by标签的内容）；在本地部分添加后缀，使用加号+分隔。例如：
 - 对于赞助提交工作的公司，使用公司名称作为详细（后缀）部分：
-Your-Name Your-Surname <your-name.your-surname+companyname@mail.com>
+
+    Your-Name Your-Surname <your-name.your-surname+companyname@mail.com>
 - 对于赞助提交工作的个人，使用他们的名字和姓氏：
-Your-Name Your-Surname <your-name.your-surname+their-name.their-surname@mail.com>
 
-在添加新软件包时，您应该将每个软件包单独提交为一个补丁。此补丁应包括package/Config.in的更新，软件包的Config.in文件，.mk文件，.hash文件，任何初始化脚本以及所有软件包补丁。如果软件包有许多子选项，有时最好将它们作为单独的后续补丁添加。摘要行应该类似于<软件包名称>：新软件包。提交消息的正文对于简单的软件包可以为空，或者可以包含软件包的描述（例如Config.in帮助文本）。如果构建软件包需要进行特殊操作，这也应在提交消息正文中明确说明。
+    Your-Name Your-Surname <your-name.your-surname+their-name.their-surname@mail.com>
 
-当您将软件包升级到新版本时，您还应为每个软件包提交一个单独的补丁。不要忘记更新.hash文件，如果尚不存在，则添加它。还要检查_LICENSE和_LICENSE_FILES是否仍然有效。摘要行应该类似于<软件包名称>：升级到版本<新版本>。如果新版本与现有版本相比仅包含安全更新，则摘要应为<软件包名称>：安全升级到版本<新版本>，提交消息正文应显示修复的CVE编号。如果新版本中的某些软件包补丁可以删除，应明确说明为什么可以删除，最好附带上游提交ID。还应明确说明任何其他所需更改，例如不再存在或不再需要的配置选项。
+在添加新软件包时，您应该将每个软件包单独提交为一个补丁。此补丁应包括package/Config.in的更新，软件包的Config.in文件，.mk文件，.hash文件，任何初始化脚本以及所有软件包补丁。如果软件包有许多子选项，有时最好将它们作为单独的后续补丁添加。摘要行应该类似于 `<packagename>` ：新软件包。提交消息的正文对于简单的软件包可以为空，或者可以包含软件包的描述（例如Config.in帮助文本）。如果构建软件包需要进行特殊操作，这也应在提交消息正文中明确说明。
 
-如果您希望在构建失败和您添加或修改的软件包中出现进一步更改时收到通知，请将自己添加到DEVELOPERS文件中。这应在创建或修改软件包的同一个补丁中完成。有关更多信息，请参阅DEVELOPERS文件。
+当您将软件包升级到新版本时，您还应为每个软件包提交一个单独的补丁。不要忘记更新.hash文件，如果尚不存在，则添加它。还要检查 `_LICENSE` 和 `_LICENSE_FILES` 是否仍然有效。摘要行应该类似于 `<packagename>`：升级到版本 `<new version>` 。如果新版本与现有版本相比仅包含安全更新，则摘要应为 `<packagename>`：安全升级到版本 `<new version>` ，提交消息正文应显示修复的 CVE 编号。如果新版本中的某些软件包补丁可以删除，应明确说明为什么可以删除，最好附带上游提交 ID。还应明确说明任何其他所需更改，例如不再存在或不再需要的配置选项。
 
-Buildroot提供了一个方便的工具来检查您创建或修改的文件中的常见代码风格错误，称为check-package（参见第18.25.2节获取更多信息）。
+如果您希望在构建失败和您添加或修改的软件包中出现进一步更改时收到通知，请将自己添加到 `DEVELOPERS` 文件中。这应在创建或修改软件包的同一个补丁中完成。有关更多信息，请参阅 `DEVELOPERS` 文件。
+
+Buildroot 提供了一个方便的工具来检查您创建或修改的文件中的常见代码风格错误，称为 check-package（参见第18.25.2节获取更多信息）。
 
 #### 22.5.2准备补丁系列
 从您的本地git视图中提交的更改开始，在生成补丁集之前，请将您的开发分支在上游代码树之上进行变基。为此，请运行：
@@ -4034,14 +4036,14 @@ $ git format-patch --subject-prefix "PATCH v4" \
     -M -s -o outgoing origin/master
 ```
 
-自git版本1.8.1以来，您还可以使用-v <n>（其中<n>是版本号）：
+自git版本1.8.1以来，您还可以使用 `-v <n>`（其中 `<n>` 是版本号）：
 ```
 $ git format-patch -v4 -M -s -o outgoing origin/master
 ```
 
 当您提供补丁的新版本时，请在patchwork中将旧版本标记为已废弃。您需要在patchwork上创建一个帐户，以便能够修改您的补丁的状态。请注意，您只能更改自己提交的补丁的状态，这意味着您在patchwork中注册的电子邮件地址应与您用于发送补丁到邮件列表的地址相匹配。
 
-提交补丁到邮件列表时，您还可以添加--in-reply-to <message-id>选项。要回复的邮件的ID可以在patchwork的"Message Id"标签下找到。in-reply-to的优点是patchwork将自动将上一个版本的补丁标记为已废弃。
+提交补丁到邮件列表时，您还可以添加 `--in-reply-to <message-id>` 选项。要回复的邮件的ID可以在patchwork的"Message Id"标签下找到。in-reply-to 的优点是 patchwork 将自动将上一个版本的补丁标记为已废弃。
 
 ### 22.6 报告问题/错误或寻求帮助
 在报告任何问题之前，请在邮件列表归档中查看是否有人已经报告和/或修复了类似的问题。
@@ -4157,7 +4159,7 @@ TestInitSystemBusyboxRw-run.log是Qemu引导和测试的日志。只有在构建
 
 您推送的分支的名称将决定是否触发Gitlab CI流水线，以及为哪些测试用例触发。
 
-在下面的示例中，分支名称的<name>部分是您选择的任意字符串。
+在下面的示例中，分支名称的 `<name>` 部分是您选择的任意字符串。
 
 - 要触发所有run-test测试用例的作业，推送一个以-runtime-tests结尾的分支:
 
@@ -4190,9 +4192,9 @@ DEVELOPERS文件的格式在文件本身中有详细的文档说明。
 
 位于utils/目录中的get-developers工具允许针对各种任务使用DEVELOPERS文件：
 - 当将一个或多个补丁作为命令行参数传递时，get-developers将返回适当的git send-email命令。如果传递了-e选项，将只打印适合git send-email --cc-cmd的电子邮件地址格式。
-- 当使用-a <arch>命令行选项时，get-developers将返回负责给定架构的开发人员列表。
-- 当使用-p <package>命令行选项时，get-developers将返回负责给定软件包的开发人员列表。
-- 当使用-c命令行选项时，get-developers将查看Buildroot代码库中所有版本控制的文件，并列出没有任何开发人员处理的文件。此选项的目的是帮助完善DEVELOPERS文件。
+- 当使用 `-a <arch>` 命令行选项时，get-developers将返回负责给定架构的开发人员列表。
+- 当使用 `-p <package>` 命令行选项时，get-developers将返回负责给定软件包的开发人员列表。
+- 当使用 `-c` 命令行选项时，get-developers将查看Buildroot代码库中所有版本控制的文件，并列出没有任何开发人员处理的文件。此选项的目的是帮助完善DEVELOPERS文件。
 - 当使用-v命令行选项时，它会验证DEVELOPERS文件的完整性，并对不匹配的项目发出警告。
 
 
@@ -4356,14 +4358,14 @@ test 8000 wheel -1 = - /bin/sh - Test user
 要从旧的Buildroot版本迁移，请执行以下步骤。
 1. 对于所有的配置，在旧的Buildroot环境中进行构建。运行make graph-size。将graphs/file-size-stats.csv保存在不同的位置。运行make clean以删除其余部分。
 2. 查看下面的特定迁移说明，并对外部软件包和自定义构建脚本进行必要的调整。
-3. 更新Buildroot。
-4. 从现有的.config开始运行make menuconfig。
-5. 如果在Legacy菜单中启用了任何选项，请检查其帮助文本，取消选择它，并保存配置。
-6. 要获取更多详细信息，请查看您需要的软件包的git提交消息。进入packages目录并运行git log <旧版本>.. -- <您的软件包>。
+3. 更新 Buildroot 。
+4. 从现有的 .config 开始运行 make menuconfig 。
+5. 如果在 Legacy 菜单中启用了任何选项，请检查其帮助文本，取消选择它，并保存配置。
+6. 要获取更多详细信息，请查看您需要的软件包的git提交消息。进入 packages 目录并运行 `git log <old version>.. -- <your packages>` 。
 7. 在新的Buildroot环境中进行构建。
 8. 修复外部软件包中的构建问题（通常是由于更新的依赖关系）。
-9. 运行make graph-size。
-10. 将新的file-size-stats.csv与原始文件进行比较，以检查是否没有消失的必需文件，并且是否没有出现新的不必要的大文件。
+9. 运行 make graph-size。
+10. 将新的 file-size-stats.csv 与原始文件进行比较，以检查是否没有消失的必需文件，并且是否没有出现新的不必要的大文件。
 11. 对于在自定义叠加层中覆盖Buildroot创建的文件的配置（和其他）文件，请检查Buildroot生成的文件中是否有需要传播到自定义文件的更改。
 
 ### 27.2 迁移到2016.11
@@ -4371,11 +4373,14 @@ test 8000 wheel -1 = - /bin/sh - Test user
 
 然而，这意味着旧的br2-external树不能直接使用。需要进行一个小的更改：给你的br2-external树添加一个名称。
 
-这可以通过以下几个简单的步骤完成：• 首先，在你的br2-external树的根目录下创建一个名为external.desc的新文件，其中只有一行定义了你的br2-external树的名称：
+这可以通过以下几个简单的步骤完成：
+- 首先，在你的br2-external树的根目录下创建一个名为external.desc的新文件，其中只有一行定义了你的br2-external树的名称：
 
     $ echo 'name: YOUR_TREE_NAME' > external.desc
 
-注意：选择名称时要小心：它必须是唯一的，并且只能由ASCII字符集[A-Za-z0-9_]中的字符组成。• 接下来，在你的br2-external树中将每个BR2_EXTERNAL的出现都改为新的变量：
+注意：选择名称时要小心：它必须是唯一的，并且只能由ASCII字符集 [A-Za-z0-9_] 中的字符组成。
+
+- 接下来，在你的br2-external树中将每个BR2_EXTERNAL的出现都改为新的变量：
 
     $ find . -type f | xargs sed -i 's/BR2_EXTERNAL/BR2_EXTERNAL_YOUR_TREE_NAME_PATH/g'
 
@@ -4388,6 +4393,6 @@ test 8000 wheel -1 = - /bin/sh - Test user
 
 从Buildroot 2017.08开始，它们直接安装在$(HOST_DIR)目录下。
 
-每当一个软件包安装一个可执行文件，并且该可执行文件与$(HOST_DIR)/lib目录中的库链接时，它必须具有指向该目录的RPATH。
+每当一个软件包安装一个可执行文件，并且该可执行文件与 `$(HOST_DIR)/lib` 目录中的库链接时，它必须具有指向该目录的RPATH。
 
-不再接受指向$(HOST_DIR)/usr/lib的RPATH。
+不再接受指向 `$(HOST_DIR)/usr/lib` 的RPATH。
