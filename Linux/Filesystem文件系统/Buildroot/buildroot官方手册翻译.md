@@ -116,23 +116,24 @@ vagrant up
 一旦完成配置，配置工具将生成一个包含整个配置的.config文件。此文件将由顶层Makefile读取。
 
 要开始构建进程，只需运行：
-$ make
 
-默认情况下，Buildroot不支持顶层并行构建，因此不需要运行make -jN。但是，顶层并行构建有实验性支持，请参阅第8.12节。
+    $ make
+
+默认情况下，Buildroot不支持顶层并行构建，因此不需要运行 make -jN 。但是，顶层并行构建有实验性支持，请参阅第8.12节。
 
 make命令通常会执行以下步骤：
 
 - 下载源文件（如果需要）；
 - 配置、构建和安装交叉编译工具链，或者简单地导入外部工具链；
 - 配置、构建和安装选定的目标软件包；
-- 构建内核映像（如果选择的话）；
-- 构建引加载程序映像（如果选择的话）；
-- 在选定的格式中创建根文件系统。
+- 构建内核映像 Kernel（如果选择的话）；
+- 构建引加载程序映像 Boodloader（如果选择的话）；
+- 在选定的格式中创建根文件系统 rootfs 。
 
-Buildroot的输出存储在一个单独的目录output/中。该目录包含几个子目录：
+Buildroot的输出存储在一个单独的目录 output/ 中。该目录包含几个子目录：
 - images/ 存储所有的映像（内核映像、引导加载程序和根文件系统映像）。这些是您需要放在目标系统上的文件。
 - build/ 构建所有组件的地方（包括Buildroot在主机上需要的工具和为目标编译的软件包）。该目录包含每个组件的一个子目录。
-- host/ 包含为主机构建的工具和目标工具链的sysroot。前者是为主机编译的工具的安装，这些工具对于Buildroot的正确执行是必需的，包括交叉编译工具链。后者是类似于根文件系统层次结构的层次结构。它包含所有用户空间软件包的头文件和库，这些软件包提供和安装其他软件包使用的库。然而，该目录不打算成为目标的根文件系统：它包含许多开发文件、未剥离的二进制文件和库，使其对于嵌入式系统来说太大了。这些开发文件用于为依赖于其他库的目标编译库和应用程序。
+- host/ 包含为主机构建的工具和目标工具链的 sysroot 。前者是为主机编译的工具的安装，这些工具对于Buildroot的正确执行是必需的，包括交叉编译工具链。后者是类似于根文件系统层次结构的层次结构。它包含所有用户空间软件包的头文件和库，这些软件包提供和安装其他软件包使用的库。然而，该目录不打算成为目标的根文件系统：它包含许多开发文件、未剥离的二进制文件和库，使其对于嵌入式系统来说太大了。这些开发文件用于为依赖于其他库的目标编译库和应用程序。
 - staging/ 是host/中目标工具链sysroot的符号链接，用于向后兼容。
 - target/ 包含几乎完整的目标根文件系统：除了/dev/中的设备文件之外，一切都已准备就绪（Buildroot无法创建它们，因为Buildroot不以root身份运行，也不希望以root身份运行）。此外，它没有正确的权限（例如busybox二进制文件的setuid）。因此，不应在目标上使用此目录。相反，您应该使用在images/目录中构建的其中一个映像。如果您需要一个已提取的根文件系统映像以通过NFS引导，则使用在images/中生成的tarball映像，并以root身份提取它。与staging/相比，target/仅包含运行选定目标应用程序所需的文件和库：开发文件（头文件等）不在其中，二进制文件已剥离。
 
@@ -204,7 +205,7 @@ Buildroot的补丁管理界面可在https://patchwork.ozlabs.org/project/buildro
 
 编译工具链由您的发行版提供，Buildroot与此无关（除了使用它来构建交叉编译工具链和在开发主机上运行的其他工具）。
 
-如上所述，随系统提供的编译工具链在主机系统上运行并为主机系统的处理器生成代码。由于嵌入式系统使用了不同的处理器，您需要一个交叉编译工具链 - 一个在主机系统上运行但为目标系统（和目标处理器）生成代码的编译工具链。例如，如果您的主机系统使用x86，而目标系统使用ARM，那么主机上的常规编译工具链将在x86上运行并为x86生成代码，而交叉编译工具链将在x86上运行并为ARM生成代码。
+如上所述，随系统提供的编译工具链在主机系统上运行并为主机系统的处理器生成代码。由于嵌入式系统使用了不同的处理器，您需要一个交叉编译工具链 —— 一个在主机系统上运行但为目标系统（和目标处理器）生成代码的编译工具链。例如，如果您的主机系统使用x86，而目标系统使用ARM，那么主机上的常规编译工具链将在x86上运行并为x86生成代码，而交叉编译工具链将在x86上运行并为ARM生成代码。
 
 Buildroot为交叉编译工具链提供了两种解决方案：
 - 内部工具链后端，在配置界面中称为 `Buildroot toolchain` 。
@@ -217,10 +218,10 @@ Buildroot为交叉编译工具链提供了两种解决方案：
 
 该后端支持多个C库：uClibc-ng、glibc和musl。
 
-选择此后端后，会出现一些选项。其中最重要的许：
+选择此后端后，会出现一些选项。其中最重要的是：
 - 更改用于构建工具链的Linux内核头文件的版本。这个项目值得一些解释。在构建交叉编译工具链的过程中，也在构建C库。该库提供用户空间应用程序与Linux内核之间的接口。为了知道如何与Linux内核进行“通信”，C库需要访问 `Linux kernel headers` （即内核的.h文件），这些文件定义了用户空间和内核之间的接口（系统调用、数据结构等）。由于此接口向后兼容，用于构建工具链的Linux内核头文件的版本不需要完全匹配您打算在嵌入式系统上运行的Linux内核的版本。它们只需要具有与您打算运行的Linux内核版本相等或更旧版本。如果使用的内核头文件比您在嵌入式系统上运行的Linux内核更新，则C库可能使用您的Linux内核不提供的接口。
 - 更改GCC编译器、binutils和C库的版本。
-- 选择一些工具链选项（仅适用于uClibc）：工具链是否应具有RPC支持（主要用于NFS）、宽字符支持、区域设置支持（用于国际化）、C++支持或线程支持。根据您选择的选项，Buildroot菜单中可见的用户空间应用程序和库的数量将发化：许多应用程序和库需要启用某些工具链选项。大多数软件包在需要启用某个特定工具链选项以启用这些软件包时会显示注释。如果需要，您可以通过运行make uclibc-menuconfig来进一步细化uClibc配置。但请注意，Buildroot中的所有软件包都是针对Buildroot中捆绑的默认uClibc配置进行测试的：如果您通过从uClibc中删除功能来偏离此配置，则某些软件包可能无法。
+- 选择多个工具链选项（仅适用于uClibc）：工具链是否应具有RPC支持（主要用于NFS）、宽字符（wide-char）支持、区域设置支持（用于国际化）、C++支持或线程支持。根据您选择的选项，Buildroot菜单中可见的用户空间应用程序和库的数量将发化：许多应用程序和库需要启用某些工具链选项。大多数软件包在需要启用某个特定工具链选项以启用这些软件包时会显示注释。如果需要，您可以通过运行make  `uclibc-menuconfig` 来进一步细化uClibc配置。但请注意，Buildroot中的所有软件包都是针对Buildroot 中捆绑的默认 uClibc 配置进行测试的：如果您通过从 uClibc 中删除功能来偏离此配置，则某些软件包可能无法。
 
 值得注意的是，每当修改其中一个选项时，链和系统都必须重新构建。请参阅第8.2节。
 
@@ -236,19 +237,19 @@ Buildroot为交叉编译工具链提供了两种解决方案：
 
 然后，您有三种解决方案来使用外部工具链：
 
-- 使用预定义的外部工具链配置文件，让Buildroot下载、提取和安装工具链。Buildroot已经了解一些CodeSourcery和Linaro工具链。只需在可用的工具链中选择工具链配置文件即可。这绝对是最的解决方案。
+- 使用预定义的外部工具链配置文件，让 Buildroot 下载、提取和安装工具链。 Buildroot 已经了解一些 [CodeSourcery](https://www.plm.automation.siemens.com/global/en/products/embedded-software/sourcery-codebench-lite-downloads.html) 和 [Linaro](https://www.linaro.org/) 工具链。只需在可用的工具链中选择工具链配置文件即可。这绝对是最的解决方案。
 
-- 使用预定义的外部工具链配置文件，但是不让Buildroot下载和提取工具链，而是告诉Buildroot您的系统上已经安装了工具链的位置。只需在可用的工具链中选择工具链配置文件，取消选择自动下载工具链，并在工具链路径文本框中填写您的交叉编译工具链的路径。
+- 使用预定义的外部工具链配置文件，但是不让 Buildroot 下载和提取工具链，而是告诉 Buildroot 您的系统上已经安装了工具链的位置。只需在可用的工具链中选择工具链配置文件，取消选择自动下载工具链，并在工具链路径文本框中填写您的交叉编译工具链的路径。
 
-- 使用完全自定义的外部工具链。这对于使用cstool-NG或Buildroot本身生成的工具链特有用。要做到这一点，选择工具链列表中的自定义工具链解决方案。您需要填写工具链路径、工具链前缀和外部工具链C库选项。然后，您需要告诉Buildroot您的外部工具链支持的内容。如果您的外部工具链使用g，您只需告诉它是否支持C++以及是否具有内置的RPC支持。如果您的外部工具链使用uClibc库，则需要告root它是否支持RPC、宽字符、区域设置、程序调用、线程和C++。在执行开始时，Buildroot会告诉您所选选项是否与工具链配置不匹配。
+- 使用完全自定义的外部工具链。这对于使用 cstool-NG 或 Buildroot 本身生成的工具链特有用。要做到这一点，选择工具链列表中的自定义工具链解决方案。您需要填写工具链路径、工具链前缀和外部工具链C库选项。然后，您需要告诉 Buildroot 您的外部工具链支持的内容。如果您的外部工具链使用g，您只需告诉它是否支持 C++ 以及是否具有内置的 RPC 支持。如果您的外部工具链使用 uClibc 库，则需要告 root 它是否支持 RPC 、宽字符、区域设置、程序调用、线程和C++。在执行开始时， Buildroot 会告诉您所选选项是否与工具链配置不匹配。
 
-我们的外部工具链支持已经通过了来自CodeSourcery和Linaro的工具链、crosstool-NG生成的链以及Buildroot自身生成的工具链的测试。一般来说，所有支持sysroot功能的工具链都应该可以工作。如果不能工作，请随时与开发人联系。
+我们的外部工具链支持已经通过了来自 CodeSourcery 和 Linaro 的工具链、 crosstool-NG 生成的链以及Buildroot自身生成的工具链的测试。一般来说，所有支持 sysroot 功能的工具链都应该可以工作。如果不能工作，请随时与开发人联系。
 
-我们不支持由OpenEmbedded或Yocto生成的工具链或SDK，因为这些工具链不是纯粹的工具链（即只有编译器、binutils、C和C++库）。相反，这些工具链附带了一套非常庞大的预编译库和程序。因此，Buildroot无法导入工具链的sysroot，因为它将包含数百兆字节的通常由Buildroot构建的预编译库。
+我们不支持由 OpenEmbedded 或 Yocto 生成的工具链或 SDK ，因为这些工具链不是纯粹的工具链（即只有编译器、binutils、C和C++库）。相反，这些工具链附带了一套非常庞大的预编译库和程序。因此，Buildroot 无法导入工具链的 sysroot ，因为它将包含数百兆字节的通常由Buildroot构建的预编译库。
 
-我们也不支持使用发行版工具链（即由您的发行版安装的gcc/binutils/C库）作为构建目标软件的工具链。这是因为您的发行版工具链不是一个“纯粹”的工具链（即只有C/C++库），所以我们无法将其正确地导入Buildroot构建环境中。因此，即使您正在为x86或x86_64目标构建系统，您也必须使用Buildroot或crosstool-NG生成交叉编译工具链。
+我们也不支持使用发行版工具链（即由您的发行版安装的 gcc/binutils/C库）作为构建目标软件的工具链。这是因为您的发行版工具链不是一个“纯粹”的工具链（即只有C/C++库），所以我们无法将其正确地导入 Buildroot 构建环境中。因此，即使您正在为 x86 或 x86_64 目标构建系统，您也必须使用Buildroot或 crosstool-NG 生成交叉编译工具链。
 
-如果您想为您的项目生成一个自定义工具链，可以在Buildroot中用作外部工具链，建议使用Buildroot本身（参见第6.1.3节）或crosstool-NG来构建它。
+如果您想为您的项目生成一个自定义工具链，可以在Buildroot中用作外部工具链，建议使用Buildroot本身（参见第6.1.3节）或 crosstool-NG 来构建它。
 
 此后端的优点：
 - 允许使用知名且经过充分测试的交叉编译工具链。
@@ -290,27 +291,27 @@ Buildroot内部工具链选项可用于创建外部工具链构建内部工具�
 
 在 `System configuration， /dev management` 中， `Buildroot` 提供了四种不同的解决方案来处理/dev目录：
 
-- 第一种解决方案是使用设备表进行静态管理(`Static using device table`)。这是Linux中处理设备文件的旧的经典方式。使用此方法，设备文件会持久地存储在根文件系统中（即它们在重新启动后仍然存在），并且没有任何自动创建和删除这些设备文件的机制，当硬件设备被添加或从系统中移除时。因此，Buildroot使用设备表创建一组标准的设备文件，其中默认的设备表存储在 `Buildroot` 源代码中的 `system/device_table_dev.txt` 中。当 `Buildroot` 生成最终的根文件系统映像时，会处理此文件，并且设备文件在 `output/target` 目录中不可见。 `BR2_ROOTFS_STATIC_DEVICE_TABLE` 选项允许更改 `Buildroot` 使用的默认设备表，或添加附加的设备表，以便 `Buildroot` 在构建过程中创建附加的设备文件。因此，如果您使用此方法，并且您的系统中缺少设备文件，您可以创建一个 `board///device_table_dev.txt` 文件，其中包含您附加设备文件的描述，然后您可以将 `BR2_ROOTFS_STATIC_DEVICE_TABLE` 设置为 `system/device_table_dev.txt board///device_table_dev.txt` 。有关设备表文件格式的更多详细信息，请参阅第25章。
+- 第一种解决方案是使用设备表进行静态管理(`Static using device table`)。这是Linux中处理设备文件的旧的经典方式。使用此方法，设备文件会持久地存储在根文件系统中（即它们在重新启动后仍然存在），并且没有任何自动创建和删除这些设备文件的机制，当硬件设备被添加或从系统中移除时。因此，Buildroot使用设备表创建一组标准的设备文件，其中默认的设备表存储在 `Buildroot` 源代码中的 `system/device_table_dev.txt` 中。当 `Buildroot` 生成最终的根文件系统映像时，会处理此文件，并且设备文件在 `output/target` 目录中不可见。 `BR2_ROOTFS_STATIC_DEVICE_TABLE` 选项允许更改 `Buildroot` 使用的默认设备表，或添加附加的设备表，以便 `Buildroot` 在构建过程中创建附加的设备文件。因此，如果您使用此方法，并且您的系统中缺少设备文件，您可以创建一个 `board/<yourcompany>/<yourproject>/device_table_dev.txt` 文件，其中包含您附加设备文件的描述，然后您可以将 `BR2_ROOTFS_STATIC_DEVICE_TABLE` 设置为 `system/device_table_dev.txt board/<yourcompany>/<yourproject>/device_table_dev.txt` 。有关设备表文件格式的更多详细信息，请参阅第25章。
 
 - 第二种解决方案是仅使用动态的 `devtmpfs` 。 `devtmpfs` 是一个虚拟文件系统，它被内嵌在 Linux 内核中，从内核2.6.32开始引入(如果您使用较旧的内核，则无法使用此选项)。当它挂载在 `/dev` 上时，这个虚拟文件系统会自动使设备文件在添加或删除系统中的硬件设备时出现和消失。这个文件系统在重启后不是持久的:它是由内核动态填充的。使用 `devtmpfs` 需要启用以下内核配置选项: `CONFIG_DEVTMPFS` 和 `CONFIG_DEVTMPFS_MOUNT` 。当 `Buildroot` 负责为您的嵌入式设备构建 Linux 内核时，它会确保启用这两个选项。但是，如果您在 `Buildroot` 外部构建Linux内核，那么启用这两个选项就是您的责任(如果您未能启用它们，您的 `Buildroot` 系统将无法启动)。
 
-- 第三种解决方案是使用动态的 `devtmpfs+mdev` 。这种方法也依赖于上述详细介绍的 `devtmpfs` 虚拟文件系统(所以内核配置中必须启用 `CONFIG_DEVTMPFS` 和 `CONFIG_DEVTMPFS_MOUNT` 这两个选项)，但在其上添加了 `mdev` 用户空间实用程序。 `mdev` 是 `BusyBox` 的一部分程序，内核将在设备添加或删除时调用它。通过 `/etc/mdev.conf` 配置文件，可以配置 `mdev` ，例如为设备文件设置特定的权限或所有权，或者在设备出现或消失时调用脚本或应用程序等。简而言之，它允许用户空间响应设备添加和删除事件。例如， `mdev` 可以自动加载当设备出现在系统上时需要的内核模块。如果设备需要固件， `mdev` 还负责将固件内容推送到内核。 `mdev` 是 `udev` 的一个轻量级实现(具有较少的功能)。有关 `mdev` 和其配置文件的语法的更多详细信息，请参阅 `http://git.busybox.net/-busybox/tree/docs/mdev.txt` 。
+- 第三种解决方案是使用动态的 `devtmpfs + mdev` 。这种方法也依赖于上述详细介绍的 `devtmpfs` 虚拟文件系统(所以内核配置中必须启用 `CONFIG_DEVTMPFS` 和 `CONFIG_DEVTMPFS_MOUNT` 这两个选项)，但在其上添加了 `mdev` 用户空间实用程序。 `mdev` 是 `BusyBox` 的一部分程序，内核将在设备添加或删除时调用它。通过 `/etc/mdev.conf` 配置文件，可以配置 `mdev` ，例如为设备文件设置特定的权限或所有权，或者在设备出现或消失时调用脚本或应用程序等。简而言之，它允许用户空间响应设备添加和删除事件。例如， `mdev` 可以自动加载当设备出现在系统上时需要的内核模块。如果设备需要固件， `mdev` 还负责将固件内容推送到内核。 `mdev` 是 `udev` 的一个轻量级实现(具有较少的功能)。有关 `mdev` 和其配置文件的语法的更多详细信息，请参阅 http://git.busybox.net/-busybox/tree/docs/mdev.txt 。
 
-- 第四种解决方案是使用动态的 `devtmpfs+eudev` 。这种方法也依赖于上面详细介绍的 `devtmpfs` 虚拟文件系统，但在其上添加了 `eudev` 用户空间守护进程。 `eudev` 是一个后台运行的守护进程，它会被内核调用来响应系统中设备的添加或删除。它是 `mdev` 更重量级的解决方案，但提供了更高的灵活性。 `eudev` 是 `udev` 的独立版本， `udev` 原来是大多数桌面 Linux 发行版使用的用户空间守护进程，现在它成为 `Systemd` 的一部分。有关详细信息，请参阅http://en.wikipedia.org/wiki/Udev。
+- 第四种解决方案是使用动态的 `devtmpfs + eudev` 。这种方法也依赖于上面详细介绍的 `devtmpfs` 虚拟文件系统，但在其上添加了 `eudev` 用户空间守护进程。 `eudev` 是一个后台运行的守护进程，它会被内核调用来响应系统中设备的添加或删除。它是 `mdev` 更重量级的解决方案，但提供了更高的灵活性。 `eudev` 是 `udev` 的独立版本， `udev` 原来是大多数桌面 Linux 发行版使用的用户空间守护进程，现在它成为 `Systemd` 的一部分。有关详细信息，请参阅 http://en.wikipedia.org/wiki/Udev 。
 
-Buildroot开发人员的建议是从仅使用动态 `devtmpfs` 的解决方案开始，直到您需要用户空间被通知设备添加/删除，或者需要固件，此时使用动态 `devtmpfs+mdev` 通常是一个很好的解决方案。
+Buildroot开发人员的建议是从仅使用动态 `devtmpfs` 的解决方案开始，直到您需要用户空间被通知设备添加/删除，或者需要固件，此时使用动态 `devtmpfs + mdev` 通常是一个很好的解决方案。
 需要注意的是，如果选择 `systemd` 作为 init 系统， `/dev` 管理将由 `systemd` 提供的 `udev` 程序进行。
 
 ### 6.3 init 系统
 `init` 程序是内核启动的第一个用户空间程序(它的PID号是1)，它负责启动用户空间服务和程序(例如:Web服务器，图形应用程序，其他网络服务器等)。
 
-`Buildroot` 允许使用三种不同类型的 `init` 系统，可以从 系统配置->初始化系统(`System configuration， Init system:`)中选择:
+`Buildroot` 允许使用三种不同类型的 `init` 系统，可以从 系统配置->初始化系统(`System configuration > Init system:`)中选择:
 
-- 第一种解决方案是 `BusyBox` 。除了许多程序外， `BusyBox` 还实现了一个基本的 `init` 程序，对大多数嵌入式系统来说已经足够。启用 `BR2_INIT_BUSYBOX` 将确保 `BusyBox` 构建和安装其 `init` 程序。这是 `Buildroot` 的默认解决方案。`BusyBox init` 程序将在引导时读取 `/etc/inittab` 文件以知道下一个操作。此文件的语法可以在 `http://git.busybox.net/busybox/tree/examples/inittab` 找到(请注意，`BusyBox inittab` 语法是特殊的:不要使用互联网上的任何 `inittab` 文档来学习 `BusyBox inittab` )`。Buildroot` 默认的 `inittab` 存储在 `system/skeleton/etc/inittab` 。除了挂载几个重要的文件系统外，默认 `inittab` 的主要工作是启动 `/etc/init.d/rcS shell` 脚本，并启动 `getty` 程序(提供登录提示)。
+- 第一种解决方案是 `BusyBox` 。除了许多程序外， `BusyBox` 还实现了一个基本的 `init` 程序，对大多数嵌入式系统来说已经足够。启用 `BR2_INIT_BUSYBOX` 将确保 `BusyBox` 构建和安装其 `init` 程序。这是 `Buildroot` 的默认解决方案。`BusyBox init` 程序将在引导时读取 `/etc/inittab` 文件以知道下一个操作。此文件的语法可以在 http://git.busybox.net/busybox/tree/examples/inittab 找到(请注意，`BusyBox inittab` 语法是特殊的:不要使用互联网上的任何 `inittab` 文档来学习 `BusyBox inittab` )`。Buildroot` 默认的 `inittab` 存储在 `system/skeleton/etc/inittab` 。除了挂载几个重要的文件系统外，默认 `inittab` 的主要工作是启动 `/etc/init.d/rcS ` shell 脚本，并启动 `getty` 程序(提供登录提示)。
 
 - 第二种解决方案是 `systemV` 。这种解决方案使用传统的 `sysvinit` 程序，它被打包在 `Buildroot` 的 `package/sysvinit` 包中。这曾是大多数桌面 Linux 发行版使用的解决方案，直到它们转向更现代的替代方案如 `Upstart` 或 `Systemd` 。 `sysvinit` 也使用 `inittab` 文件(语法与 `BusyBox` 版本略有不同)。与此 `init` 解决方案一起安装的默认 `inittab` 位于 `package/sysvinit/inittab` 。
 
-- 第三种解决方案是 `systemd` 。 `systemd` 是 Linux 新的一代 `init` 系统。它比传统的 init 程序功能更强大:支持高度并行化、使用 `socket` 和 `D-Bus` 激活启动服务、支持按需启动守护进程、使用 Linux 控制组跟踪进程状态等。 `systemd` 对相对复杂的嵌入式系统很有用，例如需要 `D-Bus` 和服务间通信的系统。需要注意的是， `systemd` 带来了大量依赖，如 `dbus、udev` 等。有关 `systemd` 的更多详细信息，请参阅 `http://www.freedesktop.org/wiki/Software/systemd` 。
+- 第三种解决方案是 `systemd` 。 `systemd` 是 Linux 新的一代 `init` 系统。它比传统的 init 程序功能更强大:支持高度并行化、使用 `socket` 和 `D-Bus` 激活启动服务、支持按需启动守护进程、使用 Linux 控制组跟踪进程状态等。 `systemd` 对相对复杂的嵌入式系统很有用，例如需要 `D-Bus` 和服务间通信的系统。需要注意的是， `systemd` 带来了大量依赖，如 `dbus、udev` 等。有关 `systemd` 的更多详细信息，请参阅 http://www.freedesktop.org/wiki/Software/systemd 。
 
 Buildroot 开发人员建议使用 BusyBox init ，因为它对大多数嵌入式系统来说已经足够。对更复杂的情况下可以使用 systemd 。
 
@@ -344,7 +345,7 @@ Buildroot 开发人员建议使用 BusyBox init ，因为它对大多数嵌入�
 
 **显示 make 执行的所有命令:**
 
-    $ make V=1 <目标>
+    $ make V=1 <target>
 
 **显示带defconfig的板列表:**
 
@@ -361,7 +362,7 @@ Buildroot 开发人员建议使用 BusyBox init ，因为它对大多数嵌入�
 - barebox-menuconfig 和 barebox-savedefconfig 只在启用 barebox 引导程序时工作。
 - uboot-menuconfig 和 uboot-savedefconfig 只在启用 U-Boot 引导程序且设置 uboot 构建系统为 Kconfig 时工作。
 
-**Cleaning**: 当任何架构或工具链配置选项更改时，需要显式清理。
+**清除**: 当任何架构或工具链配置选项更改时，需要显式清理。
 删除所有构建产品(包括构建目录、主机、交叉编译和目标树、镜像以及工具链):
 
     $ make clean
@@ -370,7 +371,7 @@ Buildroot 开发人员建议使用 BusyBox init ，因为它对大多数嵌入�
 
     $ make manual-clean
     $ make manual 
-手册输出将生成在output/docs/manual。（注意：有部分工具需要编译手册 (see: Section 2.2).）
+手册输出将生成在output/docs/manual。（注意：构建手册需要一些工具 (see: Section 2.2).）
 
 **重置Buildroot用于新的目标**: 要删除所有构建产品以及配置:
 
@@ -452,11 +453,11 @@ Buildroot不支持在不从头开始全面重建的情况下删除包。这是�
 
 虽然 `<package>-rebuild` 意味着` <package>-reinstall` ， `<package>-reconfigure` 意味着 `<package>-rebuild` ，但是这些目标以及 `<package>` 本身只作用于指定的包，不会触发重新创建根文件系统镜像。如果需要重新创建根文件系统，应额外运行 make 或 make all 。
 
-内部， Buildroot 通过所谓的印记文件跟踪每个包各个构建步骤的完成情况。它们存储在包构建目录 `output/build/<package>-<version>/` 中，命名为 `.stamp_<step-name>` 。
+在内部， Buildroot 通过所谓的印记文件跟踪每个包各个构建步骤的完成情况。它们存储在包构建目录 `output/build/<package>-<version>/` 中，命名为 `.stamp_<step-name>` 。
 
 上述命令简单地操纵这些印记文件，强制Buildroot重新启动包构建过程的特定一组步骤。
 
-有关包特殊make目标的更多详细信息请参阅第8.13.5节。
+有关包特殊 make 目标的更多详细信息请参阅第8.13.5节。
 
 
 ### 8.4 离线构建 
@@ -544,12 +545,12 @@ Buildroot的职责之一是了解包之间的依赖关系，并确保它们按�
 要生成整个已编译系统的依赖关系图，简单运行:
 
     make graph-depends
-生成的图位于output/graphs/graph-depends.pdf。
+生成的图位于 output/graphs/graph-depends.pdf 。
 
 如果系统非常大，依赖关系图可能过于复杂难以阅读。所以可以生成给定包的依赖关系图:
 
     make <pkg>-graph-depends 
-生成的图位于output/graph/<pkg>-graph-depends.pdf。
+生成的图位于 output/graph/<pkg>-graph-depends.pdf 。
 
 注意依赖关系图使用Graphviz项目的dot工具生成，您必须在系统中安装此工具才能使用此功能。在大多数发行版中它作为graphviz软件包提供。
 
@@ -557,7 +558,7 @@ Buildroot的职责之一是了解包之间的依赖关系，并确保它们按�
 
     BR2_GRAPH_OUT=svg make graph-depends
 
-可以通过设置BR2_GRAPH_DEPS_OPTS环境变量控制graph-depends行为。
+可以通过设置 BR2_GRAPH_DEPS_OPTS 环境变量控制 graph-depends 行为。
 支持的选项有:
 - --depth N， -d N，限制依赖深度到N层。默认0表示无限制。
 - --stop-on PKG， -s PKG，在包PKG停止图。PKG可以是实际包名、通配符、关键字virtual(停止在虚拟包)或host(停止在主机包)。PKG仍在图上，但其依赖不绘制。
@@ -580,7 +581,7 @@ Buildroot的职责之一是了解包之间的依赖关系，并确保它们按�
 - build.pie-packages.pdf ，每个软件包的构建时间的饼图。
 - build.pie-steps.pdf ，软件包构建过程中每个步骤的总时间的饼图。
 
-这个graph-build目标需要安装Python的Matplotlib和Numpy库（大多数发行版上-matplotlib和python-numpy），如果使用的是Python版本低于2.7，则还需要安装argparse模块（大多数发行版上是python-argparse）。
+这个graph-build目标需要安装Python的Matplotlib和Numpy库（大多数发行版上 -matplotlib 和 python-numpy ），如果使用的是Python版本低于2.7，则还需要安装argparse模块（大多数发行版上是 python-argparse ）。
 
 默认情况下，图表的输出格式是PDF，但可以使用BR2_GRAPH_OUT环境变量选择不同的格式。唯一支持的其他格式是PNG：
 
@@ -632,16 +633,20 @@ Buildroot一直能够在软件包的基础上使用并行构建：Buildroot使�
 
 
 ### 8.13 高级用法
-#### 8.13.1 
-在Buildroot之外使用生成的工具链 您可能希望为目标平台编译自己的程序或其他未打包在Buildroot中的软件。为了做到这一点，您可以使用Buildroot生成的工具链。
+#### 8.13.1 在Buildroot之外使用生成的工具链
+您可能希望为目标平台编译自己的程序或其他未打包在Buildroot中的软件。为了做到这一点，您可以使用Buildroot生成的工具链。
 
 Buildroot生成的工具链默认位于 `output/host/` 。使用它的最简单方法是将 `output/host/bin/` 添加到您的PATH环境变量中，然后使用 ARCH-linux-gcc、ARCH-linux-objdump、ARCH-linux-ld等命令。
 
-另外，Buildroot还可以通过运行make sdk命令将所有选定软件包的工具链和开发文件作为SDK导出。这将生成一个tarball，其中包含主机目录output/host/的内容，命名为_sdk-buildroot.tar.gz（可以通过设置环境变量BR2_SDK_PREFIX进行覆盖），位于output/images/目录中。然后，可以将此tarball分发给应用程序开发人员，当他们想要开发尚未打包为Buildroot软件包的应用程序时使用。
+另外，Buildroot 还可以通过运行 make sdk 命令将所有选定软件包的工具链和开发文件作为SDK导出。这将生成一个 tarball ，其中包含主机目录 output/host/ 的内容，命名为 <TARGET-TUPLE>_sdk-buildroot.tar.gz（可以通过设置环境变量 BR2_SDK_PREFIX 进行覆盖），位于 output/images/ 目录中。
 
-在提取SDK tarball后，用户必须运行relocate-sdk.sh脚本（位于SDK的顶级目录），以确保所有路径都更新为新位置。 另外，如果您只想准备SDK而不生成tarball（例如，因为您将只移动主机目录，或者将自己生成tarball），Buildroot还允许您只使用make prepare-sdk来准备SDK，而不实际生成tarball。
+然后，可以将此tarball分发给应用程序开发人员，当他们想要开发尚未打包为 Buildroot 软件包的应用程序时使用。
 
-为了方便起见，通过选择选项BR2_PACKAGE_HOST_ENVIRONMENT_SETUP，您可以在output/host/中（因此也在您的SDK中）安装一个environment-setup脚本。可以使用. your/sdk/path/environment-setup命令来源化此脚本，以导出一些环境变量，以帮助使用Buildroot SDK交叉编译项目：PATH将包含SDK二进制文件，标准autotools变量将定义为适当的值，CONFIGURE_FLAGS将包含基本的，用于交叉编译autotools项目。它还提供一些有用的命。但请注意，一旦源化此脚本，境仅为交叉编译设置，不再适用于本机编译。
+在提取SDK tarball后，用户必须运行relocate-sdk.sh脚本（位于SDK的顶级目录），以确保所有路径都更新为新位置。
+
+另外，如果您只想准备SDK而不生成tarball（例如，因为您将只移动主机目录，或者将自己生成tarball），Buildroot 还允许您只使用 `make prepare-sdk` 来准备SDK，而不实际生成tarball。
+
+为了方便起见，通过选择选项 BR2_PACKAGE_HOST_ENVIRONMENT_SETUP ，您可以在 output/host/ 中安装一个 environment-setup 脚本，因此在您的SDK中也会有这个脚本。您可以使用.  your/sdk/path/environment-setup 来源化此脚本，以导出一些环境变量，帮助使用Buildroot SDK进行交叉编译项目：PATH将包含SDK二进制文件，标准的 autotools 变量将被定义为适当的值，并且 CONFIGURE_FLAGS 将包含基本的 ./configure 选项，用于交叉编译 autotools 项目。它还提供了一些有用的命令。但请注意，一旦此脚本被源化，环境只会为交叉编译设置，不再适用于本地编译。
 
 #### 8.13.2 在Buildroot中使用gdb
 Buildroot允许进行交叉调试，其中调试器在构建机上运行，并与目标上的gdbserver通信以控制程序的执行。 要实现这一点：
