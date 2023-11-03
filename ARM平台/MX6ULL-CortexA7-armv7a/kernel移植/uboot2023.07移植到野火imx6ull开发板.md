@@ -310,3 +310,11 @@ uboot 无法启动内核时，可能是内核启动选项设置错误，可以�
 =>  setenv bootcmd 'fatload mmc 1:1 80800000 zImage;fatload mmc 1:1 83000000 imx6ull-14x14-evk.dtb;bootz 80800000 - 83000000'
 =>  saveenv
 ```
+
+### 5.2 修改官方镜像的环境变量
+根据自己烧写的内核镜像名称以及设备树名称，修改 UBOOT 启动的环境变量的内核文件名和设备树文件名。
+```bash
+# 修改前
+findfdt=if test $fdt_file = undefined; then if test $board_name = ULZ-EVK && test $board_rev = 14X14; then setenv fdt_file imx6ulz-14x14-evk.dtb; fi; if test $board_name = EVK && test $board_rev = 14X14; then setenv fdt_file imx6ull-14x14-evk.dtb; fi; if test $fdt_file = undefined; then echo WARNING: Could not determine dtb to use; fi; fi;
+image=zImage
+```
