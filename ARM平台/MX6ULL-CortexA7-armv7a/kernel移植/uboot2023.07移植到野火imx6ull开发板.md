@@ -320,7 +320,8 @@ board_rev=14X14
 ...
 findfdt=if test $fdt_file = undefined; then if test $board_name = ULZ-EVK && test $board_rev = 14X14; then setenv fdt_file imx6ulz-14x14-evk.dtb; fi; if test $board_name = EVK && test $board_rev = 14X14; then setenv fdt_file imx6ull-14x14-evk.dtb; fi; if test $fdt_file = undefined; then echo WARNING: Could not determine dtb to use; fi; fi;
 image=zImage
-...
+```
+```bash
 # 修改，
 => setenv findfdt "if test $board_name = EVK && test $board_rev = 14X14; then setenv fdt_file imx6ull-boe.dtb; fi;"
 => setenv image zImage-6.5.9
