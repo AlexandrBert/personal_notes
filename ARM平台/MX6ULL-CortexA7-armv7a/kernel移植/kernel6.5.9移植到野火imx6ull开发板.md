@@ -1,21 +1,77 @@
 # imx6ull 移植 uboot2023.07
 
-## 1. uboot 源码下载
-### 1.1 源码压缩包下载
+## 1. kernel 源码下载
 进入 uboot 源码下载网站下载对应的版本：
-    [uboot源码下载地址](https://ftp.denx.de/pub/u-boot/)
-    ![uboot源码下载地址](png/uboot下载.png)
+    [uboot源码下载地址](https://www.kernel.org/)
 
-### 1.2 源码解压和目录
-将源码包使用传输工具传输到 Linux 系统下，使用 tar 命令解压：
-> tar -jxvf u-boot-2023.07.tar.bz2
+### 1.1 git 下载 kernel 源码
+1. 选择 “ [browse] ” ，进入版本浏览器：
+    ![kernel源码下载1](png/kernel源码下载1.png)
+2. 选择 `"summary"` 页面，拉到网页最下面，查看 git 仓库地址的 ftp 地址：[kernel源码git下载地址](git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git)
+    ![kernel源码git下载1](png/kernel源码git下载1.png)
+    ![kernel源码git下载2](png/kernel源码git下载2.png)
+3. 选择 `"refs"` 页面，查看需要下载的版本分支 "Branch" 的名称，以及发布的标签 "Tag" 的名称，这里我们选择分支 "linux-6.5.y" 以及标签"v6.5.9"。
+    ![kernel源码git下载3](png/kernel源码git下载3.png)
+    ![kernel源码git下载4](png/kernel源码git下载4.png)
+4. 在交叉编译环境主机中，使用 git 命令获取需要的分支版本。
+- 可以先直接克隆整个 Linux 源码项目，然后切换到标签名指向的特定标签版本，但是获取的文件数量较多，需要耗费较长的下载时间和硬盘空间（2.6G）。
+    ```bash
+    root@light:/opt# git clone git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git
+    Cloning into 'linux'...
+    remote: Enumerating objects: 9618989, done.
+    remote: Counting objects: 100% (5259/5259), done.
+    remote: Compressing objects: 100% (1369/1369), done.
+    remote: Total 9618989 (delta 3983), reused 4701 (delta 3890), pack-reused 9613730
+    Receiving objects: 100% (9618989/9618989), 2.60 GiB | 1.57 MiB/s, done.
+    Resolving deltas: 100% (7892595/7892595), done.
+    Checking out files: 100% (81111/81111), done.
+    root@light-14-prd1:/opt/linux# git tag
+    v2.6.12
+    v2.6.12
+    ...
+    v3.10-rc1
+    ：
+    root@light-14-prd1:/opt/linux# git checkout -b v6.5.9
+    Switched to a new branch 'v6.5.9'
+    ```
 
-![uboot目录](png/uboot目录.png)
+- 如果知道需要拉取特定版本的标签，也可以直接指定克隆标签的特定版本，使用 `"--depth=1"` 表示只拉取当前分支的最近一次提交，可以减少克隆的文件数量和硬盘空间（239.01M），提高克隆时间。
+    ```bash
+    root@light:/opt# git clone -b v6.5.9 --depth=1 git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git
+    Cloning into 'linux'...
+    remote: Enumerating objects: 85927, done.
+    remote: Counting objects: 100% (85927/85927), done.
+    remote: Compressing objects: 100% (83604/83604), done.
+    remote: Total 85927 (delta 6509), reused 17736 (delta 1421), pack-reused 0
+    Receiving objects: 100% (85927/85927), 239.01 MiB | 1.47 MiB/s, done.
+    Resolving deltas: 100% (6509/6509), done.
+    Note: checking out 'd0e42510ae8347e27d416356291b7546fb7681f5'.
 
+    You are in 'detached HEAD' state. You can look around, make experimental
+    changes and commit them, and you can discard any commits you make in this
+    state without impacting any branches by performing another checkout.
+
+    If you want to create a new branch to retain commits you create, you may
+    do so (now or later) by using -b with the checkout command again. Example:
+
+      git checkout -b <new-branch-name>
+
+    Checking out files: 100% (81110/81110), done.
+    root@light:/opt# git checkout -b v6.5.9
+    Switched to a new branch 'v6.5.9'
+    ```
+
+
+### 1.2 http 直接下载 kernel 源码
+1. 选择 HTTP 下载网址：
+    ![kernel源码http下载1](png/kernel源码http下载1.png)
+2. 一次进入目录点击 `"linux" -> "kernel" -> "v6.x/" -> "linux-6.5.9.tar.gz"` ：
+    ![kernel源码http下载2](png/kernel源码http下载2.png)
+3. 等待源码下载完成。
 
 ------------------------
 
-## 2. uboot 源码修改
+## 2. kernel 源码修改
 
 ### 2.1 新增 `configs/mx6ull_boe_defconfig` 文件
 1. 进入源码的 `configs` 文件夹，把官方 `mx6ull_14x14_evk_defconfig` 文件复制出一个用于修改的 `mx6ull_boe_defconfig` 文件。
