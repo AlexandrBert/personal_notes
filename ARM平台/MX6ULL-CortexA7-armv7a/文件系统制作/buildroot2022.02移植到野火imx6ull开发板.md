@@ -75,6 +75,7 @@ do so (now or later) by using -b with the checkout command again. Example:
         ![Kernel](png/Kernel.png)
     
     - `Target packages  --->` ：  
+    红框部分表示使用自定义的 `busybox.config` 配置，不使用默认的配置，可以将修改后的 `output/build/busybox-1.35.0/.config` 配置文件备份到该文件，避免频繁修改。  
     注意：这里的 `BusyBox` 选项不过不采用自己定义命令行工具的方式，建议开启，否则可能导致进入不到命令行界面。
         ![Target_packages](png/Target_packages.png)
 
@@ -93,6 +94,8 @@ do so (now or later) by using -b with the checkout command again. Example:
     保持默认，根据需求删改。
 
 3. 在 buildroot 主目录下，使用 `make savedefconfig` 命令将 `.config` 配置保存到 `imx6ullboe_defconfig` 文件，可以备份到其他文件中。
+
+
 
 ### 3.3 编译 buildroot 镜像文件
 1. 在 buildroot 主目录下，使用 `make` 命令编译 buildroot 镜像文件。
