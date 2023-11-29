@@ -172,10 +172,104 @@ pinctrl_led: ledgrp {
 	>;
 };
 ```
-这里的 `0x1b0b0` ，将 `MX6ULL_PAD_SNVS_TAMPER3__GPIO5_IO03` 宏定义展开后就是引脚的六个参数，即引脚（PAD）属性值 `IOMUXC_SNVS_SW_PAD_CTL_PAD_SNVS_TAMPER5` ，该寄存器改动范围较大，需要根据实际的硬件设计进行设置，可以根据芯片用户手册设置，节选的设置贴在 [附录](#附录) 中。
+- 在源码中搜索 `fsl,pins` 属性名，发现属性定义在 `/drivers/pinctrl/freescale/pinctrl-imx.c` 文件中，该文件对应的头文件由 `drivers/pinctrl/freescale/pinctrl-imx6ul.c` 引用，即该属性指定了节点用到了 imx6ul 系列芯片的 pinctrl 功能。
+- 将 `MX6ULL_PAD_SNVS_TAMPER3__GPIO5_IO03` 宏定义展开后，这里的 `0x1b0b0` ，就是引脚的六个参数，即引脚（PAD）属性值 `IOMUXC_SNVS_SW_PAD_CTL_PAD_SNVS_TAMPER5` ，该寄存器改动范围较大，需要根据实际的硬件设计进行设置，可以根据芯片用户手册设置，节选的设置贴在 [附录](#附录) 中。
+![图2-2](png/leds设备树代码分析图2-2.png)
 
-# 附录 
-## 附录1 `IOMUXC_SNVS_SW_PAD_CTL_PAD_SNVS_TAMPER5` 寄存器设置
-![图2-3](png/leds设备树代码分析图2-3.png)
-![图2-4](png/leds设备树代码分析图2-4.png)
+
+### 2.3 leds 挂载的分节点书写
+#### 2.3.1 leds 相关结构体
+在了解分节点书写的步骤前需要了解设备树与内核驱动源码对应的关系，打开 `drivers/leds/leds-gpio.c` 驱动文件，与引用的 led 相关结构体定义的头文件 `include/linux/leds.h` 对比：
+
 ![图2-5](png/leds设备树代码分析图2-5.png)
+
+可以发现：
+- `label` 对应结构体中的 `name` 成员，用于标识该 led 节点，即节点名称；
+	![图2-3](png/leds设备树代码分析图2-3.png)
+	- 修改设备树内容为 `label = "cpu-test";` 可以发现系统内节点名称变化：
+		![图2-4](png/leds设备树代码分析图2-4.png)
+
+- `linux,default-trigger` 对应结构体中的 `default_trigger` 成员，用于标识该 led 节点的触发方式，这里直接采用的是直接赋值的方式，所以采用结构体成员 `default_trigger` 的有效值，这里的有效值可以查看文件夹 `drivers/leds/trigger/` 目录下的文件，其有效值即为 trigger 驱动的文件名后缀，每种触发器的闪烁频率都不相同；
+![图2-6](png/leds设备树代码分析图2-6.png)
+
+- `default-state` 对应结构体中的 `default_state` 成员，指示节点的默认状态，设备树有效词条为 `“keep”` 、 `“on”` 和其他任意字符；
+
+- `retain-state-suspended` 对应结构体中的 `retain_state_suspended` 成员，为保留为，代码解析中设置任意值都是 1；
+
+
+#### 2.3.2 leds trigger 功能
+1. 上述的结构体 `struct gpio_led{}` 中的成员 `default_trigger` ，在 `leds-gpio.c` 中并没有直接定义设备树中 `linux,default-trigger` 的有效选项，而是直接引用默认配置赋值给该成员，通过查找发现该成员的主要作用是调用 linux 自带的系统驱动 `leds trigger` 功能，主要功能代码存放在 `drivers/leds/trigger/` 文件夹。
+
+2. 通过查找发现 `default_trigger` 的有效选项都是定义在结构体 `struct led_trigger` 的 `name` 成员，主要有 `"backlight"` 、 `"default-on"` 、 `"gpio"` 、 `"heartbeat"` 、 `"oneshot"` 、 `"timer"` 、 `"transient"` 其中：
+
+	![图2-7](png/leds设备树代码分析图2-7.png)
+
+3. `default_trigger` 成员对应文件系统 `/sys/class/leds/cpu` 下的 `trigger` 文件，通过 echo 对设备 `trigger` 属性进行修改时，会发现当前目录下会出现不相同的设备属性，用于修改不同的 trigger 功能下的设置参数：
+
+	![图2-8](png/leds设备树代码分析图2-8.png)
+	
+	下面为 trigger 系列文件中的不同新增属性，具体的节点使用方式，可以参照内核 `Documentation/leds/ledtrig-xxx.txt` 类型文档。
+
+	![图2-9](png/leds设备树代码分析图2-9.png)
+
+4. 结构体展示
+	```c
+	/* include/linux/leds.h 中的结构体定义 */
+	#ifdef CONFIG_LEDS_TRIGGERS
+
+	#define TRIG_NAME_MAX 50
+
+	struct led_trigger {
+		/* Trigger Properties */
+		const char	 *name;
+		void		(*activate)(struct led_classdev *led_cdev);
+		void		(*deactivate)(struct led_classdev *led_cdev);
+
+		/* LEDs under control by this trigger (for simple triggers) */
+		rwlock_t	  leddev_list_lock;
+		struct list_head  led_cdevs;
+
+		/* Link to next registered trigger */
+		struct list_head  next_trig;
+	};
+
+	#else
+
+	/* Trigger has no members */
+	struct led_trigger {};
+
+	#endif /* CONFIG_LEDS_TRIGGERS */
+	```
+
+### 2.4 `gpios = <&gpio5 3 GPIO_ACTIVE_LOW>;`
+用于绑定 gpios 属性，每个子节点必须要设置gpios属性值，表示此LED所使用的GPIO引脚，具体的使用可以参照 `Documentation/devicetree/bindings/gpio/gpio.txt` 文档。
+
+其中
+- `&gpio5` ： 为 gpio5 设备节点的引用：
+	```dts
+	gpio5: gpio@020ac000 {
+		compatible = "fsl,imx6ul-gpio", "fsl,imx35-gpio";
+		reg = <0x020ac000 0x4000>;
+		interrupts = <GIC_SPI 74 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 75 IRQ_TYPE_LEVEL_HIGH>;
+		gpio-controller;
+		#gpio-cells = <2>;
+		interrupt-controller;
+		#interrupt-cells = <2>;
+	};
+	```
+	- 这里最重要的参数是 `#gpio-cells = <2>;` ，这表示使用 2 个单元格来指定一个 gpio ，即引用节点时，后面需要两个参数，如：`gpios = <&gpio5 3 GPIO_ACTIVE_LOW>;`。如果该参数为 `#gpio-cells = <1>;` 则使用一个单元格来指定 gpio ，如 `enable-gpios = <&gpio2 2>;` 。
+	- 每个 GPIO 控制器节点都必须包含一个空的 `“gpio-controller”` 属性和一个 `#gpio-cells` 整数属性，该属性指示 `gpio-specifier` 中的单元数。
+
+- `3` ：指示该引脚为 gpio5_3 引脚。
+
+- `GPIO_ACTIVE_LOW` ： 默认低电平，该宏定义定义在 `include/dt-bindings/gpio/gpio.h` 中，官方推荐使用该头文件进行书写定义。
+
+#### 2.4.1 GPIO 控制节点
+
+
+# 附录
+## 附录1 `IOMUXC_SNVS_SW_PAD_CTL_PAD_SNVS_TAMPER5` 寄存器设置
+![附录图1](png/leds设备树代码分析附录图1.png)
+![附录图2](png/leds设备树代码分析附录图2.png)
+![附录图3](png/leds设备树代码分析附录图3.png)
