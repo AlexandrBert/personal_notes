@@ -159,4 +159,3 @@ wpa_supplicant 是在客户端使用的 IEEE 802.1X/WPA 组件，支持与 WPA A
 
         ![WIFI_figure12](png/WIFI_figure12.png)
 
-3. 使用 `wpa_supplicant` 连接
