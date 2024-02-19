@@ -1,0 +1,7 @@
+==== BT USB CHIPS ====
+rtl8723du_fw		 BTCOEX_20210106-3b3b	FW_VER= 0x82a82df4
+ 
+==== BT UART CHIPS ====
+rtl8723d_fw		 BTCOEX_20210106-3b3b	FW_VER= 0xaaa82df5
+ 
+==== BT SDIO CHIPS ====
